@@ -115,8 +115,9 @@ Day-to-day commands:
 
 `composer audit` reports 3 pre-existing `laravel/framework` advisories at the
 currently pinned version (signed-URL path confusion, CRLF injection in email
-validation). These are known and accepted for now — they're most relevant when
-`APP_DEBUG=true`, so make sure `APP_DEBUG=false` in any real deployment.
+validation, and reflected XSS in the debug-mode error page). These are known
+and accepted for now — they're most relevant when `APP_DEBUG=true`, so make
+sure `APP_DEBUG=false` in any real deployment.
 
 ## Conventions and best practices for working in this codebase
 
