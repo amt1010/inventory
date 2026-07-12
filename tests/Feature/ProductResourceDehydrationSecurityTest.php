@@ -12,7 +12,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
 
-class ProductResourceManualVerificationTest extends TestCase
+class ProductResourceDehydrationSecurityTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -86,5 +86,37 @@ class ProductResourceManualVerificationTest extends TestCase
         $this->assertNotNull($product, 'Product should still be created (editor can create content).');
         $this->assertNull($product->price_display, 'price_display must NOT be persisted for a non-admin, even if submitted.');
         $this->assertNotSame('published', $product->status, 'status must NOT be settable by a non-admin.');
+    }
+
+    public function test_content_editor_can_create_a_product(): void
+    {
+        $editor = Staff::factory()->create();
+        $editor->assignRole('content_editor');
+
+        $seller = Seller::factory()->create();
+        $category = Category::factory()->create();
+
+        $this->actingAs($editor, 'staff');
+
+        // The status field is disabled/non-dehydrated for a content_editor,
+        // so it is never submitted by this role -- the field must still
+        // have a valid default value or the create request fails validation
+        // even though ProductPolicy::create() explicitly authorizes this role.
+        Livewire::test(CreateProduct::class)
+            ->fillForm([
+                'seller_id' => $seller->id,
+                'category_id' => $category->id,
+                'name' => 'Editor Created Product',
+                'slug' => 'editor-created-product',
+                'features' => [],
+                'applications' => [],
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $product = Product::where('slug', 'editor-created-product')->firstOrFail();
+
+        $this->assertSame('pending_review', $product->status);
+        $this->assertNull($product->price_display);
     }
 }

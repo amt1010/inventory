@@ -65,6 +65,7 @@ class ProductResource extends Resource
                     'rejected' => 'Rejected',
                     'archived' => 'Archived',
                 ])
+                ->default('pending_review')
                 ->disabled(! $canSetPrice)
                 ->dehydrated($canSetPrice)
                 ->required(),
