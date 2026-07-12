@@ -59,12 +59,36 @@ class ProductResource extends Resource
                 ->disabled(! $canSetPrice)
                 ->dehydrated($canSetPrice),
             Select::make('status')
-                ->options([
-                    'pending_review' => 'Pending Review',
-                    'published' => 'Published',
-                    'rejected' => 'Rejected',
-                    'archived' => 'Archived',
-                ])
+                ->options(function (?Product $record) {
+                    $options = [
+                        'pending_review' => 'Pending Review',
+                        'rejected' => 'Rejected',
+                        'archived' => 'Archived',
+                    ];
+
+                    // A product that is already published keeps showing
+                    // "Published" as its current value when edited, but the
+                    // option is disabled below -- it can never be *chosen*
+                    // from this select. Publishing only ever happens through
+                    // the table's `publish` action, which calls
+                    // Product::publish() and enforces the price_display
+                    // invariant.
+                    if ($record?->status === 'published') {
+                        $options['published'] = 'Published';
+                    }
+
+                    return $options;
+                })
+                ->disableOptionWhen(fn (string $value) => $value === 'published')
+                ->in(function (?Product $record) {
+                    $values = ['pending_review', 'rejected', 'archived'];
+
+                    if ($record?->status === 'published') {
+                        $values[] = 'published';
+                    }
+
+                    return $values;
+                })
                 ->default('pending_review')
                 ->disabled(! $canSetPrice)
                 ->dehydrated($canSetPrice)
