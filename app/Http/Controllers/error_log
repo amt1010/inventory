@@ -1,0 +1,120 @@
+[17-Oct-2022 16:55:56 UTC] PHP Warning:  PHP Startup: Unable to load dynamic library 'clos_ssa.so' (tried: /opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so (/opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so: cannot open shared object file: No such file or directory), /opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so.so (/opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so.so: cannot open shared object file: No such file or directory)) in Unknown on line 0
+[17-Oct-2022 16:55:56 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/SubmenuController.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/SubmenuController.php on line 7
+[17-Oct-2022 19:09:49 UTC] PHP Warning:  PHP Startup: Unable to load dynamic library 'clos_ssa.so' (tried: /opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so (/opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so: cannot open shared object file: No such file or directory), /opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so.so (/opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so.so: cannot open shared object file: No such file or directory)) in Unknown on line 0
+[17-Oct-2022 19:09:49 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/DropdownController.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/DropdownController.php on line 11
+[18-Oct-2022 17:50:18 UTC] PHP Warning:  PHP Startup: Unable to load dynamic library 'clos_ssa.so' (tried: /opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so (/opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so: cannot open shared object file: No such file or directory), /opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so.so (/opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so.so: cannot open shared object file: No such file or directory)) in Unknown on line 0
+[18-Oct-2022 17:50:18 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/AddemployeeController.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/AddemployeeController.php on line 9
+[18-Oct-2022 17:50:20 UTC] PHP Warning:  PHP Startup: Unable to load dynamic library 'clos_ssa.so' (tried: /opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so (/opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so: cannot open shared object file: No such file or directory), /opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so.so (/opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so.so: cannot open shared object file: No such file or directory)) in Unknown on line 0
+[18-Oct-2022 17:50:20 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/AddnewsController.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/AddnewsController.php on line 8
+[18-Oct-2022 17:50:36 UTC] PHP Warning:  PHP Startup: Unable to load dynamic library 'clos_ssa.so' (tried: /opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so (/opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so: cannot open shared object file: No such file or directory), /opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so.so (/opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so.so: cannot open shared object file: No such file or directory)) in Unknown on line 0
+[18-Oct-2022 17:50:36 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/EmploginController.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/EmploginController.php on line 7
+[18-Oct-2022 21:55:52 UTC] PHP Warning:  PHP Startup: Unable to load dynamic library 'clos_ssa.so' (tried: /opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so (/opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so: cannot open shared object file: No such file or directory), /opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so.so (/opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so.so: cannot open shared object file: No such file or directory)) in Unknown on line 0
+[18-Oct-2022 21:55:52 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/AddnewsController.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/AddnewsController.php on line 8
+[18-Oct-2022 22:41:00 UTC] PHP Warning:  PHP Startup: Unable to load dynamic library 'clos_ssa.so' (tried: /opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so (/opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so: cannot open shared object file: No such file or directory), /opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so.so (/opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so.so: cannot open shared object file: No such file or directory)) in Unknown on line 0
+[18-Oct-2022 22:41:00 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/AuthController.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/AuthController.php on line 8
+[19-Oct-2022 13:31:22 UTC] PHP Warning:  PHP Startup: Unable to load dynamic library 'clos_ssa.so' (tried: /opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so (/opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so: cannot open shared object file: No such file or directory), /opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so.so (/opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so.so: cannot open shared object file: No such file or directory)) in Unknown on line 0
+[19-Oct-2022 13:31:22 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/AddemployeeController.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/AddemployeeController.php on line 9
+[19-Oct-2022 20:36:02 UTC] PHP Warning:  PHP Startup: Unable to load dynamic library 'clos_ssa.so' (tried: /opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so (/opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so: cannot open shared object file: No such file or directory), /opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so.so (/opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so.so: cannot open shared object file: No such file or directory)) in Unknown on line 0
+[19-Oct-2022 20:36:02 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/DropdownController.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/DropdownController.php on line 11
+[21-Oct-2022 02:00:56 UTC] PHP Warning:  PHP Startup: Unable to load dynamic library 'clos_ssa.so' (tried: /opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so (/opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so: cannot open shared object file: No such file or directory), /opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so.so (/opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so.so: cannot open shared object file: No such file or directory)) in Unknown on line 0
+[21-Oct-2022 02:00:56 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/AddnewsController.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/AddnewsController.php on line 8
+[31-Oct-2022 18:33:54 UTC] PHP Warning:  PHP Startup: Unable to load dynamic library 'clos_ssa.so' (tried: /opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so (/opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so: cannot open shared object file: No such file or directory), /opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so.so (/opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so.so: cannot open shared object file: No such file or directory)) in Unknown on line 0
+[31-Oct-2022 18:33:54 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/EmploginController.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/EmploginController.php on line 7
+[13-Nov-2022 05:57:27 UTC] PHP Warning:  PHP Startup: Unable to load dynamic library 'clos_ssa.so' (tried: /opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so (/opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so: cannot open shared object file: No such file or directory), /opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so.so (/opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so.so: cannot open shared object file: No such file or directory)) in Unknown on line 0
+[13-Nov-2022 05:57:27 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/EmploginController.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/EmploginController.php on line 7
+[09-Dec-2022 22:38:07 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/TopmenuController.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/TopmenuController.php on line 8
+[12-Dec-2022 12:45:12 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Routing\Controller" not found in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/Controller.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/Controller.php on line 10
+[13-Dec-2022 14:12:38 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Routing\Controller" not found in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/Controller.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/Controller.php on line 10
+[29-Dec-2022 23:17:56 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/DropdownController.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/DropdownController.php on line 11
+[30-Dec-2022 00:03:04 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/EditnewsController.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/EditnewsController.php on line 8
+[30-Dec-2022 00:50:58 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/LastmenuController.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/LastmenuController.php on line 8
+[30-Dec-2022 05:26:23 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/ProductController.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/ProductController.php on line 8
+[30-Dec-2022 09:35:13 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/AuthController.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/AuthController.php on line 8
+[30-Dec-2022 13:39:52 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/EmploginController.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/EmploginController.php on line 7
+[30-Dec-2022 21:36:28 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/ViewempController.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/ViewempController.php on line 7
+[31-Dec-2022 00:17:07 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/AddnewsController.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/AddnewsController.php on line 8
+[31-Dec-2022 00:58:19 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/TopmenuController.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/TopmenuController.php on line 8
+[31-Dec-2022 01:03:54 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/AddemployeeController.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/AddemployeeController.php on line 9
+[31-Dec-2022 06:18:00 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Routing\Controller" not found in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/Controller.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/Controller.php on line 10
+[31-Dec-2022 14:42:39 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/SubmenuController.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/webhutor/dainikbejodratna.com/Admin_panel/app/Http/Controllers/SubmenuController.php on line 7

@@ -1,0 +1,24 @@
+[09-Oct-2022 02:52:28 UTC] PHP Warning:  PHP Startup: Unable to load dynamic library 'clos_ssa.so' (tried: /opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so (/opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so: cannot open shared object file: No such file or directory), /opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so.so (/opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so.so: cannot open shared object file: No such file or directory)) in Unknown on line 0
+[09-Oct-2022 02:52:28 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/webhutor/dainikbejodratna.com/Admin_panel/bootstrap/app.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/webhutor/dainikbejodratna.com/Admin_panel/bootstrap/app.php on line 14
+[19-Oct-2022 06:25:25 UTC] PHP Warning:  PHP Startup: Unable to load dynamic library 'clos_ssa.so' (tried: /opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so (/opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so: cannot open shared object file: No such file or directory), /opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so.so (/opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so.so: cannot open shared object file: No such file or directory)) in Unknown on line 0
+[19-Oct-2022 06:25:25 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/webhutor/dainikbejodratna.com/Admin_panel/bootstrap/app.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/webhutor/dainikbejodratna.com/Admin_panel/bootstrap/app.php on line 14
+[20-Oct-2022 13:54:02 UTC] PHP Warning:  PHP Startup: Unable to load dynamic library 'clos_ssa.so' (tried: /opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so (/opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so: cannot open shared object file: No such file or directory), /opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so.so (/opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so.so: cannot open shared object file: No such file or directory)) in Unknown on line 0
+[20-Oct-2022 13:54:02 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/webhutor/dainikbejodratna.com/Admin_panel/bootstrap/app.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/webhutor/dainikbejodratna.com/Admin_panel/bootstrap/app.php on line 14
+[15-Nov-2022 22:45:32 UTC] PHP Warning:  PHP Startup: Unable to load dynamic library 'clos_ssa.so' (tried: /opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so (/opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so: cannot open shared object file: No such file or directory), /opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so.so (/opt/cpanel/ea-php81/root/usr/lib64/php/modules/clos_ssa.so.so: cannot open shared object file: No such file or directory)) in Unknown on line 0
+[15-Nov-2022 22:45:32 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/webhutor/dainikbejodratna.com/Admin_panel/bootstrap/app.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/webhutor/dainikbejodratna.com/Admin_panel/bootstrap/app.php on line 14
+[21-Jan-2023 06:12:24 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/webhutor/dainikbejodratna.com/Admin_panel/bootstrap/app.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/webhutor/dainikbejodratna.com/Admin_panel/bootstrap/app.php on line 14
