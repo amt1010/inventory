@@ -10,14 +10,10 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
         <div class="container">
             <a class="navbar-brand" href="{{ url('/') }}">{{ config('app.name') }}</a>
-            @if (\Illuminate\Support\Facades\Route::has('catalog.search'))
-                {{-- catalog.search is registered in Task 13; guarded here so the layout (shared by every
-                     catalog page) doesn't 500 in the interim window before that route exists. --}}
-                <form class="d-flex ms-auto" action="{{ route('catalog.search') }}" method="GET">
-                    <input class="form-control me-2" type="search" name="q" placeholder="Search for item by keyword or product number" value="{{ request('q') }}">
-                    <button class="btn btn-outline-primary" type="submit">Search</button>
-                </form>
-            @endif
+            <form class="d-flex ms-auto" action="{{ route('catalog.search') }}" method="GET">
+                <input class="form-control me-2" type="search" name="q" placeholder="Search for item by keyword or product number" value="{{ request('q') }}">
+                <button class="btn btn-outline-primary" type="submit">Search</button>
+            </form>
         </div>
     </nav>
 
