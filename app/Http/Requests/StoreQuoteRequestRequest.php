@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Rules\Recaptcha;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreQuoteRequestRequest extends FormRequest
 {
@@ -16,7 +17,7 @@ class StoreQuoteRequestRequest extends FormRequest
     {
         return [
             'product_id' => ['nullable', 'exists:products,id'],
-            'reason' => ['required', 'in:Request a Quote,General Inquiry'],
+            'reason' => ['required', Rule::in(array_keys(config('rfq.reasons')))],
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255'],
@@ -27,7 +28,7 @@ class StoreQuoteRequestRequest extends FormRequest
             'city' => ['nullable', 'string', 'max:255'],
             'state' => ['nullable', 'string', 'max:255'],
             'message' => ['nullable', 'string', 'max:5000'],
-            'contact_preference' => ['required', 'in:email,phone'],
+            'contact_preference' => ['required', Rule::in(array_keys(config('rfq.contact_preferences')))],
             'privacy_policy' => ['accepted'],
             'g-recaptcha-response' => [new Recaptcha()],
         ];

@@ -85,6 +85,21 @@ class QuoteRequestSubmissionTest extends TestCase
         Mail::assertNothingSent();
     }
 
+    public function test_a_reason_not_in_the_configured_list_is_rejected(): void
+    {
+        $response = $this->post(route('quote-requests.store'), [
+            'reason' => 'Not A Real Reason',
+            'first_name' => 'Test',
+            'last_name' => 'User',
+            'email' => 'test@example.com',
+            'phone' => '1234567890',
+            'contact_preference' => 'email',
+            'privacy_policy' => '1',
+        ]);
+
+        $response->assertSessionHasErrors(['reason']);
+    }
+
     public function test_the_notification_is_sent_to_the_configured_recipient_address(): void
     {
         config(['rfq.notification_email' => 'custom-sales@example.com']);
