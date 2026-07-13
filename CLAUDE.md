@@ -59,10 +59,12 @@ is being built phase by phase) live in `docs/superpowers/plans/`.
 
 Prerequisites:
 
-- PHP 8.2 with the `intl` and `zip` extensions enabled (required by
-  `filament/support` and a Filament transitive dependency respectively). On XAMPP/
-  Windows these ship as DLLs but are commented out by default — uncomment
-  `extension=intl` and `extension=zip` in `php.ini` and confirm with `php -m`.
+- PHP 8.2 with the `intl`, `zip`, and `gd` extensions enabled (required by
+  `filament/support`, a Filament transitive dependency, and image-upload
+  handling — product/document `FileUpload` fields and any test using
+  `UploadedFile::fake()->image()` — respectively). On XAMPP/Windows these ship
+  as DLLs but are commented out by default — uncomment `extension=intl`,
+  `extension=zip`, and `extension=gd` in `php.ini` and confirm with `php -m`.
 - MySQL, for the dev database.
 
 First-time setup:
