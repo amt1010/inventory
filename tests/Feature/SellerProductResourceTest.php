@@ -112,4 +112,48 @@ class SellerProductResourceTest extends TestCase
                 return array_key_exists($leaf->id, $options) && ! array_key_exists($parent->id, $options);
             });
     }
+
+    public function test_editing_a_published_product_as_the_owning_seller_reverts_it_to_pending_review(): void
+    {
+        $seller = Seller::factory()->create(['status' => 'approved']);
+        $product = Product::factory()->create([
+            'seller_id' => $seller->id,
+            'status' => 'published',
+            'price_display' => '₹1,200 – ₹1,800 per reel',
+        ]);
+        $this->actingAs($seller, 'seller');
+
+        \Livewire\Livewire::test(\App\Filament\Seller\Resources\ProductResource\Pages\EditProduct::class, [
+            'record' => $product->getRouteKey(),
+        ])
+            ->fillForm(['short_description' => 'Updated by seller'])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $product->refresh();
+        $this->assertSame('pending_review', $product->status);
+        $this->assertSame('Updated by seller', $product->short_description);
+        // price_display must survive the edit -- reverting to pending_review is
+        // not the same as clearing Admin's prior pricing decision.
+        $this->assertSame('₹1,200 – ₹1,800 per reel', $product->price_display);
+    }
+
+    public function test_editing_a_pending_review_product_as_the_owning_seller_leaves_status_unchanged(): void
+    {
+        $seller = Seller::factory()->create(['status' => 'approved']);
+        $product = Product::factory()->create([
+            'seller_id' => $seller->id,
+            'status' => 'pending_review',
+        ]);
+        $this->actingAs($seller, 'seller');
+
+        \Livewire\Livewire::test(\App\Filament\Seller\Resources\ProductResource\Pages\EditProduct::class, [
+            'record' => $product->getRouteKey(),
+        ])
+            ->fillForm(['short_description' => 'Still pending'])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->assertSame('pending_review', $product->fresh()->status);
+    }
 }
