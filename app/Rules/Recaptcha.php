@@ -10,11 +10,12 @@ class Recaptcha implements ValidationRule
 {
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
+        $siteKey = config('services.recaptcha.site_key');
         $secret = config('services.recaptcha.secret_key');
 
-        if (blank($secret)) {
-            // reCAPTCHA is not configured for this environment — skip verification
-            // rather than blocking every submission until keys are provisioned.
+        if (blank($siteKey) || blank($secret)) {
+            // reCAPTCHA is not fully configured for this environment — skip
+            // verification rather than requiring a token nothing can produce.
             return;
         }
 
