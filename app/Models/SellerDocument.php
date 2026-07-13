@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SellerDocument extends Model
 {
+    use HasFactory;
+
     protected $fillable = ['seller_id', 'label', 'file_path', 'uploaded_at'];
 
     protected $casts = ['uploaded_at' => 'datetime'];
