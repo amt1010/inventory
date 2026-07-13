@@ -2,12 +2,15 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Resources\SellerResource\Pages\CreateSeller;
+use App\Filament\Resources\SellerResource\Pages\EditSeller;
 use App\Filament\Resources\SellerResource\Pages\ListSellers;
 use App\Mail\SellerApproved;
 use App\Mail\SellerRejected;
 use App\Models\Seller;
 use App\Models\Staff;
 use Database\Seeders\RoleSeeder;
+use Filament\Forms\Components\Select;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Livewire;
@@ -87,5 +90,75 @@ class SellerResourceTest extends TestCase
         Livewire::test(ListSellers::class)
             ->assertTableActionHidden('approve', $seller)
             ->assertTableActionHidden('reject', $seller);
+    }
+
+    public function test_approved_is_not_a_selectable_status_option_for_a_seller_pending_email_verification(): void
+    {
+        $admin = Staff::factory()->create();
+        $admin->assignRole('admin');
+        $this->actingAs($admin, 'staff');
+
+        $seller = Seller::factory()->create(['status' => 'pending_email_verification']);
+
+        Livewire::test(EditSeller::class, ['record' => $seller->getRouteKey()])
+            ->assertFormFieldExists('status', function (Select $field) {
+                return ! array_key_exists('approved', $field->getOptions());
+            });
+    }
+
+    public function test_approved_is_a_selectable_status_option_for_a_seller_pending_admin_approval(): void
+    {
+        $admin = Staff::factory()->create();
+        $admin->assignRole('admin');
+        $this->actingAs($admin, 'staff');
+
+        $seller = Seller::factory()->create(['status' => 'pending_admin_approval']);
+
+        Livewire::test(EditSeller::class, ['record' => $seller->getRouteKey()])
+            ->assertFormFieldExists('status', function (Select $field) {
+                return array_key_exists('approved', $field->getOptions());
+            });
+    }
+
+    public function test_a_seller_pending_email_verification_cannot_be_forced_to_approved_via_a_tampered_payload(): void
+    {
+        $admin = Staff::factory()->create();
+        $admin->assignRole('admin');
+        $this->actingAs($admin, 'staff');
+
+        $seller = Seller::factory()->create(['status' => 'pending_email_verification']);
+
+        // Simulate a tampered Livewire payload: fillForm() bypasses the
+        // rendered <select> options and sets the underlying state directly,
+        // exactly what an attacker manipulating the wire:model payload
+        // would do. The explicit `->in()` rule must reject "approved" for
+        // this record server-side, not just hide it from the dropdown.
+        Livewire::test(EditSeller::class, ['record' => $seller->getRouteKey()])
+            ->fillForm(['status' => 'approved'])
+            ->call('save')
+            ->assertHasFormErrors(['status']);
+
+        $this->assertSame('pending_email_verification', $seller->fresh()->status);
+    }
+
+    public function test_admin_created_seller_with_a_duplicate_email_is_rejected_with_a_validation_error(): void
+    {
+        $admin = Staff::factory()->create();
+        $admin->assignRole('admin');
+        $this->actingAs($admin, 'staff');
+
+        Seller::factory()->create(['email' => 'duplicate@example.com']);
+
+        Livewire::test(CreateSeller::class)
+            ->fillForm([
+                'company_name' => 'Duplicate Co',
+                'contact_person' => 'Jane Doe',
+                'phone' => '9999999999',
+                'email' => 'duplicate@example.com',
+            ])
+            ->call('create')
+            ->assertHasFormErrors(['email']);
+
+        $this->assertSame(1, Seller::where('email', 'duplicate@example.com')->count());
     }
 }

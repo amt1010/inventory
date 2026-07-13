@@ -42,11 +42,28 @@ class SellerResource extends Resource
             TextInput::make('company_name')->required(),
             TextInput::make('contact_person')->required(),
             TextInput::make('phone')->required(),
-            TextInput::make('email')->email()->required(),
+            TextInput::make('email')->email()->required()->unique(ignoreRecord: true),
             TextInput::make('business_address'),
             TextInput::make('gst_number')->label('GST Number'),
             Select::make('status')
-                ->options(static::statusOptions())
+                ->options(function (?Seller $record): array {
+                    $options = static::statusOptions();
+
+                    if ($record && $record->status === 'pending_email_verification') {
+                        unset($options['approved']);
+                    }
+
+                    return $options;
+                })
+                ->in(function (?Seller $record): array {
+                    $values = array_keys(static::statusOptions());
+
+                    if ($record && $record->status === 'pending_email_verification') {
+                        $values = array_values(array_diff($values, ['approved']));
+                    }
+
+                    return $values;
+                })
                 ->required()
                 ->visible(fn (string $operation): bool => $operation !== 'create'),
         ]);
