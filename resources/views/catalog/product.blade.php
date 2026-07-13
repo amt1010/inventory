@@ -50,8 +50,7 @@
                 <a href="{{ asset('storage/'.$product->spec_sheet_path) }}" class="btn btn-outline-danger">Download Specification Sheet</a>
             @endif
 
-            {{-- The "Get a Quote" flow is built in the RFQ / Quote System plan; this is a placeholder link until then. --}}
-            <a href="#" class="btn btn-primary mt-3">Get a Quote</a>
+            <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#quoteRequestModal-{{ $product->id }}">Get a Quote</button>
         </div>
     </div>
 
@@ -85,4 +84,6 @@
             @endforeach
         </div>
     @endif
+
+    @include('partials.quote-request-form', ['product' => $product])
 @endsection
