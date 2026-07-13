@@ -2,10 +2,13 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Resources\QuoteRequestResource\Pages\EditQuoteRequest;
 use App\Filament\Resources\QuoteRequestResource\Pages\ListQuoteRequests;
+use App\Filament\Resources\QuoteRequestResource\RelationManagers\NotesRelationManager;
 use App\Models\QuoteRequest;
 use App\Models\Staff;
 use Database\Seeders\RoleSeeder;
+use Filament\Tables\Actions\CreateAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -59,5 +62,31 @@ class QuoteRequestResourceTest extends TestCase
         ]);
 
         $this->assertCount(1, $quoteRequest->fresh()->notes);
+    }
+
+    public function test_the_notes_relation_manager_stamps_staff_id_from_the_acting_staff_member(): void
+    {
+        $sales = Staff::factory()->create();
+        $sales->assignRole('sales');
+        $this->actingAs($sales, 'staff');
+
+        $quoteRequest = QuoteRequest::factory()->create();
+
+        // pageClass must be EditQuoteRequest, not ViewQuoteRequest: Filament
+        // defaults relation managers to read-only on ViewRecord pages
+        // (Panel::hasReadOnlyRelationManagersOnResourceViewPagesByDefault()
+        // is true out of the box), so the create action is hidden there.
+        Livewire::test(NotesRelationManager::class, [
+            'ownerRecord' => $quoteRequest,
+            'pageClass' => EditQuoteRequest::class,
+        ])
+            ->callTableAction(CreateAction::class, data: ['note' => 'Left a voicemail.'])
+            ->assertHasNoTableActionErrors();
+
+        $this->assertDatabaseHas('quote_request_notes', [
+            'quote_request_id' => $quoteRequest->id,
+            'staff_id' => $sales->id,
+            'note' => 'Left a voicemail.',
+        ]);
     }
 }
