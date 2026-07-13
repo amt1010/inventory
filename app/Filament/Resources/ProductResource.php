@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductResource\Pages;
+use App\Filament\Resources\ProductResource\RelationManagers;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Seller;
@@ -45,6 +46,9 @@ class ProductResource extends Resource
                 ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state))),
             TextInput::make('slug')->required(),
             TextInput::make('sku')->label('SKU / Product Number'),
+            TextInput::make('quantity')
+                ->numeric()
+                ->minValue(0),
             TextInput::make('short_description'),
             RichEditor::make('description'),
             Repeater::make('features')->simple(TextInput::make('value')->required()),
@@ -103,6 +107,7 @@ class ProductResource extends Resource
                 TextColumn::make('name')->searchable(),
                 TextColumn::make('seller.company_name')->label('Seller'),
                 TextColumn::make('category.name')->label('Category'),
+                TextColumn::make('quantity'),
                 TextColumn::make('status')->badge(),
                 TextColumn::make('price_display')->label('Price'),
             ])
@@ -120,6 +125,13 @@ class ProductResource extends Resource
             'index' => Pages\ListProducts::route('/'),
             'create' => Pages\CreateProduct::route('/create'),
             'edit' => Pages\EditProduct::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            RelationManagers\ImagesRelationManager::class,
         ];
     }
 }
