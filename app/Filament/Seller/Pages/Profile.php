@@ -8,6 +8,7 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Illuminate\Support\Arr;
 
 class Profile extends Page implements HasForms
 {
@@ -41,7 +42,11 @@ class Profile extends Page implements HasForms
 
     public function save(): void
     {
-        auth('seller')->user()->update($this->form->getState());
+        auth('seller')->user()->update(
+            Arr::only($this->form->getState(), [
+                'company_name', 'contact_person', 'phone', 'business_address', 'gst_number',
+            ])
+        );
 
         Notification::make()->title('Profile updated')->success()->send();
     }
