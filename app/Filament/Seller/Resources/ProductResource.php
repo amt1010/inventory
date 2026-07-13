@@ -2,7 +2,9 @@
 
 namespace App\Filament\Seller\Resources;
 
+use App\Filament\Resources\ProductResource\RelationManagers as AdminRelationManagers;
 use App\Filament\Seller\Resources\ProductResource\Pages;
+use App\Filament\Seller\Resources\ProductResource\RelationManagers;
 use App\Models\Category;
 use App\Models\Product;
 use Filament\Forms\Components\FileUpload;
@@ -122,6 +124,14 @@ class ProductResource extends Resource
             'index' => Pages\ListProducts::route('/'),
             'create' => Pages\CreateProduct::route('/create'),
             'edit' => Pages\EditProduct::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            AdminRelationManagers\ImagesRelationManager::class,
+            RelationManagers\CustomAttributesRelationManager::class,
         ];
     }
 }
