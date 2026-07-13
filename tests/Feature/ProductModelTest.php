@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\QuoteRequest;
 use App\Models\Seller;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -43,5 +44,42 @@ class ProductModelTest extends TestCase
 
         $this->assertTrue($result);
         $this->assertSame('published', $product->fresh()->status);
+    }
+
+    public function test_quantity_is_fillable_and_nullable(): void
+    {
+        $product = Product::factory()->create(['quantity' => 500]);
+
+        $this->assertSame(500, $product->fresh()->quantity);
+
+        $productWithoutQuantity = Product::factory()->create(['quantity' => null]);
+
+        $this->assertNull($productWithoutQuantity->fresh()->quantity);
+    }
+
+    public function test_quote_requests_relation_returns_related_quote_requests(): void
+    {
+        $product = Product::factory()->create();
+        $other = Product::factory()->create();
+
+        $match = QuoteRequest::factory()->create(['product_id' => $product->id]);
+        QuoteRequest::factory()->create(['product_id' => $other->id]);
+
+        $this->assertCount(1, $product->quoteRequests);
+        $this->assertTrue($product->quoteRequests->first()->is($match));
+    }
+
+    public function test_status_after_edit_reverts_published_to_pending_review(): void
+    {
+        $product = Product::factory()->create(['status' => 'published']);
+
+        $this->assertSame('pending_review', $product->statusAfterEdit());
+    }
+
+    public function test_status_after_edit_leaves_non_published_status_unchanged(): void
+    {
+        $product = Product::factory()->create(['status' => 'rejected']);
+
+        $this->assertSame('rejected', $product->statusAfterEdit());
     }
 }

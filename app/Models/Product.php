@@ -16,7 +16,7 @@ class Product extends Model
     protected $fillable = [
         'seller_id', 'category_id', 'name', 'slug', 'sku', 'short_description',
         'description', 'features', 'applications', 'spec_sheet_path',
-        'price_display', 'status', 'rejection_reason', 'sort_order',
+        'price_display', 'quantity', 'status', 'rejection_reason', 'sort_order',
     ];
 
     protected $casts = [
@@ -44,6 +44,11 @@ class Product extends Model
         return $this->morphMany(CustomAttribute::class, 'attributable');
     }
 
+    public function quoteRequests(): HasMany
+    {
+        return $this->hasMany(QuoteRequest::class);
+    }
+
     public function isPublished(): bool
     {
         return $this->status === 'published';
@@ -59,6 +64,11 @@ class Product extends Model
         $this->save();
 
         return true;
+    }
+
+    public function statusAfterEdit(): string
+    {
+        return $this->status === 'published' ? 'pending_review' : $this->status;
     }
 
     public function toSearchableArray(): array

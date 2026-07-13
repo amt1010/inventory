@@ -27,6 +27,7 @@ class ProductFactory extends Factory
             'features' => [$this->faker->sentence(3), $this->faker->sentence(3)],
             'applications' => [$this->faker->sentence(3), $this->faker->sentence(3)],
             'price_display' => '₹'.$this->faker->numberBetween(500, 2000).' – ₹'.$this->faker->numberBetween(2001, 5000),
+            'quantity' => $this->faker->numberBetween(10, 1000),
             'status' => 'published',
             'sort_order' => 0,
         ];
