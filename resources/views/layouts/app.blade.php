@@ -37,6 +37,21 @@
                     <input class="form-control me-2" type="search" name="q" placeholder="Search for item by keyword or product number" value="{{ request('q') }}">
                     <button class="btn btn-outline-primary" type="submit">Search</button>
                 </form>
+                <ul class="navbar-nav ms-2">
+                    @guest('web')
+                        <li class="nav-item"><a class="nav-link" href="{{ route('login') }}">Log In</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ route('register') }}">Register</a></li>
+                    @else
+                        <li class="nav-item"><a class="nav-link" href="{{ route('favorites.index') }}">My Favorites</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ route('quote-requests.history') }}">My Quote Requests</a></li>
+                        <li class="nav-item">
+                            <form method="POST" action="{{ route('logout') }}" class="d-inline">
+                                @csrf
+                                <button type="submit" class="nav-link btn btn-link">Log Out</button>
+                            </form>
+                        </li>
+                    @endguest
+                </ul>
             </div>
         </div>
     </nav>

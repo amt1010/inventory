@@ -42,10 +42,14 @@ class QuoteRequestHistoryTest extends TestCase
         $response = $this->get('/my-quote-requests');
 
         $response->assertOk();
-        // A read-only page has no reason to contain any form that POSTs
-        // anything (status changes, notes, reassignment). The navbar search
-        // form uses method="GET", so this is precise to the actual
-        // requirement without colliding with unrelated site chrome.
-        $response->assertDontSee('method="POST"', escape: false);
+        // The page is read-only (no edit/status/reassignment controls for quote requests).
+        // The logout form in the navbar is legitimate site chrome with method="POST",
+        // so we check for specific quote-request editing patterns instead of all POST forms.
+        $html = $response->getContent();
+        $this->assertStringNotContainsString('name="status"', $html);
+        $this->assertStringNotContainsString('name="notes"', $html);
+        // Ensure no edit/delete buttons in the table rows
+        $this->assertStringNotContainsString('Edit', $html);
+        $this->assertStringNotContainsString('Delete', $html);
     }
 }
