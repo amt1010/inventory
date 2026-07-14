@@ -1,7 +1,7 @@
 {{-- resources/views/partials/quote-request-form-fields.blade.php --}}
 @php
     $defaultReason = isset($product) ? 'Request a Quote' : 'General Inquiry';
-    $idSuffix = isset($product) ? '-'.$product->id : '';
+    $idSuffix = $idSuffix ?? (isset($product) ? '-'.$product->id : '');
 @endphp
 
 <form action="{{ route('quote-requests.store') }}" method="POST">

@@ -1,9 +1,12 @@
 {{-- resources/views/blocks/featured_categories.blade.php --}}
 @php
+    $categoryOrder = array_flip($data['category_ids'] ?? []);
     $categories = \App\Models\Category::query()
         ->whereIn('id', $data['category_ids'] ?? [])
         ->where('status', 'published')
-        ->get();
+        ->get()
+        ->sortBy(fn ($category) => $categoryOrder[$category->id] ?? PHP_INT_MAX)
+        ->values();
 @endphp
 <div class="mb-4">
     @if (!empty($data['heading']))

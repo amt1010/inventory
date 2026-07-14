@@ -1,9 +1,12 @@
 {{-- resources/views/blocks/featured_products.blade.php --}}
 @php
+    $productOrder = array_flip($data['product_ids'] ?? []);
     $products = \App\Models\Product::with('images')
         ->whereIn('id', $data['product_ids'] ?? [])
         ->where('status', 'published')
-        ->get();
+        ->get()
+        ->sortBy(fn ($product) => $productOrder[$product->id] ?? PHP_INT_MAX)
+        ->values();
 @endphp
 <div class="mb-4">
     @if (!empty($data['heading']))

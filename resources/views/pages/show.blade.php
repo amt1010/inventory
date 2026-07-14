@@ -9,6 +9,6 @@
 
 @section('content')
     @foreach ($page->content ?? [] as $block)
-        @includeIf('blocks.'.$block['type'], ['data' => $block['data'] ?? []])
+        @includeIf('blocks.'.$block['type'], ['data' => $block['data'] ?? [], 'blockKey' => $loop->index])
     @endforeach
 @endsection

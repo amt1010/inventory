@@ -3,5 +3,5 @@
     @if (!empty($data['heading']))
         <h2>{{ $data['heading'] }}</h2>
     @endif
-    @include('partials.quote-request-form-fields', ['product' => null, 'modal' => false])
+    @include('partials.quote-request-form-fields', ['product' => null, 'modal' => false, 'idSuffix' => '-embed-'.($blockKey ?? 0)])
 </div>

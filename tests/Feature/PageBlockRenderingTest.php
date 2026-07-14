@@ -115,4 +115,44 @@ class PageBlockRenderingTest extends TestCase
         $response->assertOk();
         $response->assertSee('id="quoteRequestModal-'.$product->id.'"', escape: false);
     }
+
+    public function test_featured_categories_render_in_the_order_the_editor_chose_them(): void
+    {
+        $first = Category::factory()->create(['status' => 'published']);
+        $second = Category::factory()->create(['status' => 'published']);
+
+        Page::factory()->create([
+            'slug' => 'about',
+            'status' => 'published',
+            'content' => [
+                ['type' => 'featured_categories', 'data' => ['category_ids' => [$second->id, $first->id]]],
+            ],
+        ]);
+
+        $response = $this->get('/about');
+
+        $response->assertOk();
+        $positionOfSecond = strpos($response->getContent(), $second->name);
+        $positionOfFirst = strpos($response->getContent(), $first->name);
+        $this->assertLessThan($positionOfFirst, $positionOfSecond, 'Category chosen second in category_ids order should render before the one chosen first.');
+    }
+
+    public function test_two_rfq_form_embed_blocks_on_one_page_do_not_produce_duplicate_ids(): void
+    {
+        Page::factory()->create([
+            'slug' => 'about',
+            'status' => 'published',
+            'content' => [
+                ['type' => 'rfq_form_embed', 'data' => ['heading' => 'First Form']],
+                ['type' => 'rfq_form_embed', 'data' => ['heading' => 'Second Form']],
+            ],
+        ]);
+
+        $response = $this->get('/about');
+        $response->assertOk();
+
+        $html = $response->getContent();
+        $this->assertSame(1, substr_count($html, 'id="contact-email-embed-0"'));
+        $this->assertSame(1, substr_count($html, 'id="contact-email-embed-1"'));
+    }
 }
