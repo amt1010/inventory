@@ -46,27 +46,29 @@
                 </ul>
             @endif
 
-            @if ($product->spec_sheet_path)
-                <a href="{{ asset('storage/'.$product->spec_sheet_path) }}" class="btn btn-outline-danger">Download Specification Sheet</a>
-            @endif
-
-            <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#quoteRequestModal-{{ $product->id }}">Get a Quote</button>
-
-            @auth('web')
-                @if (auth('web')->user()->favorites()->where('product_id', $product->id)->exists())
-                    <form method="POST" action="{{ route('favorites.destroy', $product) }}" class="d-inline">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-outline-danger mt-3">Remove Favorite</button>
-                    </form>
-                @else
-                    <form method="POST" action="{{ route('favorites.store') }}" class="d-inline">
-                        @csrf
-                        <input type="hidden" name="product_id" value="{{ $product->id }}">
-                        <button type="submit" class="btn btn-outline-secondary mt-3">Add to Favorites</button>
-                    </form>
+            <div class="d-flex flex-wrap align-items-center gap-2 mt-3">
+                @if ($product->spec_sheet_path)
+                    <a href="{{ asset('storage/'.$product->spec_sheet_path) }}" class="btn btn-outline-danger">Download Specification Sheet</a>
                 @endif
-            @endauth
+
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#quoteRequestModal-{{ $product->id }}">Get a Quote</button>
+
+                @auth('web')
+                    @if (auth('web')->user()->favorites()->where('product_id', $product->id)->exists())
+                        <form method="POST" action="{{ route('favorites.destroy', $product) }}" class="d-inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-outline-danger">Remove Favorite</button>
+                        </form>
+                    @else
+                        <form method="POST" action="{{ route('favorites.store') }}" class="d-inline">
+                            @csrf
+                            <input type="hidden" name="product_id" value="{{ $product->id }}">
+                            <button type="submit" class="btn btn-outline-secondary">Add to Favorites</button>
+                        </form>
+                    @endif
+                @endauth
+            </div>
         </div>
     </div>
 

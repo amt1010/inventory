@@ -92,7 +92,14 @@ composer install
 npm install
 cp .env.example .env   # if .env doesn't already exist
 php artisan key:generate
+php artisan storage:link
 ```
+
+`storage:link` creates `public/storage` → `storage/app/public`, which is required for
+product images and spec-sheet PDFs to be reachable at all (`ProductImage`/`FileUpload`
+fields store under `storage/app/public/...` and every view links via
+`asset('storage/...')`). Skipping this step doesn't error anywhere — it just means
+every uploaded image silently 404s/403s on the public site.
 
 If `composer install` fails with an error about a security-advisory policy
 blocking `laravel/framework`: Composer 2.10+ refuses by default to install any

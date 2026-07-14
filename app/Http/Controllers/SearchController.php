@@ -13,7 +13,7 @@ class SearchController extends Controller
         $query = (string) $request->query('q', '');
 
         $results = $query !== ''
-            ? Product::search($query)->where('status', 'published')->get()
+            ? Product::search($query)->where('status', 'published')->get()->load(['images', 'category'])
             : collect();
 
         return view('catalog.search', [

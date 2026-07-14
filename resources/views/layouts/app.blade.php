@@ -33,8 +33,8 @@
                         @endif
                     @endforeach
                 </ul>
-                <form class="d-flex" action="{{ route('catalog.search') }}" method="GET">
-                    <input class="form-control me-2" type="search" name="q" placeholder="Search for item by keyword or product number" value="{{ request('q') }}">
+                <form class="d-flex flex-grow-1 mx-3" style="max-width: 480px;" action="{{ route('catalog.search') }}" method="GET">
+                    <input class="form-control me-2 flex-grow-1" type="search" name="q" placeholder="Search for item by keyword or product number" value="{{ request('q') }}">
                     <button class="btn btn-outline-primary" type="submit">Search</button>
                 </form>
                 <ul class="navbar-nav ms-2">
@@ -51,6 +51,7 @@
                             </form>
                         </li>
                     @endguest
+                    <li class="nav-item"><a class="nav-link" href="{{ route('filament.seller.auth.login') }}">Login as Seller</a></li>
                 </ul>
             </div>
         </div>
