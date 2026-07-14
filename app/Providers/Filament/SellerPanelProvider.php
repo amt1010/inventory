@@ -75,7 +75,9 @@ class SellerPanelProvider extends PanelProvider
             ->id('seller')
             ->path('seller')
             ->login()
+            ->passwordReset()
             ->authGuard('seller')
+            ->authPasswordBroker('sellers')
             ->favicon(asset('favicon.svg'))
             ->colors(fn () => [
                 'primary' => Color::hex(filled($branding()?->theme_accent_color) ? $branding()->theme_accent_color : '#ff6a00'),
