@@ -11,7 +11,7 @@ class NavItemSeeder extends Seeder
     {
         NavItem::query()->firstOrCreate(
             ['label' => 'Products', 'location' => 'header'],
-            ['url' => '/products', 'sort_order' => 1]
+            ['url' => '/products', 'sort_order' => 1, 'show_category_menu' => true]
         );
 
         NavItem::query()->firstOrCreate(
