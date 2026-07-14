@@ -34,4 +34,17 @@ class Category extends Model
     {
         return $this->status === 'published';
     }
+
+    public function path(): string
+    {
+        $segments = [$this->slug];
+        $parent = $this->parent;
+
+        while ($parent) {
+            array_unshift($segments, $parent->slug);
+            $parent = $parent->parent;
+        }
+
+        return implode('/', $segments);
+    }
 }

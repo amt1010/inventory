@@ -71,6 +71,11 @@ class Product extends Model
         return $this->status === 'published' ? 'pending_review' : $this->status;
     }
 
+    public function path(): string
+    {
+        return $this->category->path().'/'.$this->slug;
+    }
+
     public function toSearchableArray(): array
     {
         return [

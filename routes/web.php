@@ -1,15 +1,14 @@
 <?php
 
 use App\Http\Controllers\CatalogController;
+use App\Http\Controllers\PageController;
 use App\Http\Controllers\QuoteRequestController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\Seller\ActivationController;
 use App\Http\Controllers\Seller\RegistrationController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [PageController::class, 'show'])->defaults('slug', 'home')->name('home');
 
 Route::get('/search', SearchController::class)->name('catalog.search');
 
@@ -25,4 +24,6 @@ Route::post('/seller/activate/{seller}', [ActivationController::class, 'store'])
 Route::get('/products/{path?}', [CatalogController::class, 'show'])
     ->where('path', '.*')
     ->name('catalog.show');
+
+Route::get('/{slug}', [PageController::class, 'show'])->name('pages.show');
 
