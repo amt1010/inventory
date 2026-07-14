@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CatalogController;
+use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\QuoteRequestController;
 use App\Http\Controllers\RegistrationController;
@@ -29,6 +30,12 @@ Route::view('/seller/register/submitted', 'seller.registration-submitted')->name
 
 Route::get('/seller/activate/{seller}', [ActivationController::class, 'show'])->middleware('signed')->name('seller.activate');
 Route::post('/seller/activate/{seller}', [ActivationController::class, 'store'])->middleware('signed')->name('seller.activate.store');
+
+Route::middleware('auth:web')->group(function () {
+    Route::get('/favorites', [FavoriteController::class, 'index'])->name('favorites.index');
+    Route::post('/favorites', [FavoriteController::class, 'store'])->name('favorites.store');
+    Route::delete('/favorites/{product}', [FavoriteController::class, 'destroy'])->name('favorites.destroy');
+});
 
 Route::get('/products/{path?}', [CatalogController::class, 'show'])
     ->where('path', '.*')
