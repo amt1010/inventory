@@ -9,12 +9,16 @@ A B2B marketplace platform (Alibaba-style), styled after AFL's public catalog si
 Three actor types:
 
 - **Buyers** — public visitors who browse the catalog and submit "Request a Quote"
-  (RFQ) enquiries. No checkout, no payments anywhere in this system.
+  (RFQ) enquiries. No checkout, no payments anywhere in this system. An account
+  (`web` guard, the stock `users` table) is optional and low-friction — no email
+  verification, no password reset — used only to view past quote requests and
+  favorites.
 - **Sellers** — registered suppliers who list their own products/surplus inventory
-  via the `/seller` Filament panel (built in a later plan). Never see buyer contact
-  details or interact with buyers directly.
+  via the `/seller` Filament panel. Never see buyer contact details or interact
+  with buyers directly.
 - **Staff** (Admin / Content Editor / Sales) — manage the catalog, price and approve
-  seller listings, and handle quote requests via the `/admin` Filament panel.
+  seller listings, manage content pages/navigation, and handle quote requests via
+  the `/admin` Filament panel.
 
 This is an India-based business (GST numbers, INR pricing per the design spec);
 see `APP_TIMEZONE` below.
@@ -26,10 +30,12 @@ is being built phase by phase) live in `docs/superpowers/plans/`.
 ## Tech stack
 
 - Laravel 11, PHP 8.2, MySQL (dev/production; tests use SQLite — see below)
-- Filament v3 for the internal CMS — two panels: `/admin` (staff guard, built) and
-  `/seller` (seller guard, built in a later phase)
+- Filament v3 for the internal CMS — two panels: `/admin` (staff guard) and
+  `/seller` (seller guard)
 - `spatie/laravel-permission` for role-based access control (roles: `admin`,
-  `content_editor`, `sales`, all on the `staff` guard)
+  `content_editor`, `sales`, all on the `staff` guard). Buyer-facing features
+  (favorites, quote-request history) use plain `where('user_id', ...)` query
+  scoping instead — no Policy/Gate class, since there's no Filament panel involved.
 - Laravel Scout (`database` driver) for catalog search — deliberately abstracted so
   swapping to Meilisearch/Typesense later is a driver change, not a rewrite
 - Blade + Bootstrap (via CDN) for the public-facing catalog — no SPA framework
@@ -54,6 +60,18 @@ is being built phase by phase) live in `docs/superpowers/plans/`.
   hidden nav items).
 - Seller identity is never rendered on any public page — the catalog is fully
   platform-branded.
+- `app/Models/Page.php` + `app/Http/Controllers/PageController.php` — block-based
+  content pages (`resources/views/blocks/*.blade.php`), resolved by the catch-all
+  `/{slug}` route (registered last in `routes/web.php`, after every other route,
+  so it never shadows `/products/{path?}`, `/search`, etc.).
+- `app/Models/NavItem.php` — self-referencing header/footer nav with a one-level
+  nesting cap enforced both in the Filament form and server-side in
+  `NavItemResource`'s `rule()`. Rendered globally via a view composer on
+  `layouts.app` in `AppServiceProvider::boot()`.
+- `app/Http/Controllers/{RegistrationController,SessionController,FavoriteController,
+  QuoteRequestHistoryController}.php` — buyer-account features on the plain `web`
+  guard. No new guard, no Policy layer; ownership is enforced by scoping every
+  query to `auth('web')->id()`.
 
 ## Local development workflow
 
@@ -109,9 +127,12 @@ Day-to-day commands:
 - `php artisan tinker` — inspect data interactively
 - `php artisan migrate:fresh --seed` — reset the local (MySQL) DB to a known state
 - `/admin` — staff CMS (Admin / Content Editor / Sales)
-- `/seller` — seller portal (added in a later phase, not yet built)
+- `/seller` — seller portal
 - `/products` — public catalog root
 - `/search?q=...` — catalog search
+- `/register`, `/login`, `/logout` — optional buyer accounts (`web` guard)
+- `/favorites`, `/my-quote-requests` — buyer-only, require login
+- `/{slug}` — CMS-managed content pages (catch-all, e.g. `/` resolves `slug=home`)
 
 ### Known issues
 
@@ -142,5 +163,10 @@ sure `APP_DEBUG=false` in any real deployment.
   (Admin/Sales, and the seller's own portal) only.
 - **A product cannot be `published` without `price_display` set** — this is
   enforced in `Product::publish()`, not re-implemented ad hoc elsewhere.
+- **Buyer-facing ownership checks are plain query scoping, not Policies.**
+  Favorites and quote-request history use `where('user_id', auth('web')->id())`
+  directly in the controller. Don't introduce a Policy/Gate class for these —
+  there's no Filament panel involved, so the Policy pattern used for staff RBAC
+  doesn't apply.
 - Commit frequently, in small units — one logical change per commit, tests passing
   at each commit.
