@@ -12,6 +12,8 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             StaffSeeder::class,
             CatalogSeeder::class,
+            PageSeeder::class,
+            NavItemSeeder::class,
         ]);
     }
 }

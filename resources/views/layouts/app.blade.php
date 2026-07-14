@@ -13,10 +13,31 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
         <div class="container">
             <a class="navbar-brand" href="{{ url('/') }}">{{ config('app.name') }}</a>
-            <form class="d-flex ms-auto" action="{{ route('catalog.search') }}" method="GET">
-                <input class="form-control me-2" type="search" name="q" placeholder="Search for item by keyword or product number" value="{{ request('q') }}">
-                <button class="btn btn-outline-primary" type="submit">Search</button>
-            </form>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav me-auto">
+                    @foreach ($headerNavItems as $item)
+                        @if ($item->children->isNotEmpty())
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="{{ $item->url }}" data-bs-toggle="dropdown">{{ $item->label }}</a>
+                                <ul class="dropdown-menu">
+                                    @foreach ($item->children as $child)
+                                        <li><a class="dropdown-item" href="{{ $child->url }}">{{ $child->label }}</a></li>
+                                    @endforeach
+                                </ul>
+                            </li>
+                        @else
+                            <li class="nav-item"><a class="nav-link" href="{{ $item->url }}">{{ $item->label }}</a></li>
+                        @endif
+                    @endforeach
+                </ul>
+                <form class="d-flex" action="{{ route('catalog.search') }}" method="GET">
+                    <input class="form-control me-2" type="search" name="q" placeholder="Search for item by keyword or product number" value="{{ request('q') }}">
+                    <button class="btn btn-outline-primary" type="submit">Search</button>
+                </form>
+            </div>
         </div>
     </nav>
 
@@ -26,6 +47,16 @@
         @endif
         @yield('content')
     </main>
+
+    <footer class="bg-light border-top py-4 mt-5">
+        <div class="container">
+            <ul class="list-inline mb-0">
+                @foreach ($footerNavItems as $item)
+                    <li class="list-inline-item me-3"><a href="{{ $item->url }}">{{ $item->label }}</a></li>
+                @endforeach
+            </ul>
+        </div>
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
