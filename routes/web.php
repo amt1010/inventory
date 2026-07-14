@@ -33,6 +33,8 @@ Route::get('/login', [SessionController::class, 'create'])->name('login');
 Route::post('/login', [SessionController::class, 'store'])->middleware('throttle:6,1')->name('login.store');
 Route::post('/logout', [SessionController::class, 'destroy'])->name('logout');
 
+Route::view('/sellers', 'seller.landing')->name('seller.landing');
+
 Route::get('/seller/register', [SellerRegistrationController::class, 'create'])->name('seller.register');
 Route::post('/seller/register', [SellerRegistrationController::class, 'store'])->middleware('throttle:6,1')->name('seller.register.store');
 Route::view('/seller/register/submitted', 'seller.registration-submitted')->name('seller.registration.submitted');
