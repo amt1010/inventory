@@ -1,5 +1,4 @@
 {{-- resources/views/quote-requests/index.blade.php --}}
-@php($hideNavSearchForm = true)
 @extends('layouts.app')
 
 @section('title', 'My Quote Requests')

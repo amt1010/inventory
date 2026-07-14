@@ -33,12 +33,10 @@
                         @endif
                     @endforeach
                 </ul>
-                @unless ($hideNavSearchForm ?? false)
-                    <form class="d-flex" action="{{ route('catalog.search') }}" method="GET">
-                        <input class="form-control me-2" type="search" name="q" placeholder="Search for item by keyword or product number" value="{{ request('q') }}">
-                        <button class="btn btn-outline-primary" type="submit">Search</button>
-                    </form>
-                @endunless
+                <form class="d-flex" action="{{ route('catalog.search') }}" method="GET">
+                    <input class="form-control me-2" type="search" name="q" placeholder="Search for item by keyword or product number" value="{{ request('q') }}">
+                    <button class="btn btn-outline-primary" type="submit">Search</button>
+                </form>
             </div>
         </div>
     </nav>

@@ -42,6 +42,10 @@ class QuoteRequestHistoryTest extends TestCase
         $response = $this->get('/my-quote-requests');
 
         $response->assertOk();
-        $response->assertDontSee('<form', escape: false);
+        // A read-only page has no reason to contain any form that POSTs
+        // anything (status changes, notes, reassignment). The navbar search
+        // form uses method="GET", so this is precise to the actual
+        // requirement without colliding with unrelated site chrome.
+        $response->assertDontSee('method="POST"', escape: false);
     }
 }
