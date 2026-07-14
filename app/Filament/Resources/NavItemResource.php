@@ -42,10 +42,26 @@ class NavItemResource extends Resource
                 ->helperText(fn (?NavItem $record) => $record && $record->children()->exists()
                     ? 'This item has its own sub-items and cannot be nested under another item.'
                     : null)
-                ->rule(function (?NavItem $record) {
-                    return function (string $attribute, $value, \Closure $fail) use ($record) {
-                        if ($value && $record && $record->children()->exists()) {
+                ->rule(function (callable $get, ?NavItem $record) {
+                    return function (string $attribute, $value, \Closure $fail) use ($get, $record) {
+                        if (! $value) {
+                            return;
+                        }
+
+                        if ($record && $record->children()->exists()) {
                             $fail('This item has sub-items and cannot be nested under another item.');
+
+                            return;
+                        }
+
+                        $validParentIds = NavItem::query()
+                            ->whereNull('parent_id')
+                            ->where('location', $get('location'))
+                            ->when($record, fn ($query) => $query->where('id', '!=', $record->id))
+                            ->pluck('id');
+
+                        if (! $validParentIds->contains((int) $value)) {
+                            $fail('Please choose a valid top-level item in the same location as the parent.');
                         }
                     };
                 }),

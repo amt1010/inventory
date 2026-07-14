@@ -56,4 +56,20 @@ class NavItemResourceTest extends TestCase
             ->call('save')
             ->assertHasFormErrors(['parent_id']);
     }
+
+    public function test_an_item_cannot_be_nested_under_an_item_that_is_itself_not_top_level(): void
+    {
+        $admin = Staff::factory()->create();
+        $admin->assignRole('admin');
+        $this->actingAs($admin, 'staff');
+
+        $topLevel = NavItem::factory()->create(['location' => 'header']);
+        $midLevel = NavItem::factory()->create(['location' => 'header', 'parent_id' => $topLevel->id]);
+        $target = NavItem::factory()->create(['location' => 'header']);
+
+        Livewire::test(EditNavItem::class, ['record' => $target->getRouteKey()])
+            ->fillForm(['parent_id' => $midLevel->id])
+            ->call('save')
+            ->assertHasFormErrors(['parent_id']);
+    }
 }
