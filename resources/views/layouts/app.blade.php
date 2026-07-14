@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', config('app.name'))</title>
+    <title>@yield('title', $siteSettings->site_name ?? config('app.name'))</title>
     @hasSection('meta_description')
         <meta name="description" content="@yield('meta_description')">
     @endif
@@ -12,7 +12,13 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
         <div class="container">
-            <a class="navbar-brand" href="{{ url('/') }}">{{ config('app.name') }}</a>
+            <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url('/') }}">
+                @if ($siteSettings->logo_path)
+                    <img src="{{ asset('storage/'.$siteSettings->logo_path) }}" alt="{{ $siteSettings->site_name }}" height="36">
+                @else
+                    {{ $siteSettings->site_name }}
+                @endif
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
                 <span class="navbar-toggler-icon"></span>
             </button>

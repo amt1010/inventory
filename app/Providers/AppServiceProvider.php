@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\NavItem;
+use App\Models\Setting;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -34,6 +35,8 @@ class AppServiceProvider extends ServiceProvider
                 ->where('location', 'footer')
                 ->orderBy('sort_order')
                 ->get());
+
+            $view->with('siteSettings', Setting::current());
         });
     }
 }
