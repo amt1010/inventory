@@ -6,6 +6,7 @@ use App\Filament\Resources\NavItemResource\Pages;
 use App\Models\NavItem;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
@@ -28,6 +29,11 @@ class NavItemResource extends Resource
                 ->options(['header' => 'Header', 'footer' => 'Footer'])
                 ->required()
                 ->live(),
+            Toggle::make('show_category_menu')
+                ->label('Show live category mega-menu')
+                ->helperText('When enabled, this item\'s dropdown shows the full published category tree instead of any manually-added sub-items below. Only meaningful for a top-level header item.')
+                ->live()
+                ->visible(fn (callable $get) => $get('location') === 'header' && ! $get('parent_id')),
             Select::make('parent_id')
                 ->label('Parent Item')
                 ->options(function (callable $get, ?NavItem $record) {

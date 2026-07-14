@@ -12,7 +12,11 @@ class NavItem extends Model
     use HasFactory;
 
     protected $fillable = [
-        'label', 'url', 'location', 'parent_id', 'sort_order',
+        'label', 'url', 'location', 'parent_id', 'sort_order', 'show_category_menu',
+    ];
+
+    protected $casts = [
+        'show_category_menu' => 'boolean',
     ];
 
     public function parent(): BelongsTo

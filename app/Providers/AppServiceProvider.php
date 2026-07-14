@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\Category;
 use App\Models\NavItem;
 use App\Models\Setting;
 use Illuminate\Support\Facades\View;
@@ -37,6 +38,13 @@ class AppServiceProvider extends ServiceProvider
                 ->get());
 
             $view->with('siteSettings', Setting::current());
+
+            $view->with('topLevelCategories', Category::query()
+                ->whereNull('parent_id')
+                ->where('status', 'published')
+                ->with(['children' => fn ($query) => $query->where('status', 'published')->orderBy('sort_order')])
+                ->orderBy('sort_order')
+                ->get());
         });
     }
 }

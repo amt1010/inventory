@@ -25,7 +25,23 @@
             <div class="collapse navbar-collapse" id="mainNav">
                 <ul class="navbar-nav me-auto">
                     @foreach ($headerNavItems as $item)
-                        @if ($item->children->isNotEmpty())
+                        @if ($item->show_category_menu)
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="{{ $item->url }}" data-bs-toggle="dropdown">{{ $item->label }}</a>
+                                <div class="dropdown-menu mega-menu p-3">
+                                    <div class="row">
+                                        @foreach ($topLevelCategories as $topCategory)
+                                            <div class="col-6 col-md-3 mb-3">
+                                                <a href="{{ url('/products/'.$topCategory->path()) }}" class="fw-bold text-dark text-decoration-none d-block mb-2">{{ $topCategory->name }}</a>
+                                                @foreach ($topCategory->children as $sub)
+                                                    <a href="{{ url('/products/'.$sub->path()) }}" class="d-block text-muted text-decoration-none small mb-1">{{ $sub->name }}</a>
+                                                @endforeach
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </li>
+                        @elseif ($item->children->isNotEmpty())
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="{{ $item->url }}" data-bs-toggle="dropdown">{{ $item->label }}</a>
                                 <ul class="dropdown-menu">
