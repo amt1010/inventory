@@ -49,6 +49,11 @@ class Product extends Model
         return $this->hasMany(QuoteRequest::class);
     }
 
+    public function favoritedBy(): HasMany
+    {
+        return $this->hasMany(Favorite::class);
+    }
+
     public function isPublished(): bool
     {
         return $this->status === 'published';
