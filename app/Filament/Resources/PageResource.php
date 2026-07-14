@@ -14,6 +14,7 @@ use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
@@ -53,6 +54,35 @@ class PageResource extends Resource
                                 ->directory('page-blocks'),
                             TextInput::make('cta_label'),
                             TextInput::make('cta_url'),
+                        ]),
+                    Block::make('hero_carousel')
+                        ->label('Hero Carousel')
+                        ->schema([
+                            Repeater::make('slides')
+                                ->schema([
+                                    Select::make('media_type')
+                                        ->options(['image' => 'Image', 'video' => 'Video'])
+                                        ->default('image')
+                                        ->live()
+                                        ->required(),
+                                    FileUpload::make('image')
+                                        ->image()
+                                        ->directory('page-blocks')
+                                        ->visible(fn (callable $get) => $get('media_type') === 'image'),
+                                    TextInput::make('video_url')
+                                        ->label('Video URL (direct .mp4 link)')
+                                        ->url()
+                                        ->visible(fn (callable $get) => $get('media_type') === 'video'),
+                                    TextInput::make('heading')->required(),
+                                    TextInput::make('subheading'),
+                                    TextInput::make('cta_label'),
+                                    TextInput::make('cta_url'),
+                                    Toggle::make('active')
+                                        ->label('Show this slide')
+                                        ->default(true),
+                                ])
+                                ->required()
+                                ->minItems(1),
                         ]),
                     Block::make('rich_text')
                         ->label('Rich Text')
