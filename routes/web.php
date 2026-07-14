@@ -5,6 +5,7 @@ use App\Http\Controllers\PageController;
 use App\Http\Controllers\QuoteRequestController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\SessionController;
 use App\Http\Controllers\Seller\ActivationController;
 use App\Http\Controllers\Seller\RegistrationController as SellerRegistrationController;
 use Illuminate\Support\Facades\Route;
@@ -17,6 +18,10 @@ Route::post('/quote-requests', [QuoteRequestController::class, 'store'])->name('
 
 Route::get('/register', [RegistrationController::class, 'create'])->name('register');
 Route::post('/register', [RegistrationController::class, 'store'])->middleware('throttle:6,1')->name('register.store');
+
+Route::get('/login', [SessionController::class, 'create'])->name('login');
+Route::post('/login', [SessionController::class, 'store'])->middleware('throttle:6,1')->name('login.store');
+Route::post('/logout', [SessionController::class, 'destroy'])->name('logout');
 
 Route::get('/seller/register', [SellerRegistrationController::class, 'create'])->name('seller.register');
 Route::post('/seller/register', [SellerRegistrationController::class, 'store'])->name('seller.register.store');
