@@ -42,14 +42,20 @@ class QuoteRequestHistoryTest extends TestCase
         $response = $this->get('/my-quote-requests');
 
         $response->assertOk();
-        // The page is read-only (no edit/status/reassignment controls for quote requests).
-        // The logout form in the navbar is legitimate site chrome with method="POST",
-        // so we check for specific quote-request editing patterns instead of all POST forms.
+        // The page is read-only: the quote-request table itself must contain
+        // no forms, buttons, or links (no edit/status/reassignment controls).
+        // We scope the check to the <table>...</table> fragment rather than
+        // the whole page, because the shared layout legitimately has its own
+        // POST forms (navbar search, logout) and buyer/product data could
+        // otherwise coincidentally contain words like "Edit" (e.g. the name
+        // "Edith") or "Delete" and cause an unrelated false failure.
         $html = $response->getContent();
-        $this->assertStringNotContainsString('name="status"', $html);
-        $this->assertStringNotContainsString('name="notes"', $html);
-        // Ensure no edit/delete buttons in the table rows
-        $this->assertStringNotContainsString('Edit', $html);
-        $this->assertStringNotContainsString('Delete', $html);
+        preg_match('#<table.*?</table>#s', $html, $matches);
+        $this->assertNotEmpty($matches, 'Expected a quote-request table in the response.');
+        $tableHtml = $matches[0];
+
+        $this->assertStringNotContainsString('<form', $tableHtml);
+        $this->assertStringNotContainsString('<button', $tableHtml);
+        $this->assertStringNotContainsString('<a ', $tableHtml);
     }
 }
