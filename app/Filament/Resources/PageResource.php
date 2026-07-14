@@ -84,6 +84,19 @@ class PageResource extends Resource
                                 ->required()
                                 ->minItems(1),
                         ]),
+                    Block::make('content_strip')
+                        ->label('Content Strip (Image + Text)')
+                        ->schema([
+                            TextInput::make('heading'),
+                            RichEditor::make('body')->required(),
+                            FileUpload::make('image')
+                                ->image()
+                                ->directory('page-blocks'),
+                            Select::make('image_position')
+                                ->options(['left' => 'Image Left', 'right' => 'Image Right'])
+                                ->default('left')
+                                ->required(),
+                        ]),
                     Block::make('rich_text')
                         ->label('Rich Text')
                         ->schema([
