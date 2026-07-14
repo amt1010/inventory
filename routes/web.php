@@ -4,6 +4,7 @@ use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\QuoteRequestController;
+use App\Http\Controllers\QuoteRequestHistoryController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SessionController;
@@ -35,6 +36,7 @@ Route::middleware('auth:web')->group(function () {
     Route::get('/favorites', [FavoriteController::class, 'index'])->name('favorites.index');
     Route::post('/favorites', [FavoriteController::class, 'store'])->name('favorites.store');
     Route::delete('/favorites/{product}', [FavoriteController::class, 'destroy'])->name('favorites.destroy');
+    Route::get('/my-quote-requests', [QuoteRequestHistoryController::class, 'index'])->name('quote-requests.history');
 });
 
 Route::get('/products/{path?}', [CatalogController::class, 'show'])
