@@ -103,14 +103,20 @@ resubmission).
 
 ## Documentation Update
 
-`CLAUDE.md`'s Architecture map entry for `Category` currently reads (in part):
-"Sellers pick from this existing tree when listing a product; they do not create
-categories." This is updated to describe the propose-and-approve flow: sellers
-may propose a new leaf category inline via the product form's category picker;
-the proposal lands as an ordinary `draft` category tagged with
-`proposed_by_seller_id`, invisible to buyers until an Admin reviews, optionally
-corrects, and publishes it — after which the associated product's own review can
-proceed to final publish.
+The "sellers do not create categories" constraint lives in the original phase
+spec, `docs/superpowers/specs/2026-07-12-catalog-cms-rfq-design.md:62-63`
+("Sellers pick from this existing tree when listing a product; they do not
+create categories") — that file is a dated, point-in-time design record and is
+left as-is (it accurately describes what that phase built).
+
+`CLAUDE.md`'s Architecture map entry for `Category`
+(`app/Models/Category.php` — self-referencing tree...) currently says nothing
+about seller involvement at all. It gains one sentence describing the
+propose-and-approve flow this feature adds: sellers may propose a new leaf
+category inline via the product form's category picker; the proposal lands as
+an ordinary `draft` category tagged with `proposed_by_seller_id`, invisible to
+buyers until an Admin reviews, optionally corrects, and publishes it — after
+which the associated product's own review can proceed to final publish.
 
 ## Testing
 
