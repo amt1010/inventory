@@ -155,4 +155,25 @@ class PageBlockRenderingTest extends TestCase
         $this->assertSame(1, substr_count($html, 'id="contact-email-embed-0"'));
         $this->assertSame(1, substr_count($html, 'id="contact-email-embed-1"'));
     }
+
+    public function test_a_featured_products_block_renders_a_fixed_size_thumbnail(): void
+    {
+        $category = Category::factory()->create(['status' => 'published']);
+        $product = Product::factory()->create(['category_id' => $category->id, 'status' => 'published']);
+        $product->images()->create(['path' => 'product-images/featured.jpg', 'sort_order' => 0, 'is_primary' => true]);
+
+        Page::factory()->create([
+            'slug' => 'about',
+            'status' => 'published',
+            'content' => [
+                ['type' => 'featured_products', 'data' => ['product_ids' => [$product->id]]],
+            ],
+        ]);
+
+        $response = $this->get('/about');
+
+        $response->assertOk();
+        $response->assertSee('featured.jpg', false);
+        $response->assertSee('width="132"', false);
+    }
 }

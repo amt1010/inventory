@@ -16,9 +16,7 @@
         @foreach ($products as $product)
             <div class="col">
                 <a href="{{ url('/products/'.$product->path()) }}" class="card h-100 text-decoration-none">
-                    @if ($product->images->first())
-                        <img src="{{ asset('storage/'.$product->images->first()->path) }}" class="card-img-top" alt="{{ $product->name }}">
-                    @endif
+                    <x-product-thumbnail :path="optional($product->primaryImage())->path" :alt="$product->name" class="card-img-top" />
                     <div class="card-body">
                         <h5 class="card-title text-dark">{{ $product->name }}</h5>
                         <p class="card-text text-muted">{{ $product->short_description }}</p>
