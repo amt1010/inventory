@@ -54,6 +54,16 @@ class Product extends Model
         return $this->hasMany(Favorite::class);
     }
 
+    public function editTrails(): HasMany
+    {
+        return $this->hasMany(ProductEditTrail::class);
+    }
+
+    public function latestPendingEditTrail(): ?ProductEditTrail
+    {
+        return $this->editTrails()->whereNull('accepted_at')->latest()->first();
+    }
+
     public function isPublished(): bool
     {
         return $this->status === 'published';
