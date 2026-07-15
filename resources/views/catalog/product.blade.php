@@ -17,9 +17,42 @@
 
     <div class="row">
         <div class="col-md-6">
-            @foreach ($product->images as $image)
-                <img src="{{ asset('storage/'.$image->path) }}" class="img-fluid mb-2" alt="{{ $product->name }}">
-            @endforeach
+            @php
+                $primaryImage = $product->primaryImage();
+                $orderedImages = $product->images->isNotEmpty()
+                    ? $product->images->sortBy(fn ($image) => $primaryImage && $image->is($primaryImage) ? 0 : 1)->values()
+                    : $product->images;
+            @endphp
+            @if ($orderedImages->isNotEmpty())
+                <div id="productImagesCarousel" class="carousel slide mb-3" data-bs-ride="carousel">
+                    <div class="carousel-inner rounded-3">
+                        @foreach ($orderedImages as $image)
+                            <div class="carousel-item @if ($loop->first) active @endif">
+                                <img src="{{ asset('storage/'.$image->path) }}" class="d-block w-100" style="max-height: 480px; object-fit: cover;" alt="{{ $product->name }}">
+                            </div>
+                        @endforeach
+                    </div>
+                    @if ($orderedImages->count() > 1)
+                        <button class="carousel-control-prev" type="button" data-bs-target="#productImagesCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#productImagesCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    @endif
+                </div>
+                @if ($orderedImages->count() > 1)
+                    <div class="d-flex gap-2 flex-wrap">
+                        @foreach ($orderedImages as $image)
+                            <button type="button" data-bs-target="#productImagesCarousel" data-bs-slide-to="{{ $loop->index }}" class="btn p-0 border-0 bg-transparent">
+                                <x-product-thumbnail :path="$image->path" :alt="$product->name" />
+                            </button>
+                        @endforeach
+                    </div>
+                @endif
+            @endif
         </div>
         <div class="col-md-6">
             <h1>{{ $product->name }}</h1>
