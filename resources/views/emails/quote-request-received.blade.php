@@ -8,6 +8,8 @@
 
 @if ($quoteRequest->product)
     <p><strong>Product:</strong> {{ $quoteRequest->product->name }}</p>
+    <x-product-thumbnail :path="optional($quoteRequest->product->primaryImage())->path" :alt="$quoteRequest->product->name" />
+    <p><a href="{{ url('/products/'.$quoteRequest->product->path()) }}">View Product Page</a></p>
 @endif
 
 @if ($quoteRequest->message)
