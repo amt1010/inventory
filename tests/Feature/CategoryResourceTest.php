@@ -68,7 +68,16 @@ class CategoryResourceTest extends TestCase
         $admin->assignRole('admin');
         $this->actingAs($admin, 'staff');
 
-        Category::factory()->create(['name' => 'Admin Made This', 'proposed_by_seller_id' => null]);
+        // Give it a parent so the pre-existing Parent column renders a real name
+        // rather than its own "— Top level —" placeholder -- otherwise the '—'
+        // asserted below could be satisfied by that column instead of proving
+        // the new Proposed By column's placeholder actually renders.
+        $parent = Category::factory()->create(['name' => 'Existing Parent', 'status' => 'published']);
+        Category::factory()->create([
+            'name' => 'Admin Made This',
+            'parent_id' => $parent->id,
+            'proposed_by_seller_id' => null,
+        ]);
 
         Livewire::test(\App\Filament\Resources\CategoryResource\Pages\ListCategories::class)
             ->assertSeeText('—');

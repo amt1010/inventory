@@ -164,4 +164,19 @@ class SellerCategoryProposalTest extends TestCase
 
         $this->assertFalse($findNote($test)->isVisible());
     }
+
+    public function test_a_sellers_proposed_draft_category_is_invisible_on_the_public_catalog(): void
+    {
+        $seller = Seller::factory()->create(['status' => 'approved']);
+        $category = Category::factory()->create([
+            'slug' => 'seller-proposed-category',
+            'status' => 'draft',
+            'proposed_by_seller_id' => $seller->id,
+        ]);
+
+        $response = $this->get('/products');
+
+        $response->assertOk();
+        $response->assertViewHas('children', fn ($children) => ! $children->contains($category));
+    }
 }
