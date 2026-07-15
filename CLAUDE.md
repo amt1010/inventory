@@ -139,7 +139,20 @@ Day-to-day commands:
   your seeded dev data — don't "fix" it back to MySQL.
 - `php artisan test --filter=SomeTestName` — run a single test while iterating
 - `php artisan tinker` — inspect data interactively
-- `php artisan migrate:fresh --seed` — reset the local (MySQL) DB to a known state
+- `php artisan migrate` — apply new migrations only; never touches or drops
+  existing data. **Use this — not `migrate:fresh` — to verify a new migration
+  applies cleanly to the dev database**, including in any agentic
+  implementation-plan "verification" step. This database holds real data
+  entered through the actual app (product images, seller/buyer accounts) —
+  treat it like production, not disposable scratch space.
+- `php artisan migrate:fresh --seed` — ⚠️ **DESTROYS ALL DATA** in the local
+  MySQL database and reloads only the dummy seed data. This is a one-way
+  reset for when you deliberately want to throw away everything and start
+  over from a known fixture state — it is **not** a routine "make sure the
+  DB is up to date" command and must never be run once real data exists in
+  it (uploaded product images, registered sellers/buyers, anything entered
+  through `/admin`, `/seller`, or the public site). If you're unsure whether
+  the current dev DB has real data worth keeping, ask before running this.
 - `/admin` — staff CMS (Admin / Content Editor / Sales)
 - `/seller` — seller portal
 - `/products` — public catalog root
