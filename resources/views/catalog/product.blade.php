@@ -126,11 +126,12 @@
         <div class="row row-cols-1 row-cols-md-4 g-4">
             @foreach ($related as $relatedProduct)
                 <div class="col">
-                    <div class="card h-100">
+                    <a href="{{ url('/products/'.$relatedProduct->path()) }}" class="card h-100 text-decoration-none">
+                        <x-product-thumbnail :path="optional($relatedProduct->primaryImage())->path" :alt="$relatedProduct->name" class="card-img-top" />
                         <div class="card-body">
-                            <h6 class="card-title">{{ $relatedProduct->name }}</h6>
+                            <h6 class="card-title text-dark">{{ $relatedProduct->name }}</h6>
                         </div>
-                    </div>
+                    </a>
                 </div>
             @endforeach
         </div>
