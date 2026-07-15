@@ -46,4 +46,31 @@ class CategoryResourceTest extends TestCase
             ->call('create')
             ->assertHasFormErrors(['slug']);
     }
+
+    public function test_the_categories_table_shows_the_proposing_sellers_company_name(): void
+    {
+        $this->seed(RoleSeeder::class);
+        $admin = Staff::factory()->create();
+        $admin->assignRole('admin');
+        $this->actingAs($admin, 'staff');
+
+        $seller = \App\Models\Seller::factory()->create(['company_name' => 'Rao Traders']);
+        Category::factory()->create(['status' => 'draft', 'proposed_by_seller_id' => $seller->id]);
+
+        Livewire::test(\App\Filament\Resources\CategoryResource\Pages\ListCategories::class)
+            ->assertSee('Rao Traders');
+    }
+
+    public function test_the_categories_table_shows_a_placeholder_for_admin_authored_categories(): void
+    {
+        $this->seed(RoleSeeder::class);
+        $admin = Staff::factory()->create();
+        $admin->assignRole('admin');
+        $this->actingAs($admin, 'staff');
+
+        Category::factory()->create(['name' => 'Admin Made This', 'proposed_by_seller_id' => null]);
+
+        Livewire::test(\App\Filament\Resources\CategoryResource\Pages\ListCategories::class)
+            ->assertSeeText('—');
+    }
 }

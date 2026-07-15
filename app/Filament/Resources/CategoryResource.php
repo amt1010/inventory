@@ -58,6 +58,9 @@ class CategoryResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name')->searchable(),
+                TextColumn::make('proposedBy.company_name')
+                    ->label('Proposed By')
+                    ->placeholder('—'),
                 TextColumn::make('parent.name')->label('Parent')->placeholder('— Top level —'),
                 TextColumn::make('status')->badge(),
                 TextColumn::make('sort_order')->sortable(),
