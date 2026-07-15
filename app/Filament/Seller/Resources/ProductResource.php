@@ -132,13 +132,14 @@ class ProductResource extends Resource
                     ->modalSubmitActionLabel('Accept Changes')
                     ->action(function (Product $record) {
                         $trail = $record->latestPendingEditTrail();
-                        $trail?->update(['accepted_at' => now()]);
 
                         if (! $record->publish()) {
                             $record->update(['status' => 'pending_review']);
 
                             return;
                         }
+
+                        $trail?->update(['accepted_at' => now()]);
 
                         try {
                             Mail::to($record->seller->email)->send(new ProductListingLive($record));

@@ -30,6 +30,11 @@ class SellerPanelProvider extends PanelProvider
         FilamentView::registerRenderHook(
             PanelsRenderHook::AUTH_LOGIN_FORM_AFTER,
             function (): Htmlable {
+                // AUTH_LOGIN_FORM_AFTER isn't scopable by panel in this Filament
+                // version -- both panels render the same Filament\Pages\Auth\Login
+                // class, so `registerRenderHook(..., scopes: 'seller')` never
+                // matches. Registering unscoped and checking the current panel at
+                // render time is what actually confines this to /seller/login.
                 if (Filament::getCurrentPanel()?->getId() !== 'seller') {
                     return new HtmlString('');
                 }
