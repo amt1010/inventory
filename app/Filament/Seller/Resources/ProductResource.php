@@ -71,14 +71,58 @@ class ProductResource extends Resource
         return false;
     }
 
+    private static function categoryOptionsQuery(): Builder
+    {
+        return Category::query()
+            ->where(function (Builder $query) {
+                $query->where('status', 'published')
+                    ->orWhere(function (Builder $query) {
+                        $query->where('status', 'draft')
+                            ->where('proposed_by_seller_id', auth('seller')->id());
+                    });
+            });
+    }
+
     public static function form(Form $form): Form
     {
         return $form->schema([
             Select::make('category_id')
                 ->label('Category')
-                ->options(fn () => Category::query()->whereDoesntHave('children')->pluck('name', 'id'))
+                ->options(fn () => static::categoryOptionsQuery()
+                    ->whereDoesntHave('children')
+                    ->pluck('name', 'id'))
                 ->searchable()
-                ->required(),
+                ->required()
+                ->createOptionForm([
+                    Select::make('parent_id')
+                        ->label('Parent Category')
+                        ->options(fn () => static::categoryOptionsQuery()->pluck('name', 'id'))
+                        ->searchable()
+                        ->placeholder('— Top level (no parent) —'),
+                    TextInput::make('name')
+                        ->label('Category / Sub-Category Name')
+                        ->required()
+                        ->rule(fn (callable $get) => function (string $attribute, $value, \Closure $fail) use ($get) {
+                            $slug = Str::slug($value);
+
+                            if (Category::query()->where('parent_id', $get('parent_id'))->where('slug', $slug)->exists()) {
+                                $fail('A category with a similar name already exists under the selected parent.');
+                            }
+                        }),
+                ])
+                ->createOptionUsing(function (array $data) {
+                    return Category::create([
+                        'parent_id' => $data['parent_id'] ?? null,
+                        'name' => $data['name'],
+                        'slug' => Str::slug($data['name']),
+                        'status' => 'draft',
+                        'proposed_by_seller_id' => auth('seller')->id(),
+                    ])->id;
+                }),
+            Placeholder::make('category_status_note')
+                ->label('')
+                ->content('Category status: Draft — an administrator needs to review and publish this category before your product can go live.')
+                ->visible(fn (callable $get) => optional(Category::find($get('category_id')))->status === 'draft'),
             TextInput::make('name')
                 ->required()
                 ->live(onBlur: true)
