@@ -12,12 +12,17 @@ class Category extends Model
     use HasFactory;
 
     protected $fillable = [
-        'parent_id', 'name', 'slug', 'description', 'image', 'status', 'sort_order',
+        'parent_id', 'proposed_by_seller_id', 'name', 'slug', 'description', 'image', 'status', 'sort_order',
     ];
 
     public function parent(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'parent_id');
+    }
+
+    public function proposedBy(): BelongsTo
+    {
+        return $this->belongsTo(Seller::class, 'proposed_by_seller_id');
     }
 
     public function children(): HasMany
