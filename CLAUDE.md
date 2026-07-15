@@ -44,6 +44,13 @@ is being built phase by phase) live in `docs/superpowers/plans/`.
 
 - `app/Models/Category.php` — self-referencing tree (`parent_id`), any depth. A
   category with children renders as a hub; one without renders its products.
+  Sellers may propose a new leaf category inline from the product form (a
+  Filament create-option combo box on `category_id`); the proposal lands as an
+  ordinary `status = 'draft'` category tagged with `proposed_by_seller_id` —
+  invisible to buyers until Admin reviews, optionally corrects (name, slug,
+  parent), and publishes it via the existing `/admin/categories` screen, at
+  which point the associated product's own review can proceed to
+  `Product::publish()` (which now also requires the category to be published).
 - `app/Models/Product.php` — belongs to exactly one `Seller` and one leaf
   `Category`. `status` moves through `pending_review → published` (or
   `rejected`/`archived`). `price_display` is a free-text field settable only by the
