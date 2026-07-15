@@ -82,4 +82,19 @@ class ProductModelTest extends TestCase
 
         $this->assertSame('rejected', $product->statusAfterEdit());
     }
+
+    public function test_a_product_cannot_be_published_while_its_category_is_still_draft(): void
+    {
+        $category = Category::factory()->create(['status' => 'draft']);
+        $product = Product::factory()->create([
+            'category_id' => $category->id,
+            'price_display' => '₹1,000 – ₹1,500',
+            'status' => 'pending_review',
+        ]);
+
+        $result = $product->publish();
+
+        $this->assertFalse($result);
+        $this->assertSame('pending_review', $product->fresh()->status);
+    }
 }

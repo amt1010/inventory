@@ -75,6 +75,10 @@ class Product extends Model
             return false;
         }
 
+        if (! $this->category->isPublished()) {
+            return false;
+        }
+
         $this->status = 'published';
         $this->save();
 
