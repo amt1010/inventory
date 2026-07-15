@@ -11,6 +11,17 @@ class ProductImage extends Model
 
     protected $casts = ['is_primary' => 'boolean'];
 
+    protected static function booted(): void
+    {
+        static::saved(function (ProductImage $image) {
+            if ($image->is_primary) {
+                static::where('product_id', $image->product_id)
+                    ->where('id', '!=', $image->id)
+                    ->update(['is_primary' => false]);
+            }
+        });
+    }
+
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
