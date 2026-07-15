@@ -28,7 +28,8 @@ class CategoryResource extends Resource
                 ->label('Parent Category')
                 ->relationship('parent', 'name')
                 ->searchable()
-                ->preload(),
+                ->preload()
+                ->placeholder('— Top level (no parent) —'),
             TextInput::make('name')
                 ->required()
                 ->live(onBlur: true)
