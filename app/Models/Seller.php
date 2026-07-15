@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Filament\Models\Contracts\FilamentUser;
+use Filament\Models\Contracts\HasName;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class Seller extends Authenticatable implements FilamentUser
+class Seller extends Authenticatable implements FilamentUser, HasName
 {
     use HasFactory, Notifiable;
 
@@ -50,5 +51,10 @@ class Seller extends Authenticatable implements FilamentUser
     public function canAccessPanel(Panel $panel): bool
     {
         return $panel->getId() === 'seller' && $this->isApproved();
+    }
+
+    public function getFilamentName(): string
+    {
+        return $this->contact_person ?: $this->company_name;
     }
 }
