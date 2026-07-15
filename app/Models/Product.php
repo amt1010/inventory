@@ -76,6 +76,11 @@ class Product extends Model
         return $this->status === 'published' ? 'pending_review' : $this->status;
     }
 
+    public function primaryImage(): ?ProductImage
+    {
+        return $this->images->firstWhere('is_primary', true) ?? $this->images->first();
+    }
+
     public function path(): string
     {
         return $this->category->path().'/'.$this->slug;
