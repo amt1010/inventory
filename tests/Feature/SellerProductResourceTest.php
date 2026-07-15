@@ -156,4 +156,13 @@ class SellerProductResourceTest extends TestCase
 
         $this->assertSame('pending_review', $product->fresh()->status);
     }
+
+    public function test_an_approved_seller_sees_a_create_button_on_the_products_list(): void
+    {
+        $seller = Seller::factory()->create(['status' => 'approved']);
+        $this->actingAs($seller, 'seller');
+
+        Livewire::test(ListProducts::class)
+            ->assertActionExists('create');
+    }
 }
