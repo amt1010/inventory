@@ -5,6 +5,7 @@ namespace App\Filament\Seller\Resources;
 use App\Filament\Resources\ProductResource\RelationManagers as AdminRelationManagers;
 use App\Filament\Seller\Resources\ProductResource\Pages;
 use App\Filament\Seller\Resources\ProductResource\RelationManagers;
+use App\Mail\ProductListingLive;
 use App\Models\Category;
 use App\Models\Product;
 use Filament\Forms\Components\FileUpload;
@@ -15,10 +16,13 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class ProductResource extends Resource
@@ -115,6 +119,36 @@ class ProductResource extends Resource
                 TextColumn::make('quote_requests_count')
                     ->counts('quoteRequests')
                     ->label('Quote Requests'),
+            ])
+            ->actions([
+                Action::make('acceptChanges')
+                    ->label('Accept Changes')
+                    ->visible(fn (Product $record) => $record->status === 'pending_seller_acceptance')
+                    ->requiresConfirmation()
+                    ->modalHeading('Review Admin Changes')
+                    ->modalContent(fn (Product $record) => view('filament.seller.partials.edit-diff', [
+                        'trail' => $record->latestPendingEditTrail(),
+                    ]))
+                    ->modalSubmitActionLabel('Accept Changes')
+                    ->action(function (Product $record) {
+                        $trail = $record->latestPendingEditTrail();
+                        $trail?->update(['accepted_at' => now()]);
+
+                        if (! $record->publish()) {
+                            $record->update(['status' => 'pending_review']);
+
+                            return;
+                        }
+
+                        try {
+                            Mail::to($record->seller->email)->send(new ProductListingLive($record));
+                        } catch (\Throwable $exception) {
+                            Log::error('Failed to send product listing live email.', [
+                                'product_id' => $record->id,
+                                'exception' => $exception->getMessage(),
+                            ]);
+                        }
+                    }),
             ]);
     }
 
