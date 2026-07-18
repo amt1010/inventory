@@ -23,12 +23,4 @@ return [
         'Germany' => 'Germany',
         'Other' => 'Other',
     ],
-
-    'markets' => [
-        'Broadband' => 'Broadband',
-        'Enterprise' => 'Enterprise',
-        'Energy' => 'Energy',
-        'Industrial' => 'Industrial',
-        'Hyperscale' => 'Hyperscale',
-    ],
 ];

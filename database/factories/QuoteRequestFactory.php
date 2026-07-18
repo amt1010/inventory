@@ -19,7 +19,6 @@ class QuoteRequestFactory extends Factory
             'phone' => $this->faker->phoneNumber(),
             'company' => $this->faker->company(),
             'country' => 'India',
-            'market' => 'Industrial',
             'city' => $this->faker->city(),
             'state' => $this->faker->state(),
             'message' => $this->faker->paragraph(),
