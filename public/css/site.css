@@ -65,12 +65,14 @@ footer {
 }
 
 footer a {
-    color: #cfcfcf;
+    color: #f1f3f5;
     text-decoration: none;
 }
 
-footer a:hover {
+footer a:hover,
+footer a:focus {
     color: var(--bs-primary);
+    text-decoration: underline;
 }
 
 .text-primary {
@@ -79,4 +81,20 @@ footer a:hover {
 
 .breadcrumb-item a {
     color: var(--bs-primary);
+}
+
+/* Product image carousel controls sit over a light letterbox background,
+   so the default white arrows are invisible -- give them a dark backing. */
+#productImagesCarousel .carousel-control-prev-icon,
+#productImagesCarousel .carousel-control-next-icon {
+    background-color: rgba(28, 28, 28, 0.6);
+    border-radius: 50%;
+    padding: 1.1rem;
+    background-size: 50% 50%;
+}
+
+#productImagesCarousel .carousel-control-prev,
+#productImagesCarousel .carousel-control-next {
+    width: 10%;
+    opacity: 1;
 }
