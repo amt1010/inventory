@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Filament\Support\CategoryTree;
 use App\Models\Category;
+use App\Support\CategoryHierarchy;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
@@ -63,9 +64,12 @@ class CategoryResource extends Resource
         return $form->schema([
             Select::make('parent_id')
                 ->label('Parent Category')
-                ->relationship('parent', 'name')
+                ->options(fn (?Category $record) => CategoryHierarchy::options(
+                    $record
+                        ? fn (Builder $query) => $query->whereNotIn('id', CategoryHierarchy::descendantAndSelfIds($record))
+                        : null
+                ))
                 ->searchable()
-                ->preload()
                 ->placeholder('— Top level (no parent) —'),
             TextInput::make('name')
                 ->required()

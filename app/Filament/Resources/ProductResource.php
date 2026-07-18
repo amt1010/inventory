@@ -5,9 +5,9 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\RelationManagers;
 use App\Mail\ProductListingLive;
-use App\Models\Category;
 use App\Models\Product;
 use App\Models\Seller;
+use App\Support\CategoryHierarchy;
 use App\Support\IndianPrice;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
@@ -40,7 +40,7 @@ class ProductResource extends Resource
                 ->required(),
             Select::make('category_id')
                 ->label('Category')
-                ->options(fn () => Category::query()->pluck('name', 'id'))
+                ->options(fn () => CategoryHierarchy::options())
                 ->searchable()
                 ->required(),
             TextInput::make('name')
