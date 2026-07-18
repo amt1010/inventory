@@ -5,9 +5,27 @@
 @section('content')
     <h1>Search Results for "{{ $query }}"</h1>
 
-    @if ($results->isEmpty())
-        <p>No products found.</p>
-    @else
+    @if ($categories->isNotEmpty())
+        <h2 class="h4 mt-3">Categories</h2>
+        <div class="list-group mb-4">
+            @foreach ($categories as $category)
+                <a href="{{ url('/products/'.$category->path()) }}" class="list-group-item list-group-item-action">
+                    {{ $category->name }}
+                    @if ($category->parent)
+                        <small class="text-muted">in {{ $category->parent->name }}</small>
+                    @endif
+                </a>
+            @endforeach
+        </div>
+    @endif
+
+    @if ($categories->isNotEmpty())
+        <h2 class="h4">Products</h2>
+    @endif
+
+    @if ($results->isEmpty() && $categories->isEmpty())
+        <p>No results found.</p>
+    @elseif ($results->isNotEmpty())
         <div class="row row-cols-1 row-cols-md-3 g-4">
             @foreach ($results as $product)
                 <div class="col">
