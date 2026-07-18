@@ -33,6 +33,28 @@ class CatalogSearchTest extends TestCase
         $response->assertDontSee('Hidden Cable');
     }
 
+    public function test_search_matches_products_by_description_when_the_name_does_not_contain_the_term(): void
+    {
+        Product::factory()->create([
+            'name' => 'Generic Distribution Cable',
+            'short_description' => 'Manufactured by AFL for outdoor use',
+            'description' => 'A rugged cable.',
+            'status' => 'published',
+        ]);
+        Product::factory()->create([
+            'name' => 'Unrelated Widget',
+            'short_description' => 'nothing relevant here',
+            'description' => 'plain widget copy',
+            'status' => 'published',
+        ]);
+
+        $response = $this->get('/search?q=afl');
+
+        $response->assertOk();
+        $response->assertSee('Generic Distribution Cable');
+        $response->assertDontSee('Unrelated Widget');
+    }
+
     public function test_search_returns_matching_published_categories(): void
     {
         Category::factory()->create(['name' => 'Fibre Optic Cables', 'status' => 'published']);
