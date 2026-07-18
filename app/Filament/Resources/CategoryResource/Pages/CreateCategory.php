@@ -15,7 +15,8 @@ class CreateCategory extends CreateRecord
     protected function handleRecordCreation(array $data): Model
     {
         $subcategories = $data['subcategories'] ?? [];
-        unset($data['subcategories']);
+        $linkExisting = $data['link_existing'] ?? [];
+        unset($data['subcategories'], $data['link_existing']);
 
         /** @var Category $record */
         $record = static::getModel()::create($data);
@@ -25,6 +26,15 @@ class CreateCategory extends CreateRecord
         CategoryTree::persist($record, $subcategories, [
             'status' => $record->status,
         ]);
+
+        // Re-parent existing orphan (parentless) categories under this one.
+        if ($linkExisting !== []) {
+            Category::query()
+                ->whereIn('id', $linkExisting)
+                ->whereNull('parent_id')
+                ->whereKeyNot($record->id)
+                ->update(['parent_id' => $record->id]);
+        }
 
         return $record;
     }

@@ -8,6 +8,7 @@ use App\Filament\Seller\Resources\ProductResource\RelationManagers;
 use App\Mail\ProductListingLive;
 use App\Models\Category;
 use App\Models\Product;
+use App\Support\CategoryHierarchy;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\RichEditor;
@@ -70,16 +71,15 @@ class ProductResource extends Resource
         return false;
     }
 
-    private static function categoryOptionsQuery(): Builder
+    private static function categoryOptionsQuery(Builder $query): Builder
     {
-        return Category::query()
-            ->where(function (Builder $query) {
-                $query->where('status', 'published')
-                    ->orWhere(function (Builder $query) {
-                        $query->where('status', 'draft')
-                            ->where('proposed_by_seller_id', auth('seller')->id());
-                    });
-            });
+        return $query->where(function (Builder $query) {
+            $query->where('status', 'published')
+                ->orWhere(function (Builder $query) {
+                    $query->where('status', 'draft')
+                        ->where('proposed_by_seller_id', auth('seller')->id());
+                });
+        });
     }
 
     public static function form(Form $form): Form
@@ -87,9 +87,7 @@ class ProductResource extends Resource
         return $form->schema([
             Select::make('category_id')
                 ->label('Category')
-                ->options(fn () => static::categoryOptionsQuery()
-                    ->whereDoesntHave('children')
-                    ->pluck('name', 'id'))
+                ->options(fn () => CategoryHierarchy::options(fn (Builder $query) => static::categoryOptionsQuery($query)->whereDoesntHave('children')))
                 ->searchable()
                 ->required()
                 ->helperText('Need a category that isn\'t listed? Create it under "My Categories" first.'),

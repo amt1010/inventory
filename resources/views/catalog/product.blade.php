@@ -3,6 +3,9 @@
 @section('title', $product->name)
 
 @section('content')
+    @if ($preview ?? false)
+        <div class="alert alert-warning">Staff preview — this page may not be publicly visible yet.</div>
+    @endif
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ url('/products') }}">Home</a></li>

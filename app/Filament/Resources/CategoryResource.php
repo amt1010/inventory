@@ -5,12 +5,15 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Filament\Support\CategoryTree;
 use App\Models\Category;
+use App\Support\CategoryHierarchy;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -63,9 +66,12 @@ class CategoryResource extends Resource
         return $form->schema([
             Select::make('parent_id')
                 ->label('Parent Category')
-                ->relationship('parent', 'name')
+                ->options(fn (?Category $record) => CategoryHierarchy::options(
+                    $record
+                        ? fn (Builder $query) => $query->whereNotIn('id', CategoryHierarchy::descendantAndSelfIds($record))
+                        : null
+                ))
                 ->searchable()
-                ->preload()
                 ->placeholder('— Top level (no parent) —'),
             TextInput::make('name')
                 ->required()
@@ -76,6 +82,14 @@ class CategoryResource extends Resource
                 ->rule(fn (callable $get, $record) => Rule::unique('categories', 'slug')
                     ->where(fn ($query) => $query->where('parent_id', $get('parent_id')))
                     ->ignore($record?->id)),
+            CategoryTree::subcategoriesRepeater(),
+            Select::make('link_existing')
+                ->label('Link to existing category')
+                ->helperText('Attach existing top-level categories that have no parent as subcategories of this one.')
+                ->multiple()
+                ->searchable()
+                ->options(fn () => CategoryHierarchy::options(fn (Builder $query) => $query->whereNull('parent_id')))
+                ->visibleOn('create'),
             RichEditor::make('description'),
             FileUpload::make('image')
                 ->image()
@@ -87,7 +101,6 @@ class CategoryResource extends Resource
             TextInput::make('sort_order')
                 ->numeric()
                 ->default(0),
-            CategoryTree::subcategoriesRepeater(),
         ]);
     }
 
@@ -104,6 +117,20 @@ class CategoryResource extends Resource
                 TextColumn::make('parent.name')->label('Parent')->placeholder('— Top level —'),
                 TextColumn::make('status')->badge(),
                 TextColumn::make('sort_order'),
+            ])
+            ->actions([
+                Action::make('preview')
+                    ->label('Preview')
+                    ->icon('heroicon-o-eye')
+                    ->color('gray')
+                    ->url(fn (Category $record) => route('staff.preview.category', $record))->openUrlInNewTab(),
+                Action::make('viewLive')
+                    ->label('View live')
+                    ->icon('heroicon-o-arrow-top-right-on-square')
+                    ->color('gray')
+                    ->visible(fn (Category $record) => $record->status === 'published')
+                    ->url(fn (Category $record) => url('/products/'.$record->path()))->openUrlInNewTab(),
+                EditAction::make(),
             ])
             ->paginated(false)
             ->modifyQueryUsing(function (Builder $query) {

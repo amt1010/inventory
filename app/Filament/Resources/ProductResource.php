@@ -5,9 +5,9 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\RelationManagers;
 use App\Mail\ProductListingLive;
-use App\Models\Category;
 use App\Models\Product;
 use App\Models\Seller;
+use App\Support\CategoryHierarchy;
 use App\Support\IndianPrice;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
@@ -40,7 +40,7 @@ class ProductResource extends Resource
                 ->required(),
             Select::make('category_id')
                 ->label('Category')
-                ->options(fn () => Category::query()->pluck('name', 'id'))
+                ->options(fn () => CategoryHierarchy::options())
                 ->searchable()
                 ->required(),
             TextInput::make('name')
@@ -129,6 +129,17 @@ class ProductResource extends Resource
                 TextColumn::make('price_display')->label('Price'),
             ])
             ->actions([
+                Action::make('preview')
+                    ->label('Preview')
+                    ->icon('heroicon-o-eye')
+                    ->color('gray')
+                    ->url(fn (Product $record) => route('staff.preview.product', $record))->openUrlInNewTab(),
+                Action::make('viewLive')
+                    ->label('View live')
+                    ->icon('heroicon-o-arrow-top-right-on-square')
+                    ->color('gray')
+                    ->visible(fn (Product $record) => $record->status === 'published')
+                    ->url(fn (Product $record) => url('/products/'.$record->path()))->openUrlInNewTab(),
                 Action::make('publish')
                     ->visible(fn (Product $record) => $record->status !== 'pending_seller_acceptance'
                         && (auth('staff')->user()?->can('approve', Product::class) ?? false))

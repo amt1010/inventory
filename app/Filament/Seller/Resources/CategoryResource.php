@@ -5,6 +5,7 @@ namespace App\Filament\Seller\Resources;
 use App\Filament\Seller\Resources\CategoryResource\Pages;
 use App\Filament\Support\CategoryTree;
 use App\Models\Category;
+use App\Support\CategoryHierarchy;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
@@ -69,16 +70,17 @@ class CategoryResource extends Resource
         return false;
     }
 
-    private static function parentOptionsQuery(): Builder
+    // Sellers may nest under any published category or under one of their own
+    // draft proposals -- never under another seller's pending proposal.
+    private static function constrainToSelectable(Builder $query): Builder
     {
-        return Category::query()
-            ->where(function (Builder $query) {
-                $query->where('status', 'published')
-                    ->orWhere(function (Builder $query) {
-                        $query->where('status', 'draft')
-                            ->where('proposed_by_seller_id', auth('seller')->id());
-                    });
-            });
+        return $query->where(function (Builder $query) {
+            $query->where('status', 'published')
+                ->orWhere(function (Builder $query) {
+                    $query->where('status', 'draft')
+                        ->where('proposed_by_seller_id', auth('seller')->id());
+                });
+        });
     }
 
     public static function form(Form $form): Form
@@ -86,7 +88,7 @@ class CategoryResource extends Resource
         return $form->schema([
             Select::make('parent_id')
                 ->label('Parent Category')
-                ->options(fn () => static::parentOptionsQuery()->pluck('name', 'id'))
+                ->options(fn () => CategoryHierarchy::options(fn (Builder $query) => static::constrainToSelectable($query)))
                 ->searchable()
                 ->placeholder('— Top level (no parent) —')
                 ->helperText('Leave blank for a top-level category, or nest under any existing category to any depth.'),
@@ -107,8 +109,18 @@ class CategoryResource extends Resource
                     }
                 }),
             TextInput::make('slug')->required(),
-            RichEditor::make('description'),
             CategoryTree::subcategoriesRepeater(),
+            Select::make('link_existing')
+                ->label('Link to existing category')
+                ->helperText('Attach one of your existing top-level draft categories (with no parent) as a subcategory of this one.')
+                ->multiple()
+                ->searchable()
+                ->options(fn () => CategoryHierarchy::options(fn (Builder $query) => $query
+                    ->whereNull('parent_id')
+                    ->where('status', 'draft')
+                    ->where('proposed_by_seller_id', auth('seller')->id())))
+                ->visibleOn('create'),
+            RichEditor::make('description'),
             Placeholder::make('review_note')
                 ->label('')
                 ->content('New categories are submitted as drafts for administrator review before they appear on the public catalog. An administrator may adjust the name, slug, or parent before publishing.'),
