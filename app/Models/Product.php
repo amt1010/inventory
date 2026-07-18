@@ -19,11 +19,6 @@ class Product extends Model
         'price_display', 'quantity', 'status', 'rejection_reason', 'sort_order',
     ];
 
-    protected $casts = [
-        'features' => 'array',
-        'applications' => 'array',
-    ];
-
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);

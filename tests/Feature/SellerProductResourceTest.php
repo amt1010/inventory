@@ -27,8 +27,6 @@ class SellerProductResourceTest extends TestCase
                 'name' => 'Aerial Fiber Cable',
                 'slug' => 'aerial-fiber-cable',
                 'quantity' => 1000,
-                'features' => [],
-                'applications' => [],
             ])
             ->call('create')
             ->assertHasNoFormErrors();
@@ -60,8 +58,6 @@ class SellerProductResourceTest extends TestCase
                 'price_display' => '₹9,999 hacked',
                 'status' => 'published',
                 'seller_id' => $otherSeller->id,
-                'features' => [],
-                'applications' => [],
             ])
             ->call('create')
             ->assertHasNoFormErrors();

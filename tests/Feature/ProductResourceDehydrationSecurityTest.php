@@ -41,8 +41,6 @@ class ProductResourceDehydrationSecurityTest extends TestCase
                 'name' => 'Test Product',
                 'slug' => 'test-product',
                 'price_display' => '₹1,200 – ₹1,800 per reel',
-                'features' => [],
-                'applications' => [],
             ])
             ->call('create')
             ->assertHasNoFormErrors();
@@ -76,8 +74,6 @@ class ProductResourceDehydrationSecurityTest extends TestCase
                 'slug' => 'sneaky-product',
                 'price_display' => '₹1,200 – ₹1,800 per reel',
                 'status' => 'published',
-                'features' => [],
-                'applications' => [],
             ])
             ->call('create')
             ->assertHasFormErrors(['status']);
@@ -154,8 +150,6 @@ class ProductResourceDehydrationSecurityTest extends TestCase
                 'slug' => 'editor-product',
                 'price_display' => '₹9,999 – hacked',
                 'status' => 'published',
-                'features' => [],
-                'applications' => [],
             ])
             ->call('create')
             ->assertHasFormErrors(['status']);
@@ -183,8 +177,6 @@ class ProductResourceDehydrationSecurityTest extends TestCase
                 'category_id' => $category->id,
                 'name' => 'Editor Created Product',
                 'slug' => 'editor-created-product',
-                'features' => [],
-                'applications' => [],
             ])
             ->call('create')
             ->assertHasNoFormErrors();

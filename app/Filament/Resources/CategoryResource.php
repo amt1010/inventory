@@ -12,6 +12,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
@@ -20,6 +21,41 @@ class CategoryResource extends Resource
     protected static ?string $model = Category::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    /**
+     * Depth-first ordering of every category and its indentation depth, rebuilt
+     * once per table render so the list reads as a parent → child tree. Kept on
+     * the class (not a persistent cache) and refreshed in modifyQueryUsing so it
+     * never goes stale between renders.
+     *
+     * @var array{ordered: list<int>, depth: array<int, int>}
+     */
+    protected static array $tree = ['ordered' => [], 'depth' => []];
+
+    protected static function rebuildTree(): void
+    {
+        $all = Category::query()->orderBy('sort_order')->orderBy('name')->get(['id', 'parent_id']);
+
+        $children = [];
+        foreach ($all as $category) {
+            $children[$category->parent_id ?? 0][] = $category->id;
+        }
+
+        $ordered = [];
+        $depth = [];
+
+        $walk = function (int $parentId, int $level) use (&$walk, $children, &$ordered, &$depth): void {
+            foreach ($children[$parentId] ?? [] as $id) {
+                $ordered[] = $id;
+                $depth[$id] = $level;
+                $walk($id, $level + 1);
+            }
+        };
+
+        $walk(0, 0);
+
+        static::$tree = ['ordered' => $ordered, 'depth' => $depth];
+    }
 
     public static function form(Form $form): Form
     {
@@ -57,15 +93,28 @@ class CategoryResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('name')->searchable(),
+                TextColumn::make('name')
+                    ->searchable()
+                    ->formatStateUsing(fn (string $state, Category $record) => str_repeat('— ', static::$tree['depth'][$record->id] ?? 0).$state),
                 TextColumn::make('proposedBy.company_name')
                     ->label('Proposed By')
                     ->placeholder('—'),
                 TextColumn::make('parent.name')->label('Parent')->placeholder('— Top level —'),
                 TextColumn::make('status')->badge(),
-                TextColumn::make('sort_order')->sortable(),
+                TextColumn::make('sort_order'),
             ])
-            ->defaultSort('sort_order');
+            ->paginated(false)
+            ->modifyQueryUsing(function (Builder $query) {
+                static::rebuildTree();
+
+                if (static::$tree['ordered'] !== []) {
+                    $cases = collect(static::$tree['ordered'])
+                        ->map(fn (int $id, int $position) => "WHEN {$id} THEN {$position}")
+                        ->implode(' ');
+
+                    $query->orderByRaw("CASE id {$cases} END");
+                }
+            });
     }
 
     public static function getPages(): array

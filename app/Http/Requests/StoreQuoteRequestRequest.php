@@ -24,7 +24,6 @@ class StoreQuoteRequestRequest extends FormRequest
             'phone' => ['required', 'string', 'max:50'],
             'company' => ['nullable', 'string', 'max:255'],
             'country' => ['nullable', 'string', 'max:255'],
-            'market' => ['nullable', 'string', 'max:255'],
             'city' => ['nullable', 'string', 'max:255'],
             'state' => ['nullable', 'string', 'max:255'],
             'message' => ['nullable', 'string', 'max:5000'],

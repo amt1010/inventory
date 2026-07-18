@@ -10,7 +10,6 @@ use App\Models\Category;
 use App\Models\Product;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -134,8 +133,10 @@ class ProductResource extends Resource
                 ->minValue(0),
             TextInput::make('short_description'),
             RichEditor::make('description'),
-            Repeater::make('features')->simple(TextInput::make('value')->required()),
-            Repeater::make('applications')->simple(TextInput::make('value')->required()),
+            RichEditor::make('features')
+                ->helperText('Use a bulleted list for individual features.'),
+            RichEditor::make('applications')
+                ->helperText('Use a bulleted list for individual applications.'),
             FileUpload::make('spec_sheet_path')
                 ->label('Specification Sheet (PDF)')
                 ->directory('spec-sheets')

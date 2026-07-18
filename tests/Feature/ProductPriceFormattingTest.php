@@ -4,15 +4,15 @@ namespace Tests\Feature;
 
 use App\Filament\Resources\ProductResource\Pages\CreateProduct;
 use App\Models\Category;
+use App\Models\Product;
 use App\Models\Seller;
 use App\Models\Staff;
-use App\Models\Product;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
 
-class ProductQuantityFieldTest extends TestCase
+class ProductPriceFormattingTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -23,28 +23,29 @@ class ProductQuantityFieldTest extends TestCase
         $this->seed(RoleSeeder::class);
     }
 
-    public function test_a_content_editor_can_set_quantity_via_the_admin_create_form(): void
+    public function test_an_unformatted_price_is_saved_with_rupee_symbol_and_indian_grouping(): void
     {
-        $editor = Staff::factory()->create();
-        $editor->assignRole('content_editor');
-        $this->actingAs($editor, 'staff');
+        $admin = Staff::factory()->create();
+        $admin->assignRole('admin');
 
         $seller = Seller::factory()->create();
         $category = Category::factory()->create();
+
+        $this->actingAs($admin, 'staff');
 
         Livewire::test(CreateProduct::class)
             ->fillForm([
                 'seller_id' => $seller->id,
                 'category_id' => $category->id,
-                'name' => 'Quantity Test Product',
-                'slug' => 'quantity-test-product',
-                'quantity' => 250,
+                'name' => 'Priced Product',
+                'slug' => 'priced-product',
+                'price_display' => '100000 - 180000 per reel',
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
-        $product = Product::where('slug', 'quantity-test-product')->firstOrFail();
+        $product = Product::where('slug', 'priced-product')->firstOrFail();
 
-        $this->assertSame(250, $product->quantity);
+        $this->assertSame('₹1,00,000 - ₹1,80,000 per reel', $product->price_display);
     }
 }

@@ -42,6 +42,19 @@ class ProductHeroCarouselTest extends TestCase
         $response->assertSee('data-bs-slide-to="1"', false);
     }
 
+    public function test_the_main_image_uses_best_fit_and_is_not_cropped(): void
+    {
+        $category = Category::factory()->create(['status' => 'published']);
+        $product = Product::factory()->create(['category_id' => $category->id, 'status' => 'published']);
+        $product->images()->create(['path' => 'product-images/one.jpg', 'sort_order' => 0, 'is_primary' => true]);
+
+        $response = $this->get('/products/'.$product->path());
+
+        $response->assertOk();
+        $response->assertSee('object-fit: contain', false);
+        $response->assertDontSee('object-fit: cover;', false);
+    }
+
     public function test_a_product_with_no_images_renders_without_a_carousel(): void
     {
         $category = Category::factory()->create(['status' => 'published']);

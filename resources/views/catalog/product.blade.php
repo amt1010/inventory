@@ -25,10 +25,10 @@
             @endphp
             @if ($orderedImages->isNotEmpty())
                 <div id="productImagesCarousel" class="carousel slide mb-3" data-bs-ride="carousel">
-                    <div class="carousel-inner rounded-3">
+                    <div class="carousel-inner rounded-3 bg-light">
                         @foreach ($orderedImages as $image)
                             <div class="carousel-item @if ($loop->first) active @endif">
-                                <img src="{{ asset('storage/'.$image->path) }}" class="d-block w-100" style="max-height: 480px; object-fit: cover;" alt="{{ $product->name }}">
+                                <img src="{{ asset('storage/'.$image->path) }}" class="d-block w-100" style="height: 480px; object-fit: contain;" alt="{{ $product->name }}">
                             </div>
                         @endforeach
                     </div>
@@ -61,22 +61,14 @@
                 <p class="fs-4 text-primary">{{ $product->price_display }}</p>
             @endif
 
-            @if (! empty($product->features))
+            @if (filled($product->features))
                 <h5>Features</h5>
-                <ul>
-                    @foreach ($product->features as $feature)
-                        <li>{{ $feature }}</li>
-                    @endforeach
-                </ul>
+                <div>{!! $product->features !!}</div>
             @endif
 
-            @if (! empty($product->applications))
+            @if (filled($product->applications))
                 <h5>Applications</h5>
-                <ul>
-                    @foreach ($product->applications as $application)
-                        <li>{{ $application }}</li>
-                    @endforeach
-                </ul>
+                <div>{!! $product->applications !!}</div>
             @endif
 
             <div class="d-flex flex-wrap align-items-center gap-2 mt-3">
