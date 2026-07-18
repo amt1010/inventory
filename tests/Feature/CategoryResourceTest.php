@@ -82,4 +82,20 @@ class CategoryResourceTest extends TestCase
         Livewire::test(\App\Filament\Resources\CategoryResource\Pages\ListCategories::class)
             ->assertSeeText('—');
     }
+
+    public function test_the_admin_category_list_shows_children_indented_under_their_parent(): void
+    {
+        $this->seed(RoleSeeder::class);
+        $admin = Staff::factory()->create();
+        $admin->assignRole('admin');
+        $this->actingAs($admin, 'staff');
+
+        $parent = Category::factory()->create(['name' => 'Parent Cat', 'status' => 'published', 'sort_order' => 0]);
+        Category::factory()->create(['name' => 'Child Cat', 'parent_id' => $parent->id, 'status' => 'published', 'sort_order' => 0]);
+
+        // The child renders after the parent (tree order) and its name is
+        // indented to show the parent-child relationship.
+        Livewire::test(\App\Filament\Resources\CategoryResource\Pages\ListCategories::class)
+            ->assertSeeTextInOrder(['Parent Cat', '— Child Cat']);
+    }
 }
