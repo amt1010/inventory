@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CategoryResource\Pages;
+use App\Filament\Support\CategoryTree;
 use App\Models\Category;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
@@ -86,6 +87,7 @@ class CategoryResource extends Resource
             TextInput::make('sort_order')
                 ->numeric()
                 ->default(0),
+            CategoryTree::subcategoriesRepeater(),
         ]);
     }
 

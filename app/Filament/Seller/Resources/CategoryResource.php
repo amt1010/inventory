@@ -3,6 +3,7 @@
 namespace App\Filament\Seller\Resources;
 
 use App\Filament\Seller\Resources\CategoryResource\Pages;
+use App\Filament\Support\CategoryTree;
 use App\Models\Category;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\RichEditor;
@@ -107,6 +108,7 @@ class CategoryResource extends Resource
                 }),
             TextInput::make('slug')->required(),
             RichEditor::make('description'),
+            CategoryTree::subcategoriesRepeater(),
             Placeholder::make('review_note')
                 ->label('')
                 ->content('New categories are submitted as drafts for administrator review before they appear on the public catalog. An administrator may adjust the name, slug, or parent before publishing.'),

@@ -83,6 +83,42 @@ class CategoryResourceTest extends TestCase
             ->assertSeeText('—');
     }
 
+    public function test_an_admin_can_create_a_category_with_nested_subcategories_inline(): void
+    {
+        $this->seed(RoleSeeder::class);
+        $admin = Staff::factory()->create();
+        $admin->assignRole('admin');
+        $this->actingAs($admin, 'staff');
+
+        Livewire::test(CreateCategory::class)
+            ->fillForm([
+                'name' => 'Cables',
+                'slug' => 'cables',
+                'status' => 'published',
+                'subcategories' => [
+                    [
+                        'name' => 'Indoor',
+                        'subcategories' => [
+                            ['name' => 'Riser', 'subcategories' => []],
+                        ],
+                    ],
+                ],
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $top = Category::where('name', 'Cables')->firstOrFail();
+        $indoor = Category::where('name', 'Indoor')->firstOrFail();
+        $riser = Category::where('name', 'Riser')->firstOrFail();
+
+        $this->assertSame($top->id, $indoor->parent_id);
+        $this->assertSame($indoor->id, $riser->parent_id);
+
+        // Inline subcategories inherit the top-level category's status.
+        $this->assertSame('published', $indoor->status);
+        $this->assertSame('published', $riser->status);
+    }
+
     public function test_the_admin_category_list_shows_children_indented_under_their_parent(): void
     {
         $this->seed(RoleSeeder::class);

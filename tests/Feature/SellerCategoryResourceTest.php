@@ -36,6 +36,46 @@ class SellerCategoryResourceTest extends TestCase
         $this->assertSame($seller->id, $category->proposed_by_seller_id);
     }
 
+    public function test_a_seller_can_create_a_top_level_category_with_nested_subcategories_inline(): void
+    {
+        $seller = Seller::factory()->create(['status' => 'approved']);
+        $this->actingAs($seller, 'seller');
+
+        Livewire::test(CreateCategory::class)
+            ->fillForm([
+                'name' => 'Cables',
+                'parent_id' => null,
+                'subcategories' => [
+                    [
+                        'name' => 'Indoor',
+                        'subcategories' => [
+                            ['name' => 'Riser', 'subcategories' => []],
+                        ],
+                    ],
+                    ['name' => 'Outdoor', 'subcategories' => []],
+                ],
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $top = Category::where('name', 'Cables')->firstOrFail();
+        $indoor = Category::where('name', 'Indoor')->firstOrFail();
+        $riser = Category::where('name', 'Riser')->firstOrFail();
+        $outdoor = Category::where('name', 'Outdoor')->firstOrFail();
+
+        // Whole tree persisted with the correct parent chain...
+        $this->assertNull($top->parent_id);
+        $this->assertSame($top->id, $indoor->parent_id);
+        $this->assertSame($indoor->id, $riser->parent_id);
+        $this->assertSame($top->id, $outdoor->parent_id);
+
+        // ...and every node is a draft proposal owned by the seller.
+        foreach ([$top, $indoor, $riser, $outdoor] as $node) {
+            $this->assertSame('draft', $node->status);
+            $this->assertSame($seller->id, $node->proposed_by_seller_id);
+        }
+    }
+
     public function test_a_seller_can_create_a_sub_category_under_any_existing_category(): void
     {
         $seller = Seller::factory()->create(['status' => 'approved']);
