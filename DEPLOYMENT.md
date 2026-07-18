@@ -8,6 +8,16 @@ Everything in this file is a one-time setup you do in Railway's dashboard —
 it needs your Railway account and GitHub connection, so it can't be done
 from this repo alone. Steps 1-6 below are that setup checklist.
 
+## Required PHP extensions
+
+Nixpacks builds the PHP environment from the `ext-*` platform requirements
+declared in `composer.json` (`ext-gd`, `ext-intl`, `ext-pdo_mysql`,
+`ext-zip`). These are not optional: Filament needs `intl`, spreadsheet
+exports (openspout) need `zip`, image handling needs `gd`, and the MySQL
+connection (including the Pre-Deploy `migrate`) needs `pdo_mysql`. If you add
+a dependency that needs another extension, declare it in `composer.json` and
+run `composer update --lock` so Nixpacks installs it on the next build.
+
 ## 1. Create the project and connect the repo
 
 In Railway: **New Project → Deploy from GitHub repo** → select this
