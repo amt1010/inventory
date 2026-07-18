@@ -3,6 +3,7 @@
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\PreviewController;
 use App\Http\Controllers\QuoteRequestController;
 use App\Http\Controllers\QuoteRequestHistoryController;
 use App\Http\Controllers\RegistrationController;
@@ -37,6 +38,11 @@ Route::middleware('auth:web')->group(function () {
     Route::post('/favorites', [FavoriteController::class, 'store'])->name('favorites.store');
     Route::delete('/favorites/{product}', [FavoriteController::class, 'destroy'])->name('favorites.destroy');
     Route::get('/my-quote-requests', [QuoteRequestHistoryController::class, 'index'])->name('quote-requests.history');
+});
+
+Route::middleware('auth:staff')->group(function () {
+    Route::get('/preview/product/{product}', [PreviewController::class, 'product'])->name('staff.preview.product');
+    Route::get('/preview/category/{category}', [PreviewController::class, 'category'])->name('staff.preview.category');
 });
 
 Route::get('/products/{path?}', [CatalogController::class, 'show'])

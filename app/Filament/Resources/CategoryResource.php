@@ -12,6 +12,8 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -115,6 +117,20 @@ class CategoryResource extends Resource
                 TextColumn::make('parent.name')->label('Parent')->placeholder('— Top level —'),
                 TextColumn::make('status')->badge(),
                 TextColumn::make('sort_order'),
+            ])
+            ->actions([
+                Action::make('preview')
+                    ->label('Preview')
+                    ->icon('heroicon-o-eye')
+                    ->color('gray')
+                    ->url(fn (Category $record) => route('staff.preview.category', $record))->openUrlInNewTab(),
+                Action::make('viewLive')
+                    ->label('View live')
+                    ->icon('heroicon-o-arrow-top-right-on-square')
+                    ->color('gray')
+                    ->visible(fn (Category $record) => $record->status === 'published')
+                    ->url(fn (Category $record) => url('/products/'.$record->path()))->openUrlInNewTab(),
+                EditAction::make(),
             ])
             ->paginated(false)
             ->modifyQueryUsing(function (Builder $query) {

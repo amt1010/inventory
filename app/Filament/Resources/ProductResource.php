@@ -129,6 +129,17 @@ class ProductResource extends Resource
                 TextColumn::make('price_display')->label('Price'),
             ])
             ->actions([
+                Action::make('preview')
+                    ->label('Preview')
+                    ->icon('heroicon-o-eye')
+                    ->color('gray')
+                    ->url(fn (Product $record) => route('staff.preview.product', $record))->openUrlInNewTab(),
+                Action::make('viewLive')
+                    ->label('View live')
+                    ->icon('heroicon-o-arrow-top-right-on-square')
+                    ->color('gray')
+                    ->visible(fn (Product $record) => $record->status === 'published')
+                    ->url(fn (Product $record) => url('/products/'.$record->path()))->openUrlInNewTab(),
                 Action::make('publish')
                     ->visible(fn (Product $record) => $record->status !== 'pending_seller_acceptance'
                         && (auth('staff')->user()?->can('approve', Product::class) ?? false))
