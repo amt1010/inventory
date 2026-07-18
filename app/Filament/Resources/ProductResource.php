@@ -8,6 +8,7 @@ use App\Mail\ProductListingLive;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Seller;
+use App\Support\IndianPrice;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
@@ -62,7 +63,11 @@ class ProductResource extends Resource
                 ->acceptedFileTypes(['application/pdf']),
             TextInput::make('price_display')
                 ->label('Price Range (INR)')
-                ->placeholder('e.g. ₹1,200 – ₹1,800 per reel')
+                ->placeholder('e.g. 1200 - 1800 per reel')
+                ->helperText('The ₹ symbol and Indian comma grouping are added automatically.')
+                ->live(onBlur: true)
+                ->afterStateUpdated(fn ($state, callable $set) => $set('price_display', IndianPrice::format($state)))
+                ->dehydrateStateUsing(fn ($state) => IndianPrice::format($state))
                 ->disabled(! $canSetPrice)
                 ->dehydrated($canSetPrice),
             Select::make('status')
