@@ -25,10 +25,10 @@
             @endphp
             @if ($orderedImages->isNotEmpty())
                 <div id="productImagesCarousel" class="carousel slide mb-3" data-bs-ride="carousel">
-                    <div class="carousel-inner rounded-3">
+                    <div class="carousel-inner rounded-3 bg-light">
                         @foreach ($orderedImages as $image)
                             <div class="carousel-item @if ($loop->first) active @endif">
-                                <img src="{{ asset('storage/'.$image->path) }}" class="d-block w-100" style="max-height: 480px; object-fit: cover;" alt="{{ $product->name }}">
+                                <img src="{{ asset('storage/'.$image->path) }}" class="d-block w-100" style="height: 480px; object-fit: contain;" alt="{{ $product->name }}">
                             </div>
                         @endforeach
                     </div>
