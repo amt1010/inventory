@@ -97,6 +97,55 @@ class SellerCategoryResourceTest extends TestCase
         $this->assertSame($seller->id, $category->proposed_by_seller_id);
     }
 
+    public function test_a_seller_can_link_their_own_orphan_draft_category_under_a_new_parent(): void
+    {
+        $seller = Seller::factory()->create(['status' => 'approved']);
+        $orphan = Category::factory()->create([
+            'name' => 'Orphan Sub',
+            'parent_id' => null,
+            'status' => 'draft',
+            'proposed_by_seller_id' => $seller->id,
+        ]);
+        $this->actingAs($seller, 'seller');
+
+        Livewire::test(CreateCategory::class)
+            ->fillForm([
+                'name' => 'New Top Level',
+                'parent_id' => null,
+                'link_existing' => [$orphan->id],
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $newParent = Category::where('name', 'New Top Level')->firstOrFail();
+        $this->assertSame($newParent->id, $orphan->refresh()->parent_id);
+    }
+
+    public function test_a_seller_cannot_link_another_sellers_category(): void
+    {
+        $seller = Seller::factory()->create(['status' => 'approved']);
+        $otherSeller = Seller::factory()->create();
+        $othersOrphan = Category::factory()->create([
+            'parent_id' => null,
+            'status' => 'draft',
+            'proposed_by_seller_id' => $otherSeller->id,
+        ]);
+        $this->actingAs($seller, 'seller');
+
+        // Even a tampered payload naming another seller's category is ignored:
+        // the re-parent query is scoped to the acting seller's own drafts.
+        Livewire::test(CreateCategory::class)
+            ->fillForm([
+                'name' => 'New Top Level',
+                'parent_id' => null,
+                'link_existing' => [$othersOrphan->id],
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $this->assertNull($othersOrphan->refresh()->parent_id);
+    }
+
     public function test_the_list_shows_only_the_sellers_own_proposals(): void
     {
         $seller = Seller::factory()->create(['status' => 'approved']);

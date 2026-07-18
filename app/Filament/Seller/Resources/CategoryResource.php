@@ -109,8 +109,18 @@ class CategoryResource extends Resource
                     }
                 }),
             TextInput::make('slug')->required(),
-            RichEditor::make('description'),
             CategoryTree::subcategoriesRepeater(),
+            Select::make('link_existing')
+                ->label('Link to existing category')
+                ->helperText('Attach one of your existing top-level draft categories (with no parent) as a subcategory of this one.')
+                ->multiple()
+                ->searchable()
+                ->options(fn () => CategoryHierarchy::options(fn (Builder $query) => $query
+                    ->whereNull('parent_id')
+                    ->where('status', 'draft')
+                    ->where('proposed_by_seller_id', auth('seller')->id())))
+                ->visibleOn('create'),
+            RichEditor::make('description'),
             Placeholder::make('review_note')
                 ->label('')
                 ->content('New categories are submitted as drafts for administrator review before they appear on the public catalog. An administrator may adjust the name, slug, or parent before publishing.'),

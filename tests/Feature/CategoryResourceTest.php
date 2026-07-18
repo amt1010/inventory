@@ -83,6 +83,51 @@ class CategoryResourceTest extends TestCase
             ->assertSeeText('—');
     }
 
+    public function test_an_admin_can_link_an_existing_orphan_category_under_a_new_parent(): void
+    {
+        $this->seed(RoleSeeder::class);
+        $admin = Staff::factory()->create();
+        $admin->assignRole('admin');
+        $this->actingAs($admin, 'staff');
+
+        $orphan = Category::factory()->create(['name' => 'Orphan', 'parent_id' => null, 'status' => 'published']);
+
+        Livewire::test(CreateCategory::class)
+            ->fillForm([
+                'name' => 'New Parent',
+                'slug' => 'new-parent',
+                'status' => 'published',
+                'link_existing' => [$orphan->id],
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $newParent = Category::where('name', 'New Parent')->firstOrFail();
+        $this->assertSame($newParent->id, $orphan->refresh()->parent_id);
+    }
+
+    public function test_the_subcategories_field_appears_before_the_description_field(): void
+    {
+        $this->seed(RoleSeeder::class);
+        $admin = Staff::factory()->create();
+        $admin->assignRole('admin');
+        $this->actingAs($admin, 'staff');
+
+        $components = collect(
+            Livewire::test(CreateCategory::class)->instance()->form->getComponents()
+        )->map(fn ($component) => method_exists($component, 'getName') ? $component->getName() : null)
+            ->filter()
+            ->values()
+            ->all();
+
+        $subIndex = array_search('subcategories', $components, true);
+        $descIndex = array_search('description', $components, true);
+
+        $this->assertNotFalse($subIndex);
+        $this->assertNotFalse($descIndex);
+        $this->assertLessThan($descIndex, $subIndex, 'Subcategories should sit above the description, near the category name.');
+    }
+
     public function test_an_admin_can_create_a_category_with_nested_subcategories_inline(): void
     {
         $this->seed(RoleSeeder::class);

@@ -16,7 +16,8 @@ class CreateCategory extends CreateRecord
     protected function handleRecordCreation(array $data): Model
     {
         $subcategories = $data['subcategories'] ?? [];
-        unset($data['subcategories']);
+        $linkExisting = $data['link_existing'] ?? [];
+        unset($data['subcategories'], $data['link_existing']);
 
         // A seller's category is always a draft proposal owned by them; the
         // approval journey (admin review, optional override, publish) is
@@ -33,6 +34,19 @@ class CreateCategory extends CreateRecord
         $record = static::getModel()::create(array_merge($data, $ownership));
 
         CategoryTree::persist($record, $subcategories, $ownership);
+
+        // Re-parent the seller's own orphan (parentless) draft categories under
+        // this one -- scoped to their own drafts so they can't touch another
+        // seller's proposals or the published taxonomy.
+        if ($linkExisting !== []) {
+            Category::query()
+                ->whereIn('id', $linkExisting)
+                ->whereNull('parent_id')
+                ->where('status', 'draft')
+                ->where('proposed_by_seller_id', $record->proposed_by_seller_id)
+                ->whereKeyNot($record->id)
+                ->update(['parent_id' => $record->id]);
+        }
 
         return $record;
     }

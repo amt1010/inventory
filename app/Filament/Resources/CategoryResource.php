@@ -80,6 +80,14 @@ class CategoryResource extends Resource
                 ->rule(fn (callable $get, $record) => Rule::unique('categories', 'slug')
                     ->where(fn ($query) => $query->where('parent_id', $get('parent_id')))
                     ->ignore($record?->id)),
+            CategoryTree::subcategoriesRepeater(),
+            Select::make('link_existing')
+                ->label('Link to existing category')
+                ->helperText('Attach existing top-level categories that have no parent as subcategories of this one.')
+                ->multiple()
+                ->searchable()
+                ->options(fn () => CategoryHierarchy::options(fn (Builder $query) => $query->whereNull('parent_id')))
+                ->visibleOn('create'),
             RichEditor::make('description'),
             FileUpload::make('image')
                 ->image()
@@ -91,7 +99,6 @@ class CategoryResource extends Resource
             TextInput::make('sort_order')
                 ->numeric()
                 ->default(0),
-            CategoryTree::subcategoriesRepeater(),
         ]);
     }
 
