@@ -61,22 +61,14 @@
                 <p class="fs-4 text-primary">{{ $product->price_display }}</p>
             @endif
 
-            @if (! empty($product->features))
+            @if (filled($product->features))
                 <h5>Features</h5>
-                <ul>
-                    @foreach ($product->features as $feature)
-                        <li>{{ $feature }}</li>
-                    @endforeach
-                </ul>
+                <div>{!! $product->features !!}</div>
             @endif
 
-            @if (! empty($product->applications))
+            @if (filled($product->applications))
                 <h5>Applications</h5>
-                <ul>
-                    @foreach ($product->applications as $application)
-                        <li>{{ $application }}</li>
-                    @endforeach
-                </ul>
+                <div>{!! $product->applications !!}</div>
             @endif
 
             <div class="d-flex flex-wrap align-items-center gap-2 mt-3">

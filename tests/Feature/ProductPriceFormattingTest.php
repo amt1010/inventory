@@ -40,8 +40,6 @@ class ProductPriceFormattingTest extends TestCase
                 'name' => 'Priced Product',
                 'slug' => 'priced-product',
                 'price_display' => '100000 - 180000 per reel',
-                'features' => [],
-                'applications' => [],
             ])
             ->call('create')
             ->assertHasNoFormErrors();

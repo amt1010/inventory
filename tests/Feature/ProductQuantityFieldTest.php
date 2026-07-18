@@ -39,8 +39,6 @@ class ProductQuantityFieldTest extends TestCase
                 'name' => 'Quantity Test Product',
                 'slug' => 'quantity-test-product',
                 'quantity' => 250,
-                'features' => [],
-                'applications' => [],
             ])
             ->call('create')
             ->assertHasNoFormErrors();
