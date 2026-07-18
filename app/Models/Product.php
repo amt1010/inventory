@@ -97,9 +97,15 @@ class Product extends Model
 
     public function toSearchableArray(): array
     {
+        // Every key must be a real column: the Scout `database` engine matches
+        // `column LIKE %term%` using these keys as column names. Indexing the
+        // descriptive copy (not just name/sku) lets a brand or keyword that only
+        // appears in the description surface the product.
         return [
             'name' => $this->name,
             'sku' => $this->sku,
+            'short_description' => $this->short_description,
+            'description' => $this->description,
         ];
     }
 }

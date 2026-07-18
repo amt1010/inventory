@@ -13,79 +13,15 @@ class SellerCategoryProposalTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_a_seller_can_propose_a_new_top_level_category(): void
+    public function test_the_product_form_no_longer_offers_inline_category_creation(): void
     {
+        // Category creation was moved to the dedicated "My Categories" section
+        // (issue #2 reopen); the product form must only select existing ones.
         $seller = Seller::factory()->create(['status' => 'approved']);
         $this->actingAs($seller, 'seller');
 
         Livewire::test(CreateProduct::class)
-            ->callFormComponentAction('category_id', 'createOption', data: [
-                'name' => 'Submarine Cable',
-                'parent_id' => null,
-            ]);
-
-        $category = Category::where('name', 'Submarine Cable')->firstOrFail();
-
-        $this->assertNull($category->parent_id);
-        $this->assertSame('draft', $category->status);
-        $this->assertSame($seller->id, $category->proposed_by_seller_id);
-    }
-
-    public function test_a_seller_can_propose_a_new_sub_category_under_an_existing_parent(): void
-    {
-        $seller = Seller::factory()->create(['status' => 'approved']);
-        $parent = Category::factory()->create(['name' => 'Fiber Optic Cable', 'status' => 'published']);
-        $this->actingAs($seller, 'seller');
-
-        Livewire::test(CreateProduct::class)
-            ->callFormComponentAction('category_id', 'createOption', data: [
-                'name' => 'Submarine Cable',
-                'parent_id' => $parent->id,
-            ]);
-
-        $category = Category::where('name', 'Submarine Cable')->firstOrFail();
-
-        $this->assertSame($parent->id, $category->parent_id);
-        $this->assertSame('draft', $category->status);
-        $this->assertSame($seller->id, $category->proposed_by_seller_id);
-    }
-
-    public function test_proposing_a_category_immediately_selects_it_on_the_product_form(): void
-    {
-        $seller = Seller::factory()->create(['status' => 'approved']);
-        $this->actingAs($seller, 'seller');
-
-        Livewire::test(CreateProduct::class)
-            ->callFormComponentAction('category_id', 'createOption', data: [
-                'name' => 'Submarine Cable',
-                'parent_id' => null,
-            ]);
-
-        $category = Category::where('name', 'Submarine Cable')->firstOrFail();
-
-        Livewire::test(CreateProduct::class)
-            ->callFormComponentAction('category_id', 'createOption', data: [
-                'name' => 'Submarine Cable Two',
-                'parent_id' => null,
-            ])
-            ->assertFormSet(['category_id' => Category::where('name', 'Submarine Cable Two')->firstOrFail()->id]);
-    }
-
-    public function test_proposing_a_category_with_a_name_that_collides_under_the_same_parent_is_rejected(): void
-    {
-        $seller = Seller::factory()->create(['status' => 'approved']);
-        $parent = Category::factory()->create(['status' => 'published']);
-        Category::factory()->create(['parent_id' => $parent->id, 'name' => 'OPGW', 'slug' => 'opgw', 'status' => 'published']);
-        $this->actingAs($seller, 'seller');
-
-        Livewire::test(CreateProduct::class)
-            ->callFormComponentAction('category_id', 'createOption', data: [
-                'name' => 'OPGW',
-                'parent_id' => $parent->id,
-            ])
-            ->assertHasFormComponentActionErrors(['name']);
-
-        $this->assertSame(1, Category::where('parent_id', $parent->id)->where('slug', 'opgw')->count());
+            ->assertFormComponentActionDoesNotExist('category_id', 'createOption');
     }
 
     public function test_a_sellers_own_pending_proposal_appears_in_their_own_dropdown(): void
@@ -126,24 +62,9 @@ class SellerCategoryProposalTest extends TestCase
         // NOTE: This does not use Filament's assertFormFieldIsVisible()/
         // assertFormFieldIsHidden() helpers. Those helpers (and
         // assertFormFieldExists(), which they both call first) require the
-        // component to be an instance of Filament\Forms\Components\Field
-        // (see vendor/filament/forms/src/Testing/TestsForms.php:248, which
-        // asserts `Field::class` before ever checking visibility).
-        // Placeholder deliberately does NOT extend Field — it extends the
-        // base Component class directly (vendor/filament/forms/src/
-        // Components/Placeholder.php) — so it can never satisfy that
-        // assertion, regardless of its actual visibility state. This was
-        // confirmed by running the field-helper version of this test and
-        // observing it fail with "Failed asserting that null is an
-        // instance of class Filament\Forms\Components\Field" even before
-        // any visibility check ran.
-        //
-        // Placeholder is nonetheless the correct component for a static,
-        // read-only note (it matches the existing `status_display` and
-        // `rejection_reason` Placeholders already used in this resource),
-        // so instead of changing the field type, this test inspects the
-        // component tree directly via getComponent(), which works for any
-        // Component subclass.
+        // component to be an instance of Filament\Forms\Components\Field.
+        // Placeholder does not extend Field, so this inspects the component
+        // tree directly via getComponent(), which works for any Component.
         $seller = Seller::factory()->create(['status' => 'approved']);
         $draftCategory = Category::factory()->create(['status' => 'draft', 'proposed_by_seller_id' => $seller->id]);
         $publishedCategory = Category::factory()->create(['status' => 'published']);
