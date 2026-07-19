@@ -97,4 +97,54 @@ class ProductModelTest extends TestCase
         $this->assertFalse($result);
         $this->assertSame('pending_review', $product->fresh()->status);
     }
+
+    public function test_publish_blockers_reports_a_missing_price(): void
+    {
+        $product = Product::factory()->create(['price_display' => null, 'status' => 'pending_review']);
+
+        $blockers = $product->publishBlockers();
+
+        $this->assertCount(1, $blockers);
+        $this->assertStringContainsString('price', strtolower($blockers[0]));
+    }
+
+    public function test_publish_blockers_reports_an_unpublished_category(): void
+    {
+        $category = Category::factory()->create(['status' => 'draft', 'name' => 'Gadgets']);
+        $product = Product::factory()->create([
+            'category_id' => $category->id,
+            'price_display' => '₹1,000 – ₹1,500',
+            'status' => 'pending_review',
+        ]);
+
+        $blockers = $product->publishBlockers();
+
+        $this->assertCount(1, $blockers);
+        $this->assertStringContainsString('category', strtolower($blockers[0]));
+        $this->assertStringContainsString('Gadgets', $blockers[0]);
+    }
+
+    public function test_publish_blockers_lists_every_missing_detail_at_once(): void
+    {
+        $category = Category::factory()->create(['status' => 'draft', 'name' => 'Gadgets']);
+        $product = Product::factory()->create([
+            'category_id' => $category->id,
+            'price_display' => null,
+            'status' => 'pending_review',
+        ]);
+
+        $blockers = $product->publishBlockers();
+
+        // Both problems are surfaced together, not one-at-a-time.
+        $this->assertCount(2, $blockers);
+        $this->assertStringContainsString('price', strtolower(implode(' ', $blockers)));
+        $this->assertStringContainsString('category', strtolower(implode(' ', $blockers)));
+    }
+
+    public function test_publish_blockers_is_empty_when_the_product_can_be_published(): void
+    {
+        $product = Product::factory()->create(['price_display' => '₹1,000 – ₹1,500', 'status' => 'pending_review']);
+
+        $this->assertSame([], $product->publishBlockers());
+    }
 }

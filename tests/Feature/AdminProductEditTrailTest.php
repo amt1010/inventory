@@ -115,6 +115,27 @@ class AdminProductEditTrailTest extends TestCase
         Mail::assertSent(ProductListingLive::class, fn ($mail) => $mail->product->is($product));
     }
 
+    public function test_publishing_a_product_with_no_price_notifies_instead_of_silently_failing(): void
+    {
+        Mail::fake();
+
+        $admin = Staff::factory()->create();
+        $admin->assignRole('admin');
+        $this->actingAs($admin, 'staff');
+
+        $product = Product::factory()->create([
+            'status' => 'pending_review',
+            'price_display' => null,
+        ]);
+
+        Livewire::test(ListProducts::class)
+            ->callTableAction('publish', $product)
+            ->assertNotified();
+
+        $this->assertSame('pending_review', $product->fresh()->status);
+        Mail::assertNothingSent();
+    }
+
     public function test_editing_an_already_pending_seller_acceptance_product_does_not_error(): void
     {
         $admin = Staff::factory()->create();

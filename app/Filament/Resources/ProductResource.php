@@ -14,6 +14,7 @@ use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
@@ -146,8 +147,24 @@ class ProductResource extends Resource
                     ->requiresConfirmation()
                     ->action(function (Product $record) {
                         if (! $record->publish()) {
+                            $steps = collect($record->publishBlockers())
+                                ->map(fn (string $step) => '• '.e($step))
+                                ->implode('<br>');
+
+                            Notification::make()
+                                ->title('This product isn’t ready to publish yet')
+                                ->body('Complete the following, then try again:<br>'.$steps)
+                                ->warning()
+                                ->persistent()
+                                ->send();
+
                             return;
                         }
+
+                        Notification::make()
+                            ->title('Product published')
+                            ->success()
+                            ->send();
 
                         try {
                             Mail::to($record->seller->email)->send(new ProductListingLive($record));
