@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Exceptions\CategoryWouldFormCycle;
+use App\Support\CategoryHierarchy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,6 +17,23 @@ class Category extends Model
     protected $fillable = [
         'parent_id', 'proposed_by_seller_id', 'name', 'slug', 'description', 'image', 'status', 'sort_order',
     ];
+
+    protected static function booted(): void
+    {
+        // Backstop against a corrupt tree: refuse to save a category whose
+        // parent is, directly or transitively, itself. descendantAndSelfIds()
+        // reflects the committed tree, so setting parent_id to the category's
+        // own id or any of its current descendants is what would close a loop.
+        static::saving(function (self $category): void {
+            if ($category->parent_id === null || ! $category->exists) {
+                return;
+            }
+
+            if (in_array((int) $category->parent_id, CategoryHierarchy::descendantAndSelfIds($category), true)) {
+                throw CategoryWouldFormCycle::for($category);
+            }
+        });
+    }
 
     public function parent(): BelongsTo
     {
