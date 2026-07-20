@@ -66,11 +66,7 @@ class Product extends Model
 
     public function publish(): bool
     {
-        if (blank($this->price_display)) {
-            return false;
-        }
-
-        if (! $this->category->isPublished()) {
+        if ($this->publishBlockers() !== []) {
             return false;
         }
 
@@ -78,6 +74,30 @@ class Product extends Model
         $this->save();
 
         return true;
+    }
+
+    /**
+     * Every unmet precondition keeping this product from being published, each
+     * phrased as an instruction the user can act on. Empty when the product is
+     * ready to go live. Centralising the checks here lets callers (e.g. the
+     * admin Publish action) tell the user *all* the details to fix at once
+     * instead of failing silently or one reason at a time.
+     *
+     * @return list<string>
+     */
+    public function publishBlockers(): array
+    {
+        $blockers = [];
+
+        if (blank($this->price_display)) {
+            $blockers[] = 'Set a price on the product’s edit form (the “Price” field, Admin only).';
+        }
+
+        if (! $this->category->isPublished()) {
+            $blockers[] = 'Publish its category “'.$this->category->name.'” first — it is not live yet.';
+        }
+
+        return $blockers;
     }
 
     public function statusAfterEdit(): string
