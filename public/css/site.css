@@ -60,6 +60,23 @@
     min-width: 640px;
 }
 
+/* Sticky footer: keep the footer pinned to the bottom of the viewport even
+   when a page has little content (e.g. a category with no children/products),
+   instead of floating up into the middle of the screen. */
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+body > main {
+    flex: 1 0 auto;
+}
+
+body > footer {
+    flex-shrink: 0;
+}
+
 footer {
     background-color: #1c1c1c !important;
     color: #dee2e6;
