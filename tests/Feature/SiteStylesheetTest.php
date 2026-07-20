@@ -30,4 +30,14 @@ class SiteStylesheetTest extends TestCase
         // Footer links use a high-contrast colour rather than the low-contrast grey.
         $this->assertStringContainsString('#f1f3f5', $css);
     }
+
+    public function test_the_stylesheet_pins_the_footer_to_the_bottom_on_short_pages(): void
+    {
+        $css = file_get_contents(public_path('css/site.css'));
+
+        // The body is a full-height flex column so the main content can grow and
+        // push the footer to the bottom instead of floating up mid-page.
+        $this->assertStringContainsString('min-height: 100vh', $css);
+        $this->assertStringContainsString('flex: 1 0 auto', $css);
+    }
 }
