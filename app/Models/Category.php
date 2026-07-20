@@ -52,10 +52,15 @@ class Category extends Model
     public function path(): string
     {
         $segments = [$this->slug];
+        $seen = [$this->id => true];
         $parent = $this->parent;
 
-        while ($parent) {
+        // Guard against a corrupt tree (a category that is, directly or
+        // transitively, its own ancestor): stop the moment we revisit a node
+        // instead of walking the parent chain forever.
+        while ($parent && ! isset($seen[$parent->id])) {
             array_unshift($segments, $parent->slug);
+            $seen[$parent->id] = true;
             $parent = $parent->parent;
         }
 
