@@ -45,7 +45,7 @@
     </div>
 
     <script>
-        (function () {
+        document.addEventListener('DOMContentLoaded', function () {
             var checkbox = document.getElementById('terms-accepted-checkbox{{ $idSuffix }}');
             var acceptBtn = document.getElementById('terms-accept-btn{{ $idSuffix }}');
             var declineBtn = document.getElementById('terms-decline-btn{{ $idSuffix }}');
@@ -67,10 +67,12 @@
             });
 
             syncSubmitState();
-        })();
+        });
     </script>
 @else
     <script>
-        document.getElementById('terms-accepted-checkbox{{ $idSuffix }}').disabled = false;
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('terms-accepted-checkbox{{ $idSuffix }}').disabled = false;
+        });
     </script>
 @endif
