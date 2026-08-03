@@ -51,6 +51,7 @@ class QuoteRequestResource extends Resource
     {
         return $table
             ->columns([
+                TextColumn::make('quote_number')->label('Quote #')->searchable(),
                 TextColumn::make('created_at')->label('Received')->dateTime()->sortable(),
                 TextColumn::make('first_name')
                     ->label('Name')

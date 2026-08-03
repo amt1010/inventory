@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreUserRegistrationRequest;
+use App\Models\Page;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -13,7 +14,9 @@ class RegistrationController extends Controller
 {
     public function create(): View
     {
-        return view('auth.register');
+        return view('auth.register', [
+            'termsPage' => Page::query()->where('slug', 'terms-and-conditions')->where('status', 'published')->first(),
+        ]);
     }
 
     public function store(StoreUserRegistrationRequest $request): RedirectResponse

@@ -70,4 +70,34 @@ class CatalogRoutingTest extends TestCase
 
         $response->assertNotFound();
     }
+
+    public function test_a_category_page_shows_only_the_first_nine_published_products(): void
+    {
+        $category = Category::factory()->create(['status' => 'published']);
+        Product::factory()->count(12)->create([
+            'category_id' => $category->id,
+            'status' => 'published',
+        ]);
+
+        $response = $this->get('/products/'.$category->slug);
+
+        $response->assertOk();
+        $response->assertViewHas('products', fn ($products) => $products->count() === 9);
+    }
+
+    public function test_a_second_page_of_products_can_be_fetched_via_ajax(): void
+    {
+        $category = Category::factory()->create(['status' => 'published']);
+        Product::factory()->count(12)->create([
+            'category_id' => $category->id,
+            'status' => 'published',
+        ]);
+
+        $response = $this->get('/products/'.$category->slug.'?page=2', ['X-Requested-With' => 'XMLHttpRequest']);
+
+        $response->assertOk();
+        $response->assertViewHas('products', fn ($products) => $products->count() === 3);
+        // The AJAX branch renders only the card fragments, not the full page chrome.
+        $response->assertDontSee('<nav', false);
+    }
 }

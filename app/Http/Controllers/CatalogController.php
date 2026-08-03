@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CatalogController extends Controller
 {
-    public function show(Request $request, string $path = ''): View
+    public function show(Request $request, string $path = ''): View|\Illuminate\Http\Response
     {
         $segments = array_values(array_filter(explode('/', $path)));
 
@@ -52,15 +52,24 @@ class CatalogController extends Controller
             abort(Response::HTTP_NOT_FOUND);
         }
 
+        $products = $category
+            ? $category->products()->where('status', 'published')->orderBy('sort_order')->paginate(9)
+            : collect();
+
+        if ($request->ajax()) {
+            return response()->view('catalog.partials.product-grid-items', [
+                'products' => $products,
+                'breadcrumb' => $breadcrumb,
+            ])->header('X-Next-Page-Url', $products instanceof \Illuminate\Contracts\Pagination\Paginator ? (string) $products->nextPageUrl() : '');
+        }
+
         return view('catalog.category', [
             'category' => $category,
             'breadcrumb' => $breadcrumb,
             'children' => $category
                 ? $category->children()->where('status', 'published')->get()
                 : Category::query()->whereNull('parent_id')->where('status', 'published')->orderBy('sort_order')->get(),
-            'products' => $category
-                ? $category->products()->where('status', 'published')->orderBy('sort_order')->get()
-                : collect(),
+            'products' => $products,
         ]);
     }
 }

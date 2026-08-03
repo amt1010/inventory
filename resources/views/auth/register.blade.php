@@ -39,6 +39,8 @@
                     <input type="password" name="password_confirmation" class="form-control" required>
                 </div>
 
+                @include('partials.terms-and-conditions-modal', ['termsPage' => $termsPage])
+
                 <button type="submit" class="btn btn-primary">Create Account</button>
                 <a href="{{ route('login') }}" class="btn btn-link">Already have an account?</a>
             </form>

@@ -83,8 +83,7 @@ class SettingsTest extends TestCase
         $response->assertSee('12 Cable Street, Mumbai');
         $response->assertSee('hello@acme.test');
         $response->assertSee('https://facebook.com/acme', false);
-        // Cookie-settings placeholder slot is present for future use.
-        $response->assertSee('data-cookies-placeholder', false);
+        $response->assertSee('id="cookie-settings-link"', false);
         // Unconfigured platforms are not rendered.
         $response->assertDontSee('youtube.com', false);
     }

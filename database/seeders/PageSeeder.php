@@ -41,5 +41,22 @@ class PageSeeder extends Seeder
                 ],
             ],
         ]);
+
+        Page::query()->firstOrCreate(['slug' => 'terms-and-conditions'], [
+            'title' => 'Terms & Conditions',
+            'status' => 'published',
+            'content' => [
+                ['type' => 'content_strip', 'data' => [
+                    'heading' => 'Terms & Conditions',
+                    'body' => '<p>Welcome to our platform. By creating an account, you agree to use this '
+                        .'site for legitimate sourcing and supply purposes only. Quote requests are '
+                        .'non-binding enquiries; final pricing and terms are negotiated directly between '
+                        .'buyer and seller off-platform. We do not process payments on this site.</p>'
+                        .'<p>Update this content any time from <strong>Admin &rsaquo; Pages &rsaquo; '
+                        .'Terms & Conditions</strong>.</p>',
+                    'image_position' => 'left',
+                ]],
+            ],
+        ]);
     }
 }

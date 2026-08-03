@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Seller;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreSellerRegistrationRequest;
 use App\Mail\SellerActivationMail;
+use App\Models\Page;
 use App\Models\Seller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Hash;
@@ -16,7 +17,9 @@ class RegistrationController extends Controller
 {
     public function create(): View
     {
-        return view('seller.register');
+        return view('seller.register', [
+            'termsPage' => Page::query()->where('slug', 'terms-and-conditions')->where('status', 'published')->first(),
+        ]);
     }
 
     public function store(StoreSellerRegistrationRequest $request): RedirectResponse

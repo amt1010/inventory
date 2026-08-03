@@ -63,6 +63,17 @@ class SellerRegistrationTest extends TestCase
         $this->assertDatabaseCount('sellers', 0);
     }
 
+    public function test_registration_without_accepting_terms_is_rejected(): void
+    {
+        $payload = $this->validPayload();
+        unset($payload['terms_accepted']);
+
+        $response = $this->post(route('seller.register.store'), $payload);
+
+        $response->assertSessionHasErrors(['terms_accepted']);
+        $this->assertDatabaseCount('sellers', 0);
+    }
+
     private function validPayload(array $overrides = []): array
     {
         return array_merge([
@@ -74,6 +85,7 @@ class SellerRegistrationTest extends TestCase
             'gst_number' => '27AAAAA0000A1Z5',
             'password' => 'secret1234',
             'password_confirmation' => 'secret1234',
+            'terms_accepted' => '1',
         ], $overrides);
     }
 }

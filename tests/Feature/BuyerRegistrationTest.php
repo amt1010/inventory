@@ -17,6 +17,7 @@ class BuyerRegistrationTest extends TestCase
             'email' => 'jane@example.com',
             'password' => 'password123',
             'password_confirmation' => 'password123',
+            'terms_accepted' => '1',
         ]);
 
         $response->assertRedirect();
@@ -35,10 +36,25 @@ class BuyerRegistrationTest extends TestCase
             'email' => 'jane@example.com',
             'password' => 'password123',
             'password_confirmation' => 'password123',
+            'terms_accepted' => '1',
         ]);
 
         $response->assertSessionHasErrors('email');
         $this->assertGuest('web');
+    }
+
+    public function test_registration_without_accepting_terms_is_rejected(): void
+    {
+        $response = $this->post('/register', [
+            'name' => 'Jane Buyer',
+            'email' => 'jane@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+        ]);
+
+        $response->assertSessionHasErrors('terms_accepted');
+        $this->assertGuest('web');
+        $this->assertDatabaseCount('users', 0);
     }
 
     public function test_registration_with_mismatched_passwords_is_rejected(): void

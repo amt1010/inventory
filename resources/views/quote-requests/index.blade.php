@@ -12,6 +12,7 @@
         <table class="table">
             <thead>
                 <tr>
+                    <th>Quote #</th>
                     <th>Date</th>
                     <th>Name</th>
                     <th>Reason</th>
@@ -22,6 +23,7 @@
             <tbody>
                 @foreach ($quoteRequests as $quoteRequest)
                     <tr>
+                        <td>{{ $quoteRequest->quote_number }}</td>
                         <td>{{ $quoteRequest->created_at->format('d M Y') }}</td>
                         <td>{{ $quoteRequest->fullName() }}</td>
                         <td>{{ $quoteRequest->reason }}</td>

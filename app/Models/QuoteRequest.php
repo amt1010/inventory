@@ -12,7 +12,7 @@ class QuoteRequest extends Model
     use HasFactory;
 
     protected $fillable = [
-        'product_id', 'user_id', 'reason', 'first_name', 'last_name', 'email',
+        'quote_number', 'product_id', 'user_id', 'reason', 'first_name', 'last_name', 'email',
         'phone', 'company', 'country', 'city', 'state', 'message',
         'contact_preference', 'source_url', 'status', 'assigned_to',
     ];

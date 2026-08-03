@@ -33,6 +33,18 @@ class QuoteRequestHistoryTest extends TestCase
         $response->assertDontSee('Someone Else');
     }
 
+    public function test_the_quote_number_is_shown(): void
+    {
+        $user = User::factory()->create();
+        QuoteRequest::factory()->create(['user_id' => $user->id, 'quote_number' => '26080317300001']);
+        $this->actingAs($user, 'web');
+
+        $response = $this->get('/my-quote-requests');
+
+        $response->assertOk();
+        $response->assertSee('26080317300001');
+    }
+
     public function test_the_page_has_no_edit_or_status_change_controls(): void
     {
         $user = User::factory()->create();
