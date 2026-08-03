@@ -36,7 +36,7 @@ class SellerProductAcceptanceTest extends TestCase
         $product->refresh();
         $this->assertSame('published', $product->status);
         $this->assertNotNull($trail->fresh()->accepted_at);
-        Mail::assertSent(ProductListingLive::class, fn ($mail) => $mail->product->is($product));
+        Mail::assertQueued(ProductListingLive::class, fn ($mail) => $mail->product->is($product));
     }
 
     public function test_accepting_changes_without_a_price_falls_back_to_pending_review(): void
@@ -56,7 +56,7 @@ class SellerProductAcceptanceTest extends TestCase
             ->callTableAction('acceptChanges', $product);
 
         $this->assertSame('pending_review', $product->fresh()->status);
-        Mail::assertNotSent(ProductListingLive::class);
+        Mail::assertNotQueued(ProductListingLive::class);
     }
 
     public function test_the_accept_changes_action_is_hidden_for_products_not_awaiting_acceptance(): void

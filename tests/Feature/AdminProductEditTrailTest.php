@@ -112,7 +112,7 @@ class AdminProductEditTrailTest extends TestCase
             ->callTableAction('publish', $product);
 
         $this->assertSame('published', $product->fresh()->status);
-        Mail::assertSent(ProductListingLive::class, fn ($mail) => $mail->product->is($product));
+        Mail::assertQueued(ProductListingLive::class, fn ($mail) => $mail->product->is($product));
     }
 
     public function test_publishing_a_product_with_no_price_notifies_instead_of_silently_failing(): void

@@ -162,7 +162,7 @@ class ProductResource extends Resource
                         try {
                             Mail::to($record->seller->email)->send(new ProductListingLive($record));
                         } catch (\Throwable $exception) {
-                            Log::error('Failed to send product listing live email.', [
+                            Log::error('Failed to queue product listing live email.', [
                                 'product_id' => $record->id,
                                 'exception' => $exception->getMessage(),
                             ]);
