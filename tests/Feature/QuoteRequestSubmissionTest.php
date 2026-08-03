@@ -115,6 +115,25 @@ class QuoteRequestSubmissionTest extends TestCase
         $response->assertSessionHasErrors(['reason']);
     }
 
+    public function test_a_submission_is_assigned_a_unique_quote_number(): void
+    {
+        Mail::fake();
+
+        $this->post(route('quote-requests.store'), [
+            'reason' => 'General Inquiry',
+            'first_name' => 'Priya',
+            'last_name' => 'Nair',
+            'email' => 'priya@example.com',
+            'phone' => '9876511111',
+            'contact_preference' => 'email',
+            'privacy_policy' => '1',
+        ]);
+
+        $quoteRequest = \App\Models\QuoteRequest::where('email', 'priya@example.com')->firstOrFail();
+
+        $this->assertMatchesRegularExpression('/^\d{14}$/', $quoteRequest->quote_number);
+    }
+
     public function test_the_notification_is_sent_to_the_configured_recipient_address(): void
     {
         config(['rfq.notification_email' => 'custom-sales@example.com']);
