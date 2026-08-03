@@ -11,7 +11,13 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        // Railway (like most PaaS) terminates TLS at its edge and forwards
+        // plain HTTP to the container, setting X-Forwarded-Proto. Without
+        // trusting that proxy, Laravel thinks every request is HTTP, so
+        // asset()/url() generate http:// links even on an https:// site.
+        // The edge's IP isn't fixed, and the container has no other public
+        // ingress, so trusting all proxies here is safe.
+        $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

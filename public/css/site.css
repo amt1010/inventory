@@ -4,7 +4,9 @@
     --bs-primary: #ff6a00;
     --bs-primary-rgb: 255, 106, 0;
     --bs-link-color: #ff6a00;
+    --bs-link-color-rgb: 255, 106, 0;
     --bs-link-hover-color: #e65f00;
+    --bs-link-hover-color-rgb: 230, 95, 0;
     --brand-hover: #e65f00;
     --bs-body-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
