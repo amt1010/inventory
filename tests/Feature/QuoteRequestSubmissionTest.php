@@ -45,7 +45,7 @@ class QuoteRequestSubmissionTest extends TestCase
             'status' => 'new',
         ]);
 
-        Mail::assertSent(QuoteRequestReceived::class, function (QuoteRequestReceived $mail) use ($product) {
+        Mail::assertQueued(QuoteRequestReceived::class, function (QuoteRequestReceived $mail) use ($product) {
             return $mail->quoteRequest->product_id === $product->id;
         });
     }
@@ -130,7 +130,7 @@ class QuoteRequestSubmissionTest extends TestCase
             'privacy_policy' => '1',
         ]);
 
-        Mail::assertSent(QuoteRequestReceived::class, function (QuoteRequestReceived $mail) {
+        Mail::assertQueued(QuoteRequestReceived::class, function (QuoteRequestReceived $mail) {
             return $mail->hasTo('custom-sales@example.com');
         });
     }

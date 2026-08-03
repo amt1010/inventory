@@ -23,7 +23,7 @@ class QuoteRequestController extends Controller
         try {
             Mail::to(config('rfq.notification_email'))->send(new QuoteRequestReceived($quoteRequest));
         } catch (\Throwable $exception) {
-            Log::error('Failed to send quote request notification email.', [
+            Log::error('Failed to queue quote request notification email.', [
                 'quote_request_id' => $quoteRequest->id,
                 'exception' => $exception->getMessage(),
             ]);
