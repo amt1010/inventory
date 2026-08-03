@@ -102,7 +102,7 @@ class SellerResource extends Resource
                         try {
                             Mail::to($record->email)->send(new SellerApproved($record));
                         } catch (\Throwable $exception) {
-                            Log::error('Failed to send seller approval email.', [
+                            Log::error('Failed to queue seller approval email.', [
                                 'seller_id' => $record->id,
                                 'exception' => $exception->getMessage(),
                             ]);
@@ -122,7 +122,7 @@ class SellerResource extends Resource
                         try {
                             Mail::to($record->email)->send(new SellerRejected($record));
                         } catch (\Throwable $exception) {
-                            Log::error('Failed to send seller rejection email.', [
+                            Log::error('Failed to queue seller rejection email.', [
                                 'seller_id' => $record->id,
                                 'exception' => $exception->getMessage(),
                             ]);

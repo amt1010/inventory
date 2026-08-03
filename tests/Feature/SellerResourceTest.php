@@ -56,7 +56,7 @@ class SellerResourceTest extends TestCase
         $this->assertSame($admin->id, $seller->approved_by);
         $this->assertNotNull($seller->approved_at);
 
-        Mail::assertSent(SellerApproved::class, fn ($mail) => $mail->seller->is($seller));
+        Mail::assertQueued(SellerApproved::class, fn ($mail) => $mail->seller->is($seller));
     }
 
     public function test_rejecting_a_pending_seller_stores_the_reason_and_sends_email(): void
@@ -76,7 +76,7 @@ class SellerResourceTest extends TestCase
         $this->assertSame('rejected', $seller->status);
         $this->assertSame('Documents did not match business name.', $seller->rejection_reason);
 
-        Mail::assertSent(SellerRejected::class, fn ($mail) => $mail->seller->is($seller));
+        Mail::assertQueued(SellerRejected::class, fn ($mail) => $mail->seller->is($seller));
     }
 
     public function test_approve_and_reject_are_not_available_for_a_seller_not_pending_approval(): void
