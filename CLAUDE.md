@@ -161,6 +161,33 @@ Day-to-day commands:
 - `/favorites`, `/my-quote-requests` — buyer-only, require login
 - `/{slug}` — CMS-managed content pages (catch-all, e.g. `/` resolves `slug=home`)
 
+### Testing queued mail locally (optional)
+
+Production uses Redis for cache/session/queue (see `DEPLOYMENT.md`), so all
+outbound emails (seller activation/approval/rejection, product-listing
+notifications, RFQ notifications) are queued rather than sent inline. Local
+`.env` keeps `QUEUE_CONNECTION=sync` (and `CACHE_STORE=database`,
+`SESSION_DRIVER=file`) by default, so day-to-day work needs no local Redis —
+a queued mailable still executes immediately within the request, same as
+`phpunit.xml`'s test environment.
+
+To manually verify the real queued/worker behavior (e.g. before a release
+that touches a `Mailable`), you need a local Redis-protocol-compatible
+service — this project deliberately has no Docker setup, so:
+
+- **Memurai Developer** (free, native Windows service, Redis-protocol
+  compatible, listens on `127.0.0.1:6379` matching the `.env.example`
+  placeholders) — closest fit to this project's native-Windows-tooling
+  approach.
+- Or, if you already use WSL2, `sudo apt install redis-server` there.
+
+Then, in your local `.env` (not `.env.example`), temporarily set
+`QUEUE_CONNECTION=redis`, `CACHE_STORE=redis`, `SESSION_DRIVER=redis`,
+`REDIS_CLIENT=predis`; run `php artisan queue:work` in a second terminal;
+trigger the flow you want to check (submit an RFQ, approve a seller, etc.)
+and watch it execute in the worker terminal instead of inline. Revert
+`.env` back to the `sync`/`database`/`file` defaults afterward.
+
 ### Known issues
 
 `composer audit` reports 3 pre-existing `laravel/framework` advisories at the
