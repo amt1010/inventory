@@ -28,7 +28,7 @@ class CreateSeller extends CreateRecord
         try {
             Mail::to($this->record->email)->send(new SellerActivationMail($this->record));
         } catch (\Throwable $exception) {
-            Log::error('Failed to send seller activation email.', [
+            Log::error('Failed to queue seller activation email.', [
                 'seller_id' => $this->record->id,
                 'exception' => $exception->getMessage(),
             ]);

@@ -34,7 +34,7 @@ class SellerRegistrationTest extends TestCase
         $seller = Seller::where('email', 'asha@raotraders.example')->firstOrFail();
         $this->assertCount(1, $seller->documents);
 
-        Mail::assertSent(SellerActivationMail::class, fn ($mail) => $mail->seller->is($seller));
+        Mail::assertQueued(SellerActivationMail::class, fn ($mail) => $mail->seller->is($seller));
     }
 
     public function test_registration_with_a_duplicate_email_is_rejected(): void

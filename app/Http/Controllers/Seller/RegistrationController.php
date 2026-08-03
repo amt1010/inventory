@@ -44,7 +44,7 @@ class RegistrationController extends Controller
         try {
             Mail::to($seller->email)->send(new SellerActivationMail($seller));
         } catch (\Throwable $exception) {
-            Log::error('Failed to send seller activation email.', [
+            Log::error('Failed to queue seller activation email.', [
                 'seller_id' => $seller->id,
                 'exception' => $exception->getMessage(),
             ]);

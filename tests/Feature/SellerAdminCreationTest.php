@@ -42,7 +42,7 @@ class SellerAdminCreationTest extends TestCase
         $this->assertSame('pending_email_verification', $seller->status);
         $this->assertSame('admin', $seller->created_by);
 
-        Mail::assertSent(SellerActivationMail::class, fn ($mail) => $mail->seller->is($seller));
+        Mail::assertQueued(SellerActivationMail::class, fn ($mail) => $mail->seller->is($seller));
 
         $url = URL::temporarySignedRoute('seller.activate.store', now()->addDays(7), ['seller' => $seller->id]);
         $this->post($url, ['password' => 'brandnewpass1', 'password_confirmation' => 'brandnewpass1']);

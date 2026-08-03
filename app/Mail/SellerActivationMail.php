@@ -4,13 +4,15 @@ namespace App\Mail;
 
 use App\Models\Seller;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
 
-class SellerActivationMail extends Mailable
+class SellerActivationMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
@@ -32,5 +34,13 @@ class SellerActivationMail extends Mailable
                 'activationUrl' => URL::temporarySignedRoute('seller.activate', now()->addDays(7), ['seller' => $this->seller->id]),
             ],
         );
+    }
+
+    public function failed(\Throwable $exception): void
+    {
+        Log::error('Failed to send seller activation email.', [
+            'seller_id' => $this->seller->id,
+            'exception' => $exception->getMessage(),
+        ]);
     }
 }
