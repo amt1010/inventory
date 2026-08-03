@@ -66,6 +66,8 @@
             <div class="form-text">GST certificate, trade license, or similar. PDF, JPG, or PNG, max 5MB each.</div>
         </div>
 
+        @include('partials.terms-and-conditions-modal', ['termsPage' => $termsPage, 'idSuffix' => '-seller'])
+
         <button type="submit" class="btn btn-primary">Register</button>
     </form>
 @endsection
