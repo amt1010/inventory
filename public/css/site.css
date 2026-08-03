@@ -122,3 +122,14 @@ footer a:focus {
     width: 10%;
     opacity: 1;
 }
+
+.cookie-consent-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1050;
+    background: #212529;
+    color: #fff;
+    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.15);
+}

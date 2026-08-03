@@ -137,8 +137,7 @@
                 </div>
 
                 <div class="col-md-3 text-md-end d-flex flex-column justify-content-between">
-                    {{-- Placeholder slot for a future cookie-settings icon/button. --}}
-                    <div class="footer-cookies-placeholder" data-cookies-placeholder aria-hidden="true"></div>
+                    <a href="#" id="cookie-settings-link" class="small text-muted">Cookie Settings</a>
                     @if ($siteSettings->copyrightText())
                         <small class="mt-3">{{ $siteSettings->copyrightText() }}</small>
                     @endif
@@ -148,5 +147,6 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    @include('partials.cookie-consent-banner')
 </body>
 </html>
