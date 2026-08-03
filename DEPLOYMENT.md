@@ -167,3 +167,89 @@ you don't need to SSH in or run anything by hand. **Never** manually run
 `php artisan migrate:fresh` against this Railway database once it holds
 real data (see `CLAUDE.md`'s `migrate` vs `migrate:fresh` warning) — it
 would wipe every product image, seller account, and quote request.
+
+## Troubleshooting: issues hit during initial setup
+
+Every one of these showed up, in this order, getting this app's first
+deployment live. Listed in case the same setup is repeated (a second
+environment, a new project) or any of them regress.
+
+**"Branch 'main' not found in `{org}/inventory`"** (banner on the project
+canvas) — the Railway service was tracking `main`, but this repo's default
+branch is `master`. Fix: service → **Settings → Source → Branch** → set to
+`master`.
+
+**Deploy log: `error creating app: directory .../snapshot-target-unpack/master
+does not exist`** — happened immediately after switching the tracked branch,
+on multiple different Railway builder machines (ruling out a one-off
+builder glitch). The service's GitHub source binding was stale from before
+the branch change. Fix: **Settings → Source** → **Disconnect** the repo,
+then reconnect it fresh (repo + `master` branch + blank root directory).
+
+**"GitHub Repo not found"** (red banner under Source Repo in service
+settings) — Railway's GitHub App had lost/never had access to the repo for
+that specific service. Fix: on GitHub, **Settings → Applications → Railway
+→ Configure**, confirm the repo is in the App's access list; then
+disconnect/reconnect the source on the affected Railway service.
+
+**`SQLSTATE[HY000] [2002] Connection refused` connecting to `mysql`** on
+every boot — an env var was set as `MYSQL_URL=${{MySQL.MYSQL_URL}}`, but
+Laravel's `config/database.php` reads the connection string from **`DB_URL`**,
+not `MYSQL_URL` — that variable name is never read by the framework, so the
+`mysql` connection silently fell back to its hardcoded default
+(`127.0.0.1:3306`), which nothing listens on in the container. Fix: name the
+variable `DB_URL` (see the table in step 5 above), not `MYSQL_URL` or
+anything else.
+
+**Site loads but `/` (and everything else) 404s** — migrations had applied
+(the Pre-Deploy Command handles that), but the database was otherwise empty,
+so `PageController` found no published `Page` with slug `home` and
+correctly returned 404. This is expected on a brand new database — the
+Pre-Deploy Command deliberately never seeds (seeding isn't idempotent/safe
+to run blindly on every deploy). Fix: run once via the service's **Console**
+tab:
+```
+php artisan db:seed --class=RoleSeeder
+php artisan db:seed --class=StaffSeeder
+php artisan db:seed --class=CatalogSeeder   # optional — sample/demo catalog data, skip for a real launch
+php artisan db:seed --class=PageSeeder
+php artisan db:seed --class=NavItemSeeder
+```
+`RoleSeeder`/`StaffSeeder`/`PageSeeder`/`NavItemSeeder` use `firstOrCreate`
+and are safe to re-run. `CatalogSeeder` is **not** — it calls
+`Product::factory()->create()` / `Category::factory()->create()` directly,
+so running it a second time throws a unique-constraint error on the
+`(category_id, slug)` / `(parent_id, slug)` indexes. Only run it once, or
+delete its rows first (`Demo Supplier Co.` seller, its categories/products).
+
+**Hyperlinks render Bootstrap's default blue instead of the brand orange**
+— `public/css/site.css` set `--bs-link-color`, but Bootstrap 5.3's actual
+CSS rule for `<a>` reads `--bs-link-color-rgb` (an RGB triplet, not a hex
+custom property):
+`a{color:rgba(var(--bs-link-color-rgb),var(--bs-link-opacity,1))}`. The hex
+variable was simply never read. Fixed in `public/css/site.css` by also
+setting `--bs-link-color-rgb` / `--bs-link-hover-color-rgb`.
+
+**`/admin` and `/seller/login` render with zero CSS** (raw unstyled HTML) —
+Filament's asset `<link>` tags were being generated as `http://...` on a
+page served over `https://`, which browsers block outright as mixed content
+(CSS is treated as blockable, not just upgradable). Root cause:
+`bootstrap/app.php` never called `trustProxies()`. Railway (like every PaaS)
+terminates TLS at its edge and forwards plain HTTP internally, setting
+`X-Forwarded-Proto: https` — without trusting that header, Laravel's
+`asset()`/`url()` helpers fall back to the untrusted request's scheme
+(`http`), regardless of what `APP_URL` is set to. Fixing `APP_URL` alone
+does **not** fix this — `asset()` prefers the live request's detected
+scheme over `APP_URL` whenever a request is active. Fixed by adding
+`$middleware->trustProxies(at: '*')` in `bootstrap/app.php`.
+
+**Uploaded product images/spec-sheet PDFs "disappeared"** — not a config
+bug in this case: the Volume mount path (`/app/storage/app/public`) and
+Filament's upload disk (`FILAMENT_FILESYSTEM_DISK`, defaults to `public` —
+note this is a *different* env var from `FILESYSTEM_DISK`, so setting the
+latter to `local` per step 5 has no effect on Filament uploads) were both
+already correct. The files were uploaded mid-troubleshooting, while several
+of the issues above were still being fixed and the service was redeploying
+repeatedly — anything written before the Volume was fully wired up doesn't
+survive the next redeploy. Re-uploading after the deployment is stable
+resolved it.
