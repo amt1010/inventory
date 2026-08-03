@@ -44,20 +44,65 @@
     @endif
 
     @if ($products->isNotEmpty())
-        <div class="row row-cols-1 row-cols-md-3 g-4 mt-2">
-            @foreach ($products as $product)
-                <div class="col">
-                    <a href="{{ url('/products/'.collect($breadcrumb)->pluck('slug')->push($product->slug)->implode('/')) }}" class="card h-100 text-decoration-none">
-                        @if ($product->images->first())
-                            <img src="{{ asset('storage/'.$product->images->first()->path) }}" class="card-img-top" alt="{{ $product->name }}">
-                        @endif
-                        <div class="card-body">
-                            <h5 class="card-title text-dark">{{ $product->name }}</h5>
-                            <p class="card-text text-muted">{{ $product->short_description }}</p>
-                        </div>
-                    </a>
-                </div>
-            @endforeach
+        <div class="row row-cols-1 row-cols-md-3 g-4 mt-2" id="product-grid">
+            @include('catalog.partials.product-grid-items', ['products' => $products, 'breadcrumb' => $breadcrumb])
         </div>
+        <div class="text-center py-4" id="product-grid-loader" style="display: none;">
+            <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading…</span></div>
+        </div>
+        <div id="product-grid-sentinel" data-next-page-url="{{ $products instanceof \Illuminate\Contracts\Pagination\Paginator ? $products->nextPageUrl() : '' }}"></div>
+
+        <script>
+            (function () {
+                var sentinel = document.getElementById('product-grid-sentinel');
+                var grid = document.getElementById('product-grid');
+                var loader = document.getElementById('product-grid-loader');
+                var loading = false;
+
+                var observer = new IntersectionObserver(function (entries) {
+                    entries.forEach(function (entry) {
+                        if (entry.isIntersecting) {
+                            loadNextPage();
+                        }
+                    });
+                });
+
+                function loadNextPage() {
+                    var nextUrl = sentinel.getAttribute('data-next-page-url');
+                    if (!nextUrl || loading) {
+                        return;
+                    }
+
+                    loading = true;
+                    loader.style.display = 'block';
+
+                    fetch(nextUrl, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                        .then(function (response) {
+                            var nextPageUrl = response.headers.get('X-Next-Page-Url') || '';
+                            return response.text().then(function (html) {
+                                return { html: html, nextPageUrl: nextPageUrl };
+                            });
+                        })
+                        .then(function (result) {
+                            grid.insertAdjacentHTML('beforeend', result.html);
+                            sentinel.setAttribute('data-next-page-url', result.nextPageUrl);
+                            loader.style.display = 'none';
+                            loading = false;
+
+                            if (!result.nextPageUrl) {
+                                observer.disconnect();
+                            }
+                        })
+                        .catch(function () {
+                            loader.style.display = 'none';
+                            loading = false;
+                        });
+                }
+
+                if (sentinel.getAttribute('data-next-page-url')) {
+                    observer.observe(sentinel);
+                }
+            })();
+        </script>
     @endif
 @endsection
