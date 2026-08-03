@@ -22,6 +22,7 @@ class StoreSellerRegistrationRequest extends FormRequest
             'business_address' => ['required', 'string', 'max:500'],
             'gst_number' => ['required', 'string', 'regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/'],
             'password' => ['required', 'confirmed', Password::min(8)],
+            'terms_accepted' => ['required', 'accepted'],
             'documents' => ['nullable', 'array'],
             'documents.*' => ['file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
         ];
