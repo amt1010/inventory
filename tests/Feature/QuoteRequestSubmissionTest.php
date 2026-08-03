@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Mail\QuoteRequestConfirmation;
 use App\Mail\QuoteRequestReceived;
 use App\Models\Category;
 use App\Models\Product;
@@ -132,6 +133,30 @@ class QuoteRequestSubmissionTest extends TestCase
         $quoteRequest = \App\Models\QuoteRequest::where('email', 'priya@example.com')->firstOrFail();
 
         $this->assertMatchesRegularExpression('/^\d{14}$/', $quoteRequest->quote_number);
+    }
+
+    public function test_the_buyer_receives_a_confirmation_email_with_their_quote_number(): void
+    {
+        Mail::fake();
+
+        $this->post(route('quote-requests.store'), [
+            'reason' => 'General Inquiry',
+            'first_name' => 'Priya',
+            'last_name' => 'Nair',
+            'email' => 'priya@example.com',
+            'phone' => '9876511111',
+            'contact_preference' => 'email',
+            'privacy_policy' => '1',
+        ]);
+
+        $quoteRequest = \App\Models\QuoteRequest::where('email', 'priya@example.com')->firstOrFail();
+
+        Mail::assertQueued(QuoteRequestConfirmation::class, function (QuoteRequestConfirmation $mail) use ($quoteRequest) {
+            return $mail->hasTo('priya@example.com') && $mail->quoteRequest->is($quoteRequest);
+        });
+
+        // The existing staff notification still goes out too — this is additive, not a replacement.
+        Mail::assertQueued(QuoteRequestReceived::class);
     }
 
     public function test_the_notification_is_sent_to_the_configured_recipient_address(): void

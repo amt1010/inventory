@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreQuoteRequestRequest;
+use App\Mail\QuoteRequestConfirmation;
 use App\Mail\QuoteRequestReceived;
 use App\Models\QuoteRequest;
 use App\Services\QuoteNumberGenerator;
@@ -26,6 +27,15 @@ class QuoteRequestController extends Controller
             Mail::to(config('rfq.notification_email'))->send(new QuoteRequestReceived($quoteRequest));
         } catch (\Throwable $exception) {
             Log::error('Failed to queue quote request notification email.', [
+                'quote_request_id' => $quoteRequest->id,
+                'exception' => $exception->getMessage(),
+            ]);
+        }
+
+        try {
+            Mail::to($quoteRequest->email)->send(new QuoteRequestConfirmation($quoteRequest));
+        } catch (\Throwable $exception) {
+            Log::error('Failed to queue quote request confirmation email.', [
                 'quote_request_id' => $quoteRequest->id,
                 'exception' => $exception->getMessage(),
             ]);
