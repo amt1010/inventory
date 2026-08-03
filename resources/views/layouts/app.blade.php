@@ -81,8 +81,8 @@
     </nav>
 
     <main class="container py-4">
-        @if (session('quote_request_submitted'))
-            <div class="alert alert-success">Thank you — your quote request has been submitted. Our team will be in touch shortly.</div>
+        @if ($quoteNumber = session('quote_request_submitted'))
+            <div class="alert alert-success">Thank you — your quote request <strong>{{ $quoteNumber }}</strong> has been submitted. Our team will be in touch shortly.</div>
         @endif
         @yield('content')
     </main>

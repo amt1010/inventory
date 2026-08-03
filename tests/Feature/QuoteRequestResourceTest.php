@@ -37,6 +37,19 @@ class QuoteRequestResourceTest extends TestCase
             ->assertCanSeeTableRecords([$quoteRequest]);
     }
 
+    public function test_the_quote_number_column_is_shown(): void
+    {
+        $sales = Staff::factory()->create();
+        $sales->assignRole('sales');
+        $this->actingAs($sales, 'staff');
+
+        $quoteRequest = QuoteRequest::factory()->create(['quote_number' => '26080317300001']);
+
+        Livewire::test(ListQuoteRequests::class)
+            ->assertSuccessful()
+            ->assertSee('26080317300001');
+    }
+
     public function test_content_editor_gets_a_403_visiting_the_quote_requests_list(): void
     {
         $editor = Staff::factory()->create();

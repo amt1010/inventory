@@ -41,6 +41,6 @@ class QuoteRequestController extends Controller
             ]);
         }
 
-        return back()->with('quote_request_submitted', true);
+        return back()->with('quote_request_submitted', $quoteRequest->quote_number);
     }
 }
