@@ -220,10 +220,28 @@ php artisan db:seed --class=NavItemSeeder
 ```
 `RoleSeeder`/`StaffSeeder`/`PageSeeder`/`NavItemSeeder` use `firstOrCreate`
 and are safe to re-run. `CatalogSeeder` is **not** — it calls
-`Product::factory()->create()` / `Category::factory()->create()` directly,
-so running it a second time throws a unique-constraint error on the
-`(category_id, slug)` / `(parent_id, slug)` indexes. Only run it once, or
-delete its rows first (`Demo Supplier Co.` seller, its categories/products).
+`Product::factory()->create()` / `Category::factory()->create()` directly.
+Re-running it does **not** throw a unique-constraint error the way you'd
+expect from the `(category_id, slug)` / `(parent_id, slug)` unique indexes
+— each run creates a brand new seller/category tree with fresh IDs, so the
+indexed columns never actually collide across runs, and you silently end up
+with N full duplicate demo catalogs instead of an error telling you
+something's wrong. This also broke the public storefront's category-tree
+walk (`CatalogController`), which could resolve a category slug to whichever
+duplicate it found first — one with no products under it — making real,
+already-seeded data look "missing."
+
+If this happens, clean it up via the Console tab (`php artisan tinker`),
+leaf-to-root to satisfy the self-referencing FK, which removes every
+duplicate at once regardless of how many times it was run:
+```php
+\App\Models\Product::whereIn('slug', ['centracore-opgw-cable', 'hexacore-opgw-cable'])->delete();
+\App\Models\Category::where('slug', 'opgw')->delete();
+\App\Models\Category::where('slug', 'aerial')->delete();
+\App\Models\Category::where('slug', 'fiber-optic-cable')->delete();
+\App\Models\Seller::where('company_name', 'Demo Supplier Co.')->delete();
+```
+then run `php artisan db:seed --class=CatalogSeeder` once, cleanly.
 
 **Hyperlinks render Bootstrap's default blue instead of the brand orange**
 — `public/css/site.css` set `--bs-link-color`, but Bootstrap 5.3's actual
@@ -270,4 +288,16 @@ chasing where to run `storage:link` instead: `config/filesystems.php`'s
 `/app/storage/app/public` to `/app/public/storage` (same persistent volume,
 just remounted — no data migration needed). If you set this up before this
 fix landed, update the Volume's mount path in Railway's dashboard to match
-and redeploy.
+and redeploy. Confirmed working: re-uploading after the mount path change
+made the previously-404ing image load correctly.
+
+**Footer settings (phone, email, address, social links) are blank on a
+fresh deploy** — not a bug. `Setting::current()`
+(`app/Models/Setting.php`) does `firstOrCreate(['id' => 1], ['site_name' =>
+config('app.name')])`, so the very first access creates a row with only
+`site_name` populated; everything else is genuinely empty by design. There
+is no `SettingsSeeder` — these fields are meant to be filled in once,
+directly through **Settings** in `/admin`, not seeded or imported from
+anywhere. Local dev and this Railway database are separate databases too,
+so nothing carries over automatically even if you'd already filled these in
+locally.
