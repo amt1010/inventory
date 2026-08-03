@@ -99,14 +99,18 @@ composer install
 npm install
 cp .env.example .env   # if .env doesn't already exist
 php artisan key:generate
-php artisan storage:link
 ```
 
-`storage:link` creates `public/storage` → `storage/app/public`, which is required for
-product images and spec-sheet PDFs to be reachable at all (`ProductImage`/`FileUpload`
-fields store under `storage/app/public/...` and every view links via
-`asset('storage/...')`). Skipping this step doesn't error anywhere — it just means
-every uploaded image silently 404s/403s on the public site.
+Product images and spec-sheet PDFs (`ProductImage`/`FileUpload` fields) are written
+to the `public` disk, which is `public/storage` directly (see `config/filesystems.php`)
+— not the usual Laravel `storage/app/public` + `storage:link` symlink. That symlink
+approach broke in production: Railway's Pre-Deploy Command runs in a throwaway
+container that's discarded before the container serving traffic boots, so a symlink
+created there never reaches the container clients actually hit (see `DEPLOYMENT.md`'s
+troubleshooting section). Pointing the disk at `public/storage` directly sidesteps
+this — no symlink, no separate command, and it also avoids `storage:link` needing
+elevated privileges to create symlinks on Windows. Laravel creates the directory
+automatically on first upload; nothing to run by hand.
 
 If `composer install` fails with an error about a security-advisory policy
 blocking `laravel/framework`: Composer 2.10+ refuses by default to install any

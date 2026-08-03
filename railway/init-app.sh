@@ -6,7 +6,6 @@ set -e
 
 php artisan optimize:clear
 php artisan migrate --force
-php artisan storage:link
 php artisan config:cache
 php artisan event:cache
 php artisan route:cache

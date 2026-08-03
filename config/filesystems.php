@@ -40,7 +40,14 @@ return [
 
         'public' => [
             'driver' => 'local',
-            'root' => storage_path('app/public'),
+            // Not storage_path('app/public') + a storage:link symlink: on
+            // Railway, the Pre-Deploy Command that would run `storage:link`
+            // executes in a throwaway container that's discarded before the
+            // container serving traffic ever boots, so the symlink never
+            // reaches the container clients actually hit. Pointing this disk
+            // directly at public/storage (and mounting the persistent Volume
+            // there — see DEPLOYMENT.md) sidesteps the symlink entirely.
+            'root' => public_path('storage'),
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
             'throw' => false,
@@ -62,19 +69,8 @@ return [
 
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Symbolic Links
-    |--------------------------------------------------------------------------
-    |
-    | Here you may configure the symbolic links that will be created when the
-    | `storage:link` Artisan command is executed. The array keys should be
-    | the locations of the links and the values should be their targets.
-    |
-    */
-
-    'links' => [
-        public_path('storage') => storage_path('app/public'),
-    ],
+    // No `links` entry / storage:link: the `public` disk above is
+    // public_path('storage') directly, not a symlinked storage_path('app/public') —
+    // see the comment on that disk for why.
 
 ];
