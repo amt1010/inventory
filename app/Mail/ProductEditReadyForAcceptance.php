@@ -5,12 +5,14 @@ namespace App\Mail;
 use App\Models\Product;
 use App\Models\ProductEditTrail;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
-class ProductEditReadyForAcceptance extends Mailable
+class ProductEditReadyForAcceptance extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
@@ -34,5 +36,13 @@ class ProductEditReadyForAcceptance extends Mailable
                 'editTrail' => $this->editTrail,
             ],
         );
+    }
+
+    public function failed(\Throwable $exception): void
+    {
+        Log::error('Failed to send product edit acceptance email.', [
+            'product_id' => $this->product->id,
+            'exception' => $exception->getMessage(),
+        ]);
     }
 }

@@ -56,7 +56,7 @@ class EditProduct extends EditRecord
         try {
             Mail::to($this->record->seller->email)->send(new ProductEditReadyForAcceptance($this->record, $trail));
         } catch (\Throwable $exception) {
-            Log::error('Failed to send product edit acceptance email.', [
+            Log::error('Failed to queue product edit acceptance email.', [
                 'product_id' => $this->record->id,
                 'exception' => $exception->getMessage(),
             ]);

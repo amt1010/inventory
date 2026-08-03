@@ -52,7 +52,7 @@ class AdminProductEditTrailTest extends TestCase
         $this->assertSame(['old' => 'Original text', 'new' => 'Corrected text'], $trail->changes['short_description']);
         $this->assertSame($admin->id, $trail->staff_id);
 
-        Mail::assertSent(ProductEditReadyForAcceptance::class, fn ($mail) => $mail->product->is($product));
+        Mail::assertQueued(ProductEditReadyForAcceptance::class, fn ($mail) => $mail->product->is($product));
     }
 
     public function test_saving_a_pending_review_product_with_no_tracked_field_changes_creates_no_trail(): void
@@ -77,7 +77,7 @@ class AdminProductEditTrailTest extends TestCase
         $this->assertSame('pending_review', $product->status);
         $this->assertSame(0, $product->editTrails()->count());
 
-        Mail::assertNotSent(ProductEditReadyForAcceptance::class);
+        Mail::assertNotQueued(ProductEditReadyForAcceptance::class);
     }
 
     public function test_the_publish_action_is_hidden_while_a_product_awaits_seller_acceptance(): void
