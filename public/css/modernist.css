@@ -204,3 +204,40 @@
 .md-theme footer a:hover {
     color: var(--color-accent);
 }
+
+/* RFQ form embed: scoped override of the shared quote-request form's
+   Bootstrap classes. Scoped to .md-rfq-card so the same partial keeps its
+   default Bootstrap look everywhere else it's used (e.g. the product-detail
+   modal). */
+.md-rfq-card .form-label {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.md-rfq-card .form-control,
+.md-rfq-card .form-select {
+    border: 2px solid var(--color-divider);
+    border-radius: var(--radius-0);
+}
+
+.md-rfq-card .form-control:focus,
+.md-rfq-card .form-select:focus {
+    border-color: var(--color-accent);
+    box-shadow: none;
+}
+
+.md-rfq-card .btn-primary {
+    background-color: var(--color-accent);
+    border-color: var(--color-accent);
+    border-radius: var(--radius-0);
+    font-family: var(--font-heading);
+    font-weight: 600;
+}
+
+.md-rfq-card .btn-primary:hover,
+.md-rfq-card .btn-primary:focus,
+.md-rfq-card .btn-primary:active {
+    background-color: var(--color-accent-700);
+    border-color: var(--color-accent-700);
+}

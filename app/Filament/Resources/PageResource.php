@@ -168,7 +168,9 @@ class PageResource extends Resource
                     Block::make('rfq_form_embed')
                         ->label('RFQ Form Embed')
                         ->schema([
+                            TextInput::make('tag'),
                             TextInput::make('heading')->default('Request a Quote'),
+                            Textarea::make('body'),
                         ]),
                     Block::make('resource_list')
                         ->label('Resource List')
