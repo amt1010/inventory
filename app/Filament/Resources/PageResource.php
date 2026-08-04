@@ -84,6 +84,22 @@ class PageResource extends Resource
                                 ->required()
                                 ->minItems(1),
                         ]),
+                    Block::make('hero_banner')
+                        ->label('Hero Banner (Modernist)')
+                        ->schema([
+                            TextInput::make('tag'),
+                            TextInput::make('heading')->required(),
+                            Textarea::make('body'),
+                            TextInput::make('search_placeholder')
+                                ->default('Search for item by keyword or product number'),
+                            TextInput::make('cta_primary_label')->default('Browse Products'),
+                            TextInput::make('cta_primary_url')->default('/products'),
+                            TextInput::make('cta_secondary_label')->default('Request a Quote'),
+                            TextInput::make('cta_secondary_url')->default('/#rfq'),
+                            FileUpload::make('image')
+                                ->image()
+                                ->directory('page-blocks'),
+                        ]),
                     Block::make('content_strip')
                         ->label('Content Strip (Image + Text)')
                         ->schema([
@@ -96,6 +112,23 @@ class PageResource extends Resource
                                 ->options(['left' => 'Image Left', 'right' => 'Image Right'])
                                 ->default('left')
                                 ->required(),
+                        ]),
+                    Block::make('trust_badges')
+                        ->label('Trust Badges')
+                        ->schema([
+                            Repeater::make('items')
+                                ->schema([
+                                    Select::make('icon')
+                                        ->options([
+                                            'shield-check' => 'Shield Check',
+                                            'package-check' => 'Package Check',
+                                            'handshake' => 'Handshake',
+                                            'message-square' => 'Message Square',
+                                        ])
+                                        ->required(),
+                                    TextInput::make('label')->required(),
+                                ])
+                                ->minItems(1),
                         ]),
                     Block::make('rich_text')
                         ->label('Rich Text')
@@ -113,6 +146,14 @@ class PageResource extends Resource
                                 ->options(fn () => Category::query()->where('status', 'published')->pluck('name', 'id'))
                                 ->required(),
                         ]),
+                    Block::make('deals_banner')
+                        ->label('Deals Banner')
+                        ->schema([
+                            TextInput::make('heading')->default('Bulk Deals This Week'),
+                            Textarea::make('body'),
+                            TextInput::make('cta_label')->default('Shop Deals'),
+                            TextInput::make('cta_url')->default('/products'),
+                        ]),
                     Block::make('featured_products')
                         ->label('Featured Products Grid')
                         ->schema([
@@ -127,7 +168,15 @@ class PageResource extends Resource
                     Block::make('rfq_form_embed')
                         ->label('RFQ Form Embed')
                         ->schema([
+                            TextInput::make('tag'),
                             TextInput::make('heading')->default('Request a Quote'),
+                            Textarea::make('body'),
+                        ]),
+                    Block::make('newsletter_signup')
+                        ->label('Newsletter Signup')
+                        ->schema([
+                            TextInput::make('heading')->default('Get sourcing updates & deals'),
+                            TextInput::make('subheading'),
                         ]),
                     Block::make('resource_list')
                         ->label('Resource List')

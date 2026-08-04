@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Models\Setting;
+use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
@@ -33,7 +34,7 @@ class ManageSettings extends Page implements HasForms
     public function mount(): void
     {
         $this->form->fill(Setting::current()->only([
-            'site_name', 'logo_path',
+            'site_name', 'logo_path', 'theme_accent_color',
             'footer_copyright', 'footer_address', 'footer_phone', 'footer_email',
             'social_facebook', 'social_twitter', 'social_linkedin', 'social_instagram', 'social_youtube',
         ]));
@@ -47,6 +48,11 @@ class ManageSettings extends Page implements HasForms
                 ->label('Logo')
                 ->image()
                 ->directory('branding'),
+            ColorPicker::make('theme_accent_color')
+                ->label('Theme Accent Color')
+                ->hex()
+                ->helperText('Used for buttons, tags, and highlights across the public site.')
+                ->required(),
             Section::make('Footer')
                 ->description('Content shown in the site footer.')
                 ->schema([

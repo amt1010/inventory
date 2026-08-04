@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\FavoriteController;
+use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PreviewController;
 use App\Http\Controllers\QuoteRequestController;
@@ -18,6 +19,8 @@ Route::get('/', [PageController::class, 'show'])->defaults('slug', 'home')->name
 Route::get('/search', SearchController::class)->name('catalog.search');
 
 Route::post('/quote-requests', [QuoteRequestController::class, 'store'])->name('quote-requests.store');
+
+Route::post('/newsletter/subscribe', [NewsletterController::class, 'store'])->name('newsletter.subscribe');
 
 Route::get('/register', [RegistrationController::class, 'create'])->name('register');
 Route::post('/register', [RegistrationController::class, 'store'])->middleware('throttle:6,1')->name('register.store');

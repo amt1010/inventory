@@ -7,10 +7,18 @@
     @hasSection('meta_description')
         <meta name="description" content="@yield('meta_description')">
     @endif
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="{{ asset('css/site.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/modernist.css') }}" rel="stylesheet">
+    <style>
+        :root {
+            --color-accent: {{ $siteSettings->theme_accent_color }};
+            --color-accent-700: {{ $siteSettings->accentColorDark() }};
+        }
+    </style>
 </head>
-<body>
+<body class="md-theme">
     <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url('/') }}">
@@ -83,6 +91,9 @@
     <main class="container py-4">
         @if ($quoteNumber = session('quote_request_submitted'))
             <div class="alert alert-success">Thank you — your quote request <strong>{{ $quoteNumber }}</strong> has been submitted. Our team will be in touch shortly.</div>
+        @endif
+        @if (session('newsletter_subscribed'))
+            <div class="alert alert-success">Thanks for subscribing — you're on the list.</div>
         @endif
         @yield('content')
     </main>

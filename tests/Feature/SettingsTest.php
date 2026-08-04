@@ -109,6 +109,42 @@ class SettingsTest extends TestCase
         $this->assertSame('https://linkedin.com/company/acme', $setting->social_linkedin);
     }
 
+    public function test_the_accent_color_defaults_to_the_original_orange(): void
+    {
+        $this->assertSame('#ff6a00', Setting::current()->theme_accent_color);
+    }
+
+    public function test_accent_color_dark_computes_a_darker_shade(): void
+    {
+        $setting = Setting::current();
+        $setting->update(['theme_accent_color' => '#ff6a00']);
+
+        $this->assertSame('#cc5500', $setting->fresh()->accentColorDark());
+    }
+
+    public function test_the_public_layout_applies_the_configured_accent_color(): void
+    {
+        Setting::current()->update(['theme_accent_color' => '#123456']);
+
+        $response = $this->get('/');
+
+        $response->assertOk();
+        $response->assertSee('--color-accent: #123456', escape: false);
+    }
+
+    public function test_an_admin_can_save_the_theme_accent_color(): void
+    {
+        $staff = Staff::factory()->create();
+        $staff->assignRole('admin');
+        $this->actingAs($staff, 'staff');
+
+        \Livewire\Livewire::test(\App\Filament\Pages\ManageSettings::class)
+            ->fillForm(['theme_accent_color' => '#00ff00'])
+            ->call('save');
+
+        $this->assertSame('#00ff00', Setting::current()->theme_accent_color);
+    }
+
     public function test_an_admin_can_access_the_settings_page(): void
     {
         $staff = Staff::factory()->create();

@@ -1,0 +1,231 @@
+/* public/css/modernist.css — "Modernist" design system tokens + components.
+   Layered on top of Bootstrap 5 (still CDN-loaded); md-prefixed to avoid
+   colliding with Bootstrap or site.css's existing class overrides.
+   --color-accent/--color-accent-700 below are just a fallback default (the
+   original brand orange) — the real values come from the admin-configurable
+   Setting::theme_accent_color, applied via an inline <style> override in
+   layouts/app.blade.php that loads after this file. */
+
+:root {
+    --color-bg: #f3f2f2;
+    --color-text: #201e1d;
+    --color-accent: #ff6a00;
+    --color-neutral-100: #f3f2f2;
+    --color-neutral-700: #666;
+    --color-neutral-900: #1a1a1a;
+    --color-divider: #e0e0e0;
+    --color-accent-700: #cc5500;
+
+    --font-heading: 'Archivo', sans-serif;
+    --font-body: 'Archivo', sans-serif;
+
+    --space-2: 4px;
+    --space-3: 8px;
+    --space-4: 12px;
+    --space-5: 16px;
+    --space-6: 24px;
+    --space-7: 32px;
+    --space-8: 40px;
+    --space-9: 48px;
+
+    --radius-0: 0px;
+
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.md-theme {
+    font-family: var(--font-body);
+    color: var(--color-text);
+}
+
+.md-theme h1, .md-theme h2, .md-theme h3, .md-theme h4 {
+    font-family: var(--font-heading);
+    font-weight: 800;
+}
+
+/* Buttons */
+.md-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 15px;
+    padding: var(--space-4) var(--space-6);
+    border: 2px solid transparent;
+    border-radius: var(--radius-0);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color .15s, color .15s, border-color .15s;
+}
+
+.md-btn-primary {
+    background: var(--color-accent);
+    color: #fff;
+    border-color: var(--color-accent);
+}
+
+.md-btn-primary:hover, .md-btn-primary:focus {
+    background: var(--color-accent-700);
+    border-color: var(--color-accent-700);
+    color: #fff;
+}
+
+.md-btn-secondary {
+    background: transparent;
+    color: var(--color-text);
+    border-color: var(--color-text);
+}
+
+.md-btn-secondary:hover, .md-btn-secondary:focus {
+    background: var(--color-text);
+    color: var(--color-bg);
+}
+
+.md-btn-ghost {
+    background: transparent;
+    color: var(--color-accent-700);
+    border-color: transparent;
+}
+
+.md-btn-ghost:hover, .md-btn-ghost:focus {
+    color: var(--color-accent);
+    text-decoration: underline;
+}
+
+.md-btn-block {
+    display: flex;
+    width: 100%;
+}
+
+/* Tags */
+.md-tag {
+    display: inline-block;
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    padding: var(--space-2) var(--space-4);
+    border: 2px solid var(--color-divider);
+    border-radius: var(--radius-0);
+    color: var(--color-text);
+}
+
+.md-tag-accent {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: #fff;
+}
+
+.md-tag-outline {
+    background: transparent;
+    border-color: var(--color-accent-700);
+    color: var(--color-accent-700);
+}
+
+/* Cards */
+.md-card {
+    display: block;
+    background: #fff;
+    border: 2px solid var(--color-divider);
+    border-radius: var(--radius-0);
+    color: var(--color-text);
+}
+
+.md-elev-sm { box-shadow: var(--shadow-sm); }
+.md-elev-md { box-shadow: var(--shadow-md); }
+
+/* Dividers */
+.md-hr {
+    border: none;
+    border-top: 2px solid var(--color-divider);
+    margin: var(--space-6) 0;
+}
+
+/* Image treatment */
+.md-grayscale {
+    filter: grayscale(100%);
+    transition: filter .2s;
+}
+
+.md-grayscale:hover {
+    filter: grayscale(0%);
+}
+
+/* Global chrome: header, footer. Scoped under .md-theme so it never leaks
+   onto anything outside the public layout (e.g. Filament). */
+
+.md-theme .navbar {
+    background: var(--color-bg) !important;
+    border-bottom: 2px solid var(--color-divider) !important;
+    box-shadow: none;
+}
+
+.md-theme .navbar-brand {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    color: var(--color-text) !important;
+}
+
+.md-theme .nav-link {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    color: var(--color-text) !important;
+}
+
+.md-theme .nav-link:hover {
+    color: var(--color-accent) !important;
+}
+
+.md-theme footer {
+    background: var(--color-neutral-900);
+    color: var(--color-bg);
+    border-top: none;
+}
+
+.md-theme footer a {
+    color: var(--color-bg);
+}
+
+.md-theme footer a:hover {
+    color: var(--color-accent);
+}
+
+/* RFQ form embed: scoped override of the shared quote-request form's
+   Bootstrap classes. Scoped to .md-rfq-card so the same partial keeps its
+   default Bootstrap look everywhere else it's used (e.g. the product-detail
+   modal). */
+.md-rfq-card .form-label {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.md-rfq-card .form-control,
+.md-rfq-card .form-select {
+    border: 2px solid var(--color-divider);
+    border-radius: var(--radius-0);
+}
+
+.md-rfq-card .form-control:focus,
+.md-rfq-card .form-select:focus {
+    border-color: var(--color-accent);
+    box-shadow: none;
+}
+
+.md-rfq-card .btn-primary {
+    background-color: var(--color-accent);
+    border-color: var(--color-accent);
+    border-radius: var(--radius-0);
+    font-family: var(--font-heading);
+    font-weight: 600;
+}
+
+.md-rfq-card .btn-primary:hover,
+.md-rfq-card .btn-primary:focus,
+.md-rfq-card .btn-primary:active {
+    background-color: var(--color-accent-700);
+    border-color: var(--color-accent-700);
+}

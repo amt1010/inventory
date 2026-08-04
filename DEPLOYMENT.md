@@ -76,7 +76,10 @@ On the app service's **Variables** tab:
 | `LOG_CHANNEL` | `stderr` | so logs show up in Railway's log viewer |
 | `LOG_STDERR_FORMATTER` | `\Monolog\Formatter\JsonFormatter` | structured logs |
 | `FILESYSTEM_DISK` | `local` | unchanged from local dev — the Volume from step 4 makes this durable |
-| mail vars (`MAIL_MAILER`, `MAIL_HOST`, etc.) | your real SMTP provider's credentials | `.env.example` has the full list; in local dev these are usually unset (mail defaults to writing to the log) — production needs real ones or queued emails silently never send |
+| `MAIL_MAILER` | `postmark` | Railway blocks all outbound SMTP ports (25, 465, 587, 2525) below the Pro plan — see the troubleshooting section below. Use an HTTP-API mailer instead of `smtp` unless the project is on Railway Pro |
+| `POSTMARK_TOKEN` | your Postmark Server API Token | read by `config/services.php` → `postmark.token`; requires `composer require symfony/postmark-mailer symfony/http-client` (already installed) |
+| `MAIL_FROM_ADDRESS` | the email address verified as a Postmark Sender Signature (or a verified sending domain, once one exists) | Postmark rejects sends from an unverified `From` address |
+| `MAIL_FROM_NAME` | `${APP_NAME}` | |
 | `RECAPTCHA_SITE_KEY` / `RECAPTCHA_SECRET_KEY` | your production reCAPTCHA keys | only if the RFQ form's recaptcha check is enabled — see `.env.example` |
 
 Do not copy values from your local `.env` — generate fresh credentials for
@@ -290,6 +293,27 @@ just remounted — no data migration needed). If you set this up before this
 fix landed, update the Volume's mount path in Railway's dashboard to match
 and redeploy. Confirmed working: re-uploading after the mount path change
 made the previously-404ing image load correctly.
+
+**Quote-request confirmation/notification emails never arrive, even with
+correct SMTP credentials set on both services** — `php artisan queue:failed`
+showed every `SendQueuedMailable` job failing, and the stored exception
+(`DB::table('failed_jobs')->latest('failed_at')->first()->exception` via
+`tinker`, since `queue:failed`'s table view doesn't print it) was
+`Symfony\Component\Mailer\Exception\TransportException: Connection could not
+be established with host "sandbox.smtp.mailtrap.io:2525": ... Connection
+timed out`. Root cause: Railway blocks all outbound SMTP ports (25, 465, 587,
+2525) on every plan below Pro — the container can't open the TCP connection
+at all, so it hangs until timeout rather than getting a fast "connection
+refused" from Mailtrap. This affects **any** SMTP provider, not just
+Mailtrap — switching `MAIL_HOST` won't fix it. Fixed by switching off SMTP
+entirely to an HTTP-API mailer (`config/mail.php` already has `postmark`,
+`resend`, and `ses` stubbed in; this project uses `postmark` — see the env
+var table in step 5). Resend needs a verified sending domain even for one
+address, which this project doesn't have yet; Postmark's single Sender
+Signature verifies one existing mailbox by email confirmation with no domain
+needed, so that's the interim choice until a real domain exists. The
+alternative is upgrading the Railway service to the Pro plan, which
+unblocks SMTP outright and needs no mailer change.
 
 **Footer settings (phone, email, address, social links) are blank on a
 fresh deploy** — not a bug. `Setting::current()`
