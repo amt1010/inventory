@@ -84,6 +84,22 @@ class PageResource extends Resource
                                 ->required()
                                 ->minItems(1),
                         ]),
+                    Block::make('hero_banner')
+                        ->label('Hero Banner (Modernist)')
+                        ->schema([
+                            TextInput::make('tag'),
+                            TextInput::make('heading')->required(),
+                            Textarea::make('body'),
+                            TextInput::make('search_placeholder')
+                                ->default('Search for item by keyword or product number'),
+                            TextInput::make('cta_primary_label')->default('Browse Products'),
+                            TextInput::make('cta_primary_url')->default('/products'),
+                            TextInput::make('cta_secondary_label')->default('Request a Quote'),
+                            TextInput::make('cta_secondary_url')->default('/#rfq'),
+                            FileUpload::make('image')
+                                ->image()
+                                ->directory('page-blocks'),
+                        ]),
                     Block::make('content_strip')
                         ->label('Content Strip (Image + Text)')
                         ->schema([
