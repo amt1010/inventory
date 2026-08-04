@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\CustomAttribute;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -53,9 +54,24 @@ class CatalogController extends Controller
         }
 
         $products = collect();
+        $filterGroups = collect();
 
         if ($category) {
+            $filterGroups = CustomAttribute::query()
+                ->whereHasMorph('attributable', [Product::class], function ($query) use ($category) {
+                    $query->where('category_id', $category->id)->where('status', 'published');
+                })
+                ->get(['label', 'value'])
+                ->groupBy('label')
+                ->map(fn ($group) => $group->pluck('value')->unique()->sort()->values());
+
             $productsQuery = $category->products()->with('images')->where('status', 'published');
+
+            foreach ((array) $request->query('attr', []) as $label => $values) {
+                $productsQuery->whereHas('customAttributes', function ($query) use ($label, $values) {
+                    $query->where('label', $label)->whereIn('value', (array) $values);
+                });
+            }
 
             $productsQuery = match ($request->query('sort')) {
                 'newest' => $productsQuery->orderBy('created_at', 'desc'),
@@ -81,6 +97,7 @@ class CatalogController extends Controller
                 ? $category->children()->where('status', 'published')->get()
                 : Category::query()->whereNull('parent_id')->where('status', 'published')->orderBy('sort_order')->get(),
             'products' => $products,
+            'filterGroups' => $filterGroups,
         ]);
     }
 }
