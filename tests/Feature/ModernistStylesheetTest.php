@@ -24,7 +24,7 @@ class ModernistStylesheetTest extends TestCase
     {
         $css = file_get_contents(public_path('css/modernist.css'));
 
-        $this->assertStringContainsString('--color-accent: #ec3013', $css);
+        $this->assertStringContainsString('--color-accent: #ff6a00', $css);
         $this->assertStringContainsString('--color-bg: #f3f2f2', $css);
         $this->assertStringContainsString('--font-heading', $css);
     }

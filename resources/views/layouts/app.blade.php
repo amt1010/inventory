@@ -11,6 +11,12 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="{{ asset('css/site.css') }}" rel="stylesheet">
     <link href="{{ asset('css/modernist.css') }}" rel="stylesheet">
+    <style>
+        :root {
+            --color-accent: {{ $siteSettings->theme_accent_color }};
+            --color-accent-700: {{ $siteSettings->accentColorDark() }};
+        }
+    </style>
 </head>
 <body class="md-theme">
     <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">

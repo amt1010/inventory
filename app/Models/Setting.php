@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Setting extends Model
 {
     protected $fillable = [
-        'site_name', 'logo_path',
+        'site_name', 'logo_path', 'theme_accent_color',
         'footer_copyright', 'footer_address', 'footer_phone', 'footer_email',
         'social_facebook', 'social_twitter', 'social_linkedin', 'social_instagram', 'social_youtube',
     ];
@@ -26,7 +26,10 @@ class Setting extends Model
 
     public static function current(): self
     {
-        return self::firstOrCreate(['id' => 1], ['site_name' => config('app.name')]);
+        return self::firstOrCreate(['id' => 1], [
+            'site_name' => config('app.name'),
+            'theme_accent_color' => '#ff6a00',
+        ]);
     }
 
     /**
@@ -39,6 +42,19 @@ class Setting extends Model
         }
 
         return str_replace('{year}', (string) now()->year, $this->footer_copyright);
+    }
+
+    /**
+     * A 20%-darker shade of the configured accent color, used for hover/active
+     * states (the Modernist design system's `--color-accent-700` token).
+     */
+    public function accentColorDark(): string
+    {
+        [$red, $green, $blue] = sscanf(ltrim($this->theme_accent_color, '#'), '%02x%02x%02x');
+
+        return '#'.collect([$red, $green, $blue])
+            ->map(fn ($channel) => str_pad(dechex((int) round($channel * 0.8)), 2, '0', STR_PAD_LEFT))
+            ->implode('');
     }
 
     /**
