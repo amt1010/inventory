@@ -97,6 +97,9 @@
         @if ($quoteNumber = session('quote_request_submitted'))
             <div class="alert alert-success">Thank you — your quote request <strong>{{ $quoteNumber }}</strong> has been submitted. Our team will be in touch shortly.</div>
         @endif
+        @if (session('newsletter_subscribed'))
+            <div class="alert alert-success">Thanks for subscribing — you're on the list.</div>
+        @endif
         @yield('content')
     </main>
 

@@ -172,6 +172,12 @@ class PageResource extends Resource
                             TextInput::make('heading')->default('Request a Quote'),
                             Textarea::make('body'),
                         ]),
+                    Block::make('newsletter_signup')
+                        ->label('Newsletter Signup')
+                        ->schema([
+                            TextInput::make('heading')->default('Get sourcing updates & deals'),
+                            TextInput::make('subheading'),
+                        ]),
                     Block::make('resource_list')
                         ->label('Resource List')
                         ->schema([
