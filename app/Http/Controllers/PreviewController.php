@@ -28,7 +28,8 @@ class PreviewController extends Controller
             'category' => $category,
             'breadcrumb' => $this->breadcrumb($category),
             'children' => $category->children()->orderBy('sort_order')->get(),
-            'products' => $category->products()->orderBy('sort_order')->get(),
+            'products' => $category->products()->orderBy('sort_order')->paginate(9),
+            'filterGroups' => collect(),
             'preview' => true,
         ]);
     }
