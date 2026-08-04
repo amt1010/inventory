@@ -9,18 +9,28 @@
         ->values();
 @endphp
 <div class="mb-4">
-    @if (!empty($data['heading']))
-        <h2>{{ $data['heading'] }}</h2>
-    @endif
-    <div class="row row-cols-1 row-cols-md-3 g-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        @if (!empty($data['heading']))
+            <h2 class="mb-0">{{ $data['heading'] }}</h2>
+        @endif
+        <a href="{{ url('/products') }}" class="md-btn md-btn-ghost">View all categories</a>
+    </div>
+    <div class="row row-cols-1 row-cols-md-4 g-4">
         @foreach ($categories as $category)
+            @php
+                $productCount = \App\Models\Product::query()
+                    ->whereIn('category_id', \App\Support\CategoryHierarchy::descendantAndSelfIds($category))
+                    ->where('status', 'published')
+                    ->count();
+            @endphp
             <div class="col">
-                <a href="{{ url('/products/'.$category->path()) }}" class="card h-100 text-decoration-none">
+                <a href="{{ url('/products/'.$category->path()) }}" class="md-card h-100 text-decoration-none d-block">
                     @if ($category->image)
-                        <img src="{{ asset('storage/'.$category->image) }}" class="card-img-top" alt="{{ $category->name }}">
+                        <img src="{{ asset('storage/'.$category->image) }}" class="w-100 md-grayscale" alt="{{ $category->name }}">
                     @endif
-                    <div class="card-body">
-                        <h5 class="card-title text-dark">{{ $category->name }}</h5>
+                    <div class="p-3">
+                        <h5 class="mb-1" style="color: var(--color-text);">{{ $category->name }}</h5>
+                        <span class="text-muted small">{{ $productCount }} products</span>
                     </div>
                 </a>
             </div>
