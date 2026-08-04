@@ -52,9 +52,20 @@ class CatalogController extends Controller
             abort(Response::HTTP_NOT_FOUND);
         }
 
-        $products = $category
-            ? $category->products()->where('status', 'published')->orderBy('sort_order')->paginate(9)
-            : collect();
+        $products = collect();
+
+        if ($category) {
+            $productsQuery = $category->products()->with('images')->where('status', 'published');
+
+            $productsQuery = match ($request->query('sort')) {
+                'newest' => $productsQuery->orderBy('created_at', 'desc'),
+                'name_asc' => $productsQuery->orderBy('name'),
+                'name_desc' => $productsQuery->orderBy('name', 'desc'),
+                default => $productsQuery->orderBy('sort_order'),
+            };
+
+            $products = $productsQuery->paginate(9)->withQueryString();
+        }
 
         if ($request->ajax()) {
             return response()->view('catalog.partials.product-grid-items', [
