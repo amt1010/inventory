@@ -146,6 +146,14 @@ class PageResource extends Resource
                                 ->options(fn () => Category::query()->where('status', 'published')->pluck('name', 'id'))
                                 ->required(),
                         ]),
+                    Block::make('deals_banner')
+                        ->label('Deals Banner')
+                        ->schema([
+                            TextInput::make('heading')->default('Bulk Deals This Week'),
+                            Textarea::make('body'),
+                            TextInput::make('cta_label')->default('Shop Deals'),
+                            TextInput::make('cta_url')->default('/products'),
+                        ]),
                     Block::make('featured_products')
                         ->label('Featured Products Grid')
                         ->schema([
