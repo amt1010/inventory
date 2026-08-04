@@ -113,6 +113,23 @@ class PageResource extends Resource
                                 ->default('left')
                                 ->required(),
                         ]),
+                    Block::make('trust_badges')
+                        ->label('Trust Badges')
+                        ->schema([
+                            Repeater::make('items')
+                                ->schema([
+                                    Select::make('icon')
+                                        ->options([
+                                            'shield-check' => 'Shield Check',
+                                            'package-check' => 'Package Check',
+                                            'handshake' => 'Handshake',
+                                            'message-square' => 'Message Square',
+                                        ])
+                                        ->required(),
+                                    TextInput::make('label')->required(),
+                                ])
+                                ->minItems(1),
+                        ]),
                     Block::make('rich_text')
                         ->label('Rich Text')
                         ->schema([
