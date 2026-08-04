@@ -1,14 +1,25 @@
 {{-- resources/views/catalog/partials/product-grid-items.blade.php --}}
 @foreach ($products as $product)
     <div class="col">
-        <a href="{{ url('/products/'.collect($breadcrumb)->pluck('slug')->push($product->slug)->implode('/')) }}" class="card product-card text-decoration-none">
-            @if ($product->images->first())
-                <img src="{{ asset('storage/'.$product->images->first()->path) }}" class="card-img-top product-card-img" alt="{{ $product->name }}">
-            @endif
-            <div class="card-body">
-                <h5 class="card-title text-dark product-card-title">{{ $product->name }}</h5>
-                <p class="card-text text-muted product-card-desc">{{ $product->short_description }}</p>
+        <div class="md-card h-100 d-flex flex-column">
+            <a href="{{ url('/products/'.collect($breadcrumb)->pluck('slug')->push($product->slug)->implode('/')) }}" class="text-decoration-none d-block">
+                <div class="md-grayscale">
+                    <x-product-thumbnail :path="optional($product->primaryImage())->path" :alt="$product->name" />
+                </div>
+                <div class="p-3 pb-0">
+                    <h5 class="mb-1" style="color: var(--color-text);">{{ $product->name }}</h5>
+                    @if ($product->quantity)
+                        <div class="small text-muted">MOQ: {{ $product->quantity }}</div>
+                    @endif
+                    @if ($product->price_display)
+                        <div class="fw-bold" style="color: var(--color-accent-700);">{{ $product->price_display }}</div>
+                    @endif
+                </div>
+            </a>
+            <div class="p-3 pt-2 mt-auto">
+                <button type="button" class="md-btn md-btn-primary md-btn-block" data-bs-toggle="modal" data-bs-target="#quoteRequestModal-{{ $product->id }}">Add to RFQ</button>
             </div>
-        </a>
+        </div>
     </div>
+    @include('partials.quote-request-form', ['product' => $product])
 @endforeach
