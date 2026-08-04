@@ -4,7 +4,6 @@ namespace App\Providers;
 
 use App\Models\Category;
 use App\Models\NavItem;
-use App\Models\Page;
 use App\Models\Setting;
 use Filament\Support\Facades\FilamentView;
 use Filament\View\PanelsRenderHook;
@@ -65,11 +64,6 @@ class AppServiceProvider extends ServiceProvider
                 ->with(['children' => fn ($query) => $query->where('status', 'published')->orderBy('sort_order')])
                 ->orderBy('sort_order')
                 ->get());
-
-            $view->with('helpCenterPage', Page::query()
-                ->where('slug', 'help-center')
-                ->where('status', 'published')
-                ->first());
         });
     }
 }
