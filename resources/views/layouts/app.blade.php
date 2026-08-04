@@ -12,7 +12,18 @@
     <link href="{{ asset('css/site.css') }}" rel="stylesheet">
     <link href="{{ asset('css/modernist.css') }}" rel="stylesheet">
 </head>
-<body>
+<body class="md-theme">
+    <div class="md-utility-bar">
+        <div class="container d-flex justify-content-between align-items-center">
+            <span>Ship to: India | English</span>
+            <div class="d-flex gap-3">
+                @if ($helpCenterPage)
+                    <a href="{{ url('/'.$helpCenterPage->slug) }}">Help Center</a>
+                @endif
+                <a href="{{ route('seller.register') }}">Become a Seller</a>
+            </div>
+        </div>
+    </div>
     <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url('/') }}">

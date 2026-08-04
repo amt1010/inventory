@@ -149,3 +149,58 @@
 .md-grayscale:hover {
     filter: grayscale(0%);
 }
+
+/* Global chrome: utility bar, header, footer. Scoped under .md-theme so it
+   never leaks onto anything outside the public layout (e.g. Filament). */
+
+.md-theme .md-utility-bar {
+    background: var(--color-neutral-900);
+    color: var(--color-bg);
+    font-size: 12px;
+    padding: var(--space-3) 0;
+}
+
+.md-theme .md-utility-bar a {
+    color: var(--color-bg);
+    text-decoration: none;
+}
+
+.md-theme .md-utility-bar a:hover {
+    color: var(--color-accent);
+}
+
+.md-theme .navbar {
+    background: var(--color-bg) !important;
+    border-bottom: 2px solid var(--color-divider) !important;
+    box-shadow: none;
+}
+
+.md-theme .navbar-brand {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    color: var(--color-text) !important;
+}
+
+.md-theme .nav-link {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    color: var(--color-text) !important;
+}
+
+.md-theme .nav-link:hover {
+    color: var(--color-accent) !important;
+}
+
+.md-theme footer {
+    background: var(--color-neutral-900);
+    color: var(--color-bg);
+    border-top: none;
+}
+
+.md-theme footer a {
+    color: var(--color-bg);
+}
+
+.md-theme footer a:hover {
+    color: var(--color-accent);
+}
