@@ -124,6 +124,7 @@ class ProductResource extends Resource
             ->columns([
                 TextColumn::make('name')->searchable(),
                 TextColumn::make('seller.company_name')->label('Seller'),
+                TextColumn::make('seller.seller_code')->label('Seller Code'),
                 TextColumn::make('category.name')->label('Category'),
                 TextColumn::make('quantity'),
                 TextColumn::make('status')->badge(),
