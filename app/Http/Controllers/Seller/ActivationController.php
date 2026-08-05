@@ -13,6 +13,14 @@ class ActivationController extends Controller
 {
     public function show(Request $request, Seller $seller): View
     {
+        if ($seller->created_by === 'admin_bulk_upload') {
+            if ($seller->status !== 'approved' || $seller->password_set_at !== null) {
+                return view('seller.activation-invalid');
+            }
+
+            return view('seller.set-password', ['seller' => $seller]);
+        }
+
         if ($seller->status !== 'pending_email_verification') {
             return view('seller.activation-invalid');
         }
@@ -31,6 +39,19 @@ class ActivationController extends Controller
 
     public function store(SetSellerPasswordRequest $request, Seller $seller): View
     {
+        if ($seller->created_by === 'admin_bulk_upload') {
+            if ($seller->status !== 'approved' || $seller->password_set_at !== null) {
+                return view('seller.activation-invalid');
+            }
+
+            $seller->update([
+                'password' => Hash::make($request->validated('password')),
+                'password_set_at' => now(),
+            ]);
+
+            return view('seller.activation-complete', ['seller' => $seller]);
+        }
+
         if ($seller->status !== 'pending_email_verification' || $seller->created_by !== 'admin') {
             return view('seller.activation-invalid');
         }
