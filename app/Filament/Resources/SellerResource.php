@@ -2,15 +2,16 @@
 
 namespace App\Filament\Resources;
 
+use App\Actions\ApproveSeller;
 use App\Filament\Resources\SellerResource\Pages;
 use App\Filament\Resources\SellerResource\RelationManagers\DocumentsRelationManager;
-use App\Mail\SellerApproved;
 use App\Mail\SellerRejected;
 use App\Models\Seller;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
@@ -93,19 +94,14 @@ class SellerResource extends Resource
                     ->visible(fn (Seller $record) => $record->status === 'pending_admin_approval')
                     ->requiresConfirmation()
                     ->action(function (Seller $record) {
-                        $record->update([
-                            'status' => 'approved',
-                            'approved_at' => now(),
-                            'approved_by' => auth('staff')->id(),
-                        ]);
+                        $reasons = app(ApproveSeller::class)->approve($record, auth('staff')->user());
 
-                        try {
-                            Mail::to($record->email)->send(new SellerApproved($record));
-                        } catch (\Throwable $exception) {
-                            Log::error('Failed to queue seller approval email.', [
-                                'seller_id' => $record->id,
-                                'exception' => $exception->getMessage(),
-                            ]);
+                        if ($reasons !== []) {
+                            Notification::make()
+                                ->title('Cannot approve this seller')
+                                ->body(implode(' ', $reasons))
+                                ->danger()
+                                ->send();
                         }
                     }),
                 Action::make('reject')
