@@ -49,4 +49,30 @@ class SellerAdminCreationTest extends TestCase
 
         $this->assertSame('approved', $seller->fresh()->status);
     }
+
+    public function test_admin_creating_a_seller_can_include_manufacturing_activity_and_availability_hours(): void
+    {
+        Mail::fake();
+
+        $this->seed(RoleSeeder::class);
+        $admin = Staff::factory()->create();
+        $admin->assignRole('admin');
+        $this->actingAs($admin, 'staff');
+
+        Livewire::test(CreateSeller::class)
+            ->fillForm([
+                'company_name' => 'Vikram Supplies',
+                'contact_person' => 'Vikram Singh',
+                'phone' => '9876500000',
+                'email' => 'vikram2@vikramsupplies.example',
+                'manufacturing_activity' => 'Textile weaving',
+                'availability_hours' => 'Mon-Fri 10am-5pm',
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $seller = Seller::where('email', 'vikram2@vikramsupplies.example')->firstOrFail();
+        $this->assertSame('Textile weaving', $seller->manufacturing_activity);
+        $this->assertSame('Mon-Fri 10am-5pm', $seller->availability_hours);
+    }
 }

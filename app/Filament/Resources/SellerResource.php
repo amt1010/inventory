@@ -46,6 +46,8 @@ class SellerResource extends Resource
             TextInput::make('email')->email()->required()->unique(ignoreRecord: true),
             TextInput::make('business_address'),
             TextInput::make('gst_number')->label('GST Number'),
+            TextInput::make('manufacturing_activity')->label('Manufacturing Activity'),
+            TextInput::make('availability_hours')->label('Availability Hours'),
             Select::make('status')
                 ->options(function (?Seller $record): array {
                     $options = static::statusOptions();
