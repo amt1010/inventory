@@ -74,6 +74,33 @@ class SellerRegistrationTest extends TestCase
         $this->assertDatabaseCount('sellers', 0);
     }
 
+    public function test_registration_persists_manufacturing_activity_and_availability_hours_when_provided(): void
+    {
+        $response = $this->post(route('seller.register.store'), $this->validPayload([
+            'manufacturing_activity' => 'Steel fabrication',
+            'availability_hours' => 'Mon-Sat 9am-6pm',
+        ]));
+
+        $response->assertRedirect(route('seller.registration.submitted'));
+        $this->assertDatabaseHas('sellers', [
+            'email' => 'asha@raotraders.example',
+            'manufacturing_activity' => 'Steel fabrication',
+            'availability_hours' => 'Mon-Sat 9am-6pm',
+        ]);
+    }
+
+    public function test_registration_succeeds_without_manufacturing_activity_or_availability_hours(): void
+    {
+        $response = $this->post(route('seller.register.store'), $this->validPayload());
+
+        $response->assertRedirect(route('seller.registration.submitted'));
+        $this->assertDatabaseHas('sellers', [
+            'email' => 'asha@raotraders.example',
+            'manufacturing_activity' => null,
+            'availability_hours' => null,
+        ]);
+    }
+
     private function validPayload(array $overrides = []): array
     {
         return array_merge([
