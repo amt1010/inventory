@@ -61,4 +61,13 @@ class SiteStylesheetTest extends TestCase
         $response->assertOk();
         $response->assertSee('site-search-form', false);
     }
+
+    public function test_the_stylesheet_defines_the_mobile_category_panel_visibility_rules(): void
+    {
+        $css = file_get_contents(public_path('css/site.css'));
+
+        $this->assertStringContainsString('.mcn-panel', $css);
+        $this->assertStringContainsString('.mcn-panel.is-active', $css);
+        $this->assertStringContainsString('.mcn-hidden', $css);
+    }
 }

@@ -80,6 +80,54 @@
     }
 }
 
+/* Mobile category drill-down (Products nav item on mobile — see
+   resources/views/partials/mobile-category-panel.blade.php). Every panel
+   is hidden by default; JS (public/js/mobile-category-nav.js) toggles
+   .is-active on exactly one panel at a time and .mcn-hidden on the rest
+   of the mobile nav while a drill-down is open. */
+.mcn-panel {
+    display: none;
+}
+
+.mcn-panel.is-active {
+    display: block;
+}
+
+.mcn-hidden {
+    display: none !important;
+}
+
+.mcn-open-trigger,
+.mcn-back,
+.mcn-drill-in {
+    border: 0;
+    background: none;
+    padding: 0.5rem 0;
+}
+
+.mcn-open-trigger,
+.mcn-back {
+    width: 100%;
+    text-align: left;
+}
+
+.mcn-back {
+    font-weight: 600;
+}
+
+.mcn-drill-in {
+    font-size: 1.25rem;
+    line-height: 1;
+    padding: 0.25rem 0.5rem;
+}
+
+.mcn-row-link {
+    display: block;
+    padding: 0.5rem 0;
+    color: inherit;
+    text-decoration: none;
+}
+
 /* Sticky footer: keep the footer pinned to the bottom of the viewport even
    when a page has little content (e.g. a category with no children/products),
    instead of floating up into the middle of the screen. */
