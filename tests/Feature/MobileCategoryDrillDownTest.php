@@ -105,4 +105,23 @@ class MobileCategoryDrillDownTest extends TestCase
         $this->assertStringContainsString('data-mcn-open', $js);
         $this->assertStringContainsString('data-mcn-back', $js);
     }
+
+    public function test_closing_the_drill_down_deactivates_every_panel(): void
+    {
+        // Bug: tapping "back" from the root panel restored the main menu
+        // (removed mcn-hidden from its siblings) but never removed
+        // is-active from the panel itself, so the root panel stayed
+        // visible underneath the main menu that just reappeared.
+        // closeDrillDown() must clear every panel's is-active, not just
+        // the wrapper's.
+        $js = file_get_contents(public_path('js/mobile-category-nav.js'));
+
+        $this->assertMatchesRegularExpression('/function closeDrillDown\(\)\s*\{[^}]*/', $js);
+        preg_match('/function closeDrillDown\(\)\s*\{(.*?)\n    \}/s', $js, $matches);
+        $this->assertNotEmpty($matches, 'closeDrillDown() function body not found');
+
+        $body = $matches[1];
+        $this->assertStringContainsString('mcn-panel', $body);
+        $this->assertStringContainsString("remove('is-active')", $body);
+    }
 }

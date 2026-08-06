@@ -31,6 +31,9 @@
             el.classList.remove('mcn-hidden');
         });
         mcn.classList.remove('is-active');
+        mcn.querySelectorAll('.mcn-panel').forEach(function (panel) {
+            panel.classList.remove('is-active');
+        });
         stack = [];
     }
 
