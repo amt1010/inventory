@@ -10,6 +10,7 @@ use App\Support\CategoryHierarchy;
 use Database\Seeders\RoleSeeder;
 use Filament\Forms\Components\Select;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -77,5 +78,42 @@ class CategoryHierarchyTest extends TestCase
                     && ! array_key_exists($sub->id, $options)
                     && ! array_key_exists($leaf->id, $options);
             });
+    }
+
+    public function test_published_tree_nests_categories_to_full_depth(): void
+    {
+        ['top' => $top, 'sub' => $sub, 'leaf' => $leaf] = $this->tree();
+
+        $tree = CategoryHierarchy::publishedTree();
+
+        $this->assertSame($top->id, $tree[0]['id']);
+        $this->assertSame($top->slug, $tree[0]['path']);
+        $this->assertSame($sub->id, $tree[0]['children'][0]['id']);
+        $this->assertSame($top->slug.'/'.$sub->slug, $tree[0]['children'][0]['path']);
+        $this->assertSame($leaf->id, $tree[0]['children'][0]['children'][0]['id']);
+        $this->assertSame($top->slug.'/'.$sub->slug.'/'.$leaf->slug, $tree[0]['children'][0]['children'][0]['path']);
+    }
+
+    public function test_published_tree_excludes_draft_categories(): void
+    {
+        ['top' => $top] = $this->tree();
+        Category::factory()->create(['name' => 'Draft Sub', 'parent_id' => $top->id, 'status' => 'draft']);
+
+        $tree = CategoryHierarchy::publishedTree();
+
+        $names = collect($tree[0]['children'])->pluck('name');
+        $this->assertNotContains('Draft Sub', $names);
+    }
+
+    public function test_published_tree_issues_a_single_query_regardless_of_depth(): void
+    {
+        $this->tree();
+
+        DB::enableQueryLog();
+        CategoryHierarchy::publishedTree();
+        $queries = DB::getQueryLog();
+        DB::disableQueryLog();
+
+        $this->assertCount(1, $queries);
     }
 }

@@ -84,4 +84,46 @@ class CategoryHierarchy
 
         return $ids;
     }
+
+    /**
+     * The full published category tree, nested to whatever depth the data
+     * has. One query total (same flat-fetch-then-build-in-PHP technique as
+     * descendantAndSelfIds()) regardless of depth.
+     *
+     * @return list<array{id: int, name: string, path: string, children: array}>
+     */
+    public static function publishedTree(): array
+    {
+        $all = Category::query()
+            ->where('status', 'published')
+            ->orderBy('sort_order')
+            ->get(['id', 'parent_id', 'name', 'slug']);
+
+        $childrenOf = [];
+        foreach ($all as $category) {
+            $childrenOf[$category->parent_id ?? 0][] = $category;
+        }
+
+        $build = function (?int $parentId, string $parentPath, int $depth) use (&$build, $childrenOf): array {
+            if ($depth > 50) {
+                return [];
+            }
+
+            $nodes = [];
+            foreach ($childrenOf[$parentId ?? 0] ?? [] as $category) {
+                $path = $parentPath === '' ? $category->slug : $parentPath.'/'.$category->slug;
+
+                $nodes[] = [
+                    'id' => $category->id,
+                    'name' => $category->name,
+                    'path' => $path,
+                    'children' => $build($category->id, $path, $depth + 1),
+                ];
+            }
+
+            return $nodes;
+        };
+
+        return $build(null, '', 0);
+    }
 }
