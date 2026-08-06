@@ -31,6 +31,8 @@ class RegistrationController extends Controller
             'email' => $request->validated('email'),
             'business_address' => $request->validated('business_address'),
             'gst_number' => $request->validated('gst_number'),
+            'manufacturing_activity' => $request->validated('manufacturing_activity'),
+            'availability_hours' => $request->validated('availability_hours'),
             'password' => Hash::make($request->validated('password')),
             'status' => 'pending_email_verification',
             'created_by' => 'self',

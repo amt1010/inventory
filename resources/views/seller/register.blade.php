@@ -51,6 +51,17 @@
 
         <div class="row">
             <div class="col-md-6 mb-3">
+                <label class="form-label">Manufacturing Activity</label>
+                <input type="text" name="manufacturing_activity" class="form-control" value="{{ old('manufacturing_activity') }}">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Availability Hours</label>
+                <input type="text" name="availability_hours" class="form-control" value="{{ old('availability_hours') }}" placeholder="e.g. Mon-Sat 9am-6pm">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
                 <label class="form-label">Password</label>
                 <input type="password" name="password" class="form-control" required>
             </div>

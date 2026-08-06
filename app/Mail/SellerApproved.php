@@ -15,7 +15,7 @@ class SellerApproved extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    public function __construct(public Seller $seller)
+    public function __construct(public Seller $seller, public ?string $activationUrl = null)
     {
     }
 
@@ -26,7 +26,10 @@ class SellerApproved extends Mailable implements ShouldQueue
 
     public function content(): Content
     {
-        return new Content(view: 'emails.seller-approved', with: ['seller' => $this->seller]);
+        return new Content(view: 'emails.seller-approved', with: [
+            'seller' => $this->seller,
+            'activationUrl' => $this->activationUrl,
+        ]);
     }
 
     public function failed(\Throwable $exception): void
