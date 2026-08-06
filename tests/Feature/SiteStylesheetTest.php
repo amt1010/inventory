@@ -40,4 +40,25 @@ class SiteStylesheetTest extends TestCase
         $this->assertStringContainsString('min-height: 100vh', $css);
         $this->assertStringContainsString('flex: 1 0 auto', $css);
     }
+
+    public function test_the_stylesheet_prevents_the_header_search_box_overflowing_on_mobile(): void
+    {
+        $css = file_get_contents(public_path('css/site.css'));
+
+        // A flex item's default min-width is `auto`, which lets the search
+        // input's long placeholder push it (and the form) wider than the
+        // viewport on mobile instead of shrinking. min-width: 0 overrides that.
+        $this->assertStringContainsString('.site-search-form', $css);
+        $this->assertStringContainsString('min-width: 0', $css);
+    }
+
+    public function test_the_header_search_form_has_the_overflow_fix_class(): void
+    {
+        Page::factory()->create(['slug' => 'home', 'status' => 'published']);
+
+        $response = $this->get('/');
+
+        $response->assertOk();
+        $response->assertSee('site-search-form', false);
+    }
 }

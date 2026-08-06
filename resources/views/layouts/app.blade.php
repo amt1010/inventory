@@ -64,7 +64,7 @@
                         @endif
                     @endforeach
                 </ul>
-                <form class="d-flex flex-grow-1 mx-3" style="max-width: 480px;" action="{{ route('catalog.search') }}" method="GET">
+                <form class="site-search-form d-flex flex-grow-1 mx-3" style="max-width: 480px;" action="{{ route('catalog.search') }}" method="GET">
                     <input class="form-control me-2 flex-grow-1" type="search" name="q" placeholder="Search for item by keyword or product number" value="{{ request('q') }}">
                     <button class="btn btn-outline-primary" type="submit">Search</button>
                 </form>

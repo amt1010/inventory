@@ -62,6 +62,24 @@
     min-width: 640px;
 }
 
+/* Header search box: a flex item's default min-width is `auto`, which lets
+   the input's long placeholder push it (and its form) wider than the
+   viewport on mobile instead of shrinking to fit. */
+.site-search-form,
+.site-search-form input[type="search"] {
+    min-width: 0;
+}
+
+@media (max-width: 991.98px) {
+    .site-search-form {
+        max-width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+}
+
 /* Sticky footer: keep the footer pinned to the bottom of the viewport even
    when a page has little content (e.g. a category with no children/products),
    instead of floating up into the middle of the screen. */
