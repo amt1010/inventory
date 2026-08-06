@@ -13,7 +13,7 @@ class QuoteRequest extends Model
 
     protected $fillable = [
         'quote_number', 'product_id', 'user_id', 'reason', 'first_name', 'last_name', 'email',
-        'phone', 'company', 'country', 'city', 'state', 'message',
+        'phone', 'company', 'city', 'state', 'message',
         'contact_preference', 'source_url', 'status', 'assigned_to',
     ];
 

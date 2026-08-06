@@ -18,7 +18,6 @@ class QuoteRequestFactory extends Factory
             'email' => $this->faker->safeEmail(),
             'phone' => $this->faker->phoneNumber(),
             'company' => $this->faker->company(),
-            'country' => 'India',
             'city' => $this->faker->city(),
             'state' => $this->faker->state(),
             'message' => $this->faker->paragraph(),

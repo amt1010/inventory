@@ -12,15 +12,4 @@ return [
         'email' => 'Email',
         'phone' => 'Phone',
     ],
-
-    'countries' => [
-        'India' => 'India',
-        'United States' => 'United States',
-        'United Kingdom' => 'United Kingdom',
-        'United Arab Emirates' => 'United Arab Emirates',
-        'Singapore' => 'Singapore',
-        'Australia' => 'Australia',
-        'Germany' => 'Germany',
-        'Other' => 'Other',
-    ],
 ];

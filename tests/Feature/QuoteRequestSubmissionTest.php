@@ -29,7 +29,6 @@ class QuoteRequestSubmissionTest extends TestCase
             'email' => 'asha@example.com',
             'phone' => '9876543210',
             'company' => 'Rao Traders',
-            'country' => 'India',
             'city' => 'Mumbai',
             'state' => 'Maharashtra',
             'message' => 'Need pricing for 500 meters.',
@@ -65,6 +64,22 @@ class QuoteRequestSubmissionTest extends TestCase
         $response->assertOk();
         $response->assertDontSee('Select Market');
         $response->assertDontSee('name="market"', false);
+    }
+
+    public function test_the_quote_form_does_not_render_the_select_country_field(): void
+    {
+        $category = Category::factory()->create(['status' => 'published']);
+        $product = Product::factory()->create([
+            'category_id' => $category->id,
+            'status' => 'published',
+            'price_display' => '₹1,200 per unit',
+        ]);
+
+        $response = $this->get(url('/products/'.$product->path()));
+
+        $response->assertOk();
+        $response->assertDontSee('Select Country');
+        $response->assertDontSee('name="country"', false);
     }
 
     public function test_a_general_inquiry_without_a_product_is_accepted(): void

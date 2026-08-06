@@ -59,21 +59,12 @@
             <input type="text" name="company" class="form-control">
         </div>
         <div class="col-md-6 mb-3">
-            <label class="form-label">Select Country</label>
-            <select name="country" class="form-select">
-                <option value="">Select Country</option>
-                @foreach (config('rfq.countries') as $value => $label)
-                    <option value="{{ $value }}">{{ $label }}</option>
-                @endforeach
-            </select>
+            <label class="form-label">City</label>
+            <input type="text" name="city" class="form-control">
         </div>
     </div>
 
     <div class="row">
-        <div class="col-md-6 mb-3">
-            <label class="form-label">City</label>
-            <input type="text" name="city" class="form-control">
-        </div>
         <div class="col-md-6 mb-3">
             <label class="form-label">State</label>
             <input type="text" name="state" class="form-control">
