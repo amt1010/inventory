@@ -36,8 +36,8 @@
                     @foreach ($headerNavItems as $item)
                         @if ($item->show_category_menu)
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="{{ $item->url }}" data-bs-toggle="dropdown">{{ $item->label }}</a>
-                                <div class="dropdown-menu mega-menu p-3">
+                                <a class="nav-link dropdown-toggle d-none d-lg-block" href="{{ $item->url }}" data-bs-toggle="dropdown">{{ $item->label }}</a>
+                                <div class="dropdown-menu mega-menu p-3 d-none d-lg-block">
                                     <div class="row">
                                         @foreach ($topLevelCategories as $topCategory)
                                             <div class="col-6 col-md-3 mb-3">

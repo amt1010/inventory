@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\Category;
 use App\Models\NavItem;
 use App\Models\Setting;
+use App\Support\CategoryHierarchy;
 use Filament\Support\Facades\FilamentView;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Support\Facades\View;
@@ -64,6 +65,8 @@ class AppServiceProvider extends ServiceProvider
                 ->with(['children' => fn ($query) => $query->where('status', 'published')->orderBy('sort_order')])
                 ->orderBy('sort_order')
                 ->get());
+
+            $view->with('categoryTree', CategoryHierarchy::publishedTree());
         });
     }
 }

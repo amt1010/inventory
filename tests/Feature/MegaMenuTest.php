@@ -61,4 +61,17 @@ class MegaMenuTest extends TestCase
         $response->assertOk();
         $response->assertSee('About Us');
     }
+
+    public function test_the_desktop_mega_menu_is_hidden_below_the_lg_breakpoint(): void
+    {
+        NavItem::factory()->create([
+            'label' => 'Products', 'url' => '/products', 'location' => 'header',
+            'parent_id' => null, 'show_category_menu' => true,
+        ]);
+
+        $response = $this->get('/');
+
+        $response->assertOk();
+        $response->assertSee('mega-menu p-3 d-none d-lg-block', false);
+    }
 }
