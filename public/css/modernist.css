@@ -144,16 +144,6 @@
     margin: var(--space-6) 0;
 }
 
-/* Image treatment */
-.md-grayscale {
-    filter: grayscale(100%);
-    transition: filter .2s;
-}
-
-.md-grayscale:hover {
-    filter: grayscale(0%);
-}
-
 /* Global chrome: header, footer. Scoped under .md-theme so it never leaks
    onto anything outside the public layout (e.g. Filament). */
 

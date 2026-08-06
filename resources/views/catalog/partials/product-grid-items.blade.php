@@ -3,9 +3,7 @@
     <div class="col">
         <div class="md-card h-100 d-flex flex-column">
             <a href="{{ url('/products/'.collect($breadcrumb)->pluck('slug')->push($product->slug)->implode('/')) }}" class="text-decoration-none d-block">
-                <div class="md-grayscale">
-                    <x-product-thumbnail :path="optional($product->primaryImage())->path" :alt="$product->name" />
-                </div>
+                <x-product-thumbnail :path="optional($product->primaryImage())->path" :alt="$product->name" />
                 <div class="p-3 pb-0">
                     <h5 class="mb-1" style="color: var(--color-text);">{{ $product->name }}</h5>
                     @if ($product->quantity)

@@ -56,4 +56,20 @@ class HeroBannerBlockTest extends TestCase
         $response->assertSee('action="'.route('catalog.search').'"', escape: false);
         $response->assertSee('name="q"', escape: false);
     }
+
+    public function test_the_hero_image_is_not_grayscaled(): void
+    {
+        Page::factory()->create([
+            'slug' => 'home',
+            'status' => 'published',
+            'content' => [
+                ['type' => 'hero_banner', 'data' => ['heading' => 'Test Heading', 'image' => 'hero.jpg']],
+            ],
+        ]);
+
+        $response = $this->get('/');
+
+        $response->assertOk();
+        $response->assertDontSee('md-grayscale', false);
+    }
 }

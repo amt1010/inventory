@@ -65,4 +65,15 @@ class CatalogProductCardTest extends TestCase
         $response->assertOk();
         $response->assertDontSee($product->seller->company_name);
     }
+
+    public function test_the_product_thumbnail_is_not_grayscaled(): void
+    {
+        $category = Category::factory()->create(['status' => 'published']);
+        Product::factory()->create(['category_id' => $category->id, 'status' => 'published']);
+
+        $response = $this->get('/products/'.$category->slug);
+
+        $response->assertOk();
+        $response->assertDontSee('md-grayscale', false);
+    }
 }

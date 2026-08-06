@@ -76,4 +76,23 @@ class FeaturedProductsCardDetailsTest extends TestCase
         $response->assertOk();
         $response->assertDontSee($product->seller->company_name);
     }
+
+    public function test_the_product_thumbnail_is_not_grayscaled(): void
+    {
+        $category = Category::factory()->create(['status' => 'published']);
+        $product = Product::factory()->create(['category_id' => $category->id, 'status' => 'published']);
+
+        Page::factory()->create([
+            'slug' => 'home',
+            'status' => 'published',
+            'content' => [
+                ['type' => 'featured_products', 'data' => ['product_ids' => [$product->id]]],
+            ],
+        ]);
+
+        $response = $this->get('/');
+
+        $response->assertOk();
+        $response->assertDontSee('md-grayscale', false);
+    }
 }

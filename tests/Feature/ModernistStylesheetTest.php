@@ -28,4 +28,13 @@ class ModernistStylesheetTest extends TestCase
         $this->assertStringContainsString('--color-bg: #f3f2f2', $css);
         $this->assertStringContainsString('--font-heading', $css);
     }
+
+    public function test_the_stylesheet_does_not_grayscale_images(): void
+    {
+        $css = file_get_contents(public_path('css/modernist.css'));
+
+        // Homepage/catalog images used to render desaturated until hover
+        // (.md-grayscale); they should always render in full color now.
+        $this->assertStringNotContainsString('grayscale', $css);
+    }
 }

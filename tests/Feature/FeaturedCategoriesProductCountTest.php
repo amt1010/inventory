@@ -72,4 +72,22 @@ class FeaturedCategoriesProductCountTest extends TestCase
         $response->assertSee('View all categories');
         $response->assertSee('href="'.url('/products').'"', escape: false);
     }
+
+    public function test_the_category_image_is_not_grayscaled(): void
+    {
+        $category = Category::factory()->create(['status' => 'published', 'image' => 'categories/cable.jpg']);
+
+        Page::factory()->create([
+            'slug' => 'home',
+            'status' => 'published',
+            'content' => [
+                ['type' => 'featured_categories', 'data' => ['category_ids' => [$category->id]]],
+            ],
+        ]);
+
+        $response = $this->get('/');
+
+        $response->assertOk();
+        $response->assertDontSee('md-grayscale', false);
+    }
 }

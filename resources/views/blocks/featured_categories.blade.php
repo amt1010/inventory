@@ -26,7 +26,7 @@
             <div class="col">
                 <a href="{{ url('/products/'.$category->path()) }}" class="md-card h-100 text-decoration-none d-block">
                     @if ($category->image)
-                        <img src="{{ asset('storage/'.$category->image) }}" class="w-100 md-grayscale" alt="{{ $category->name }}">
+                        <img src="{{ asset('storage/'.$category->image) }}" class="w-100" alt="{{ $category->name }}">
                     @endif
                     <div class="p-3">
                         <h5 class="mb-1" style="color: var(--color-text);">{{ $category->name }}</h5>

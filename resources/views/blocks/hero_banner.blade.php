@@ -26,7 +26,7 @@
         </div>
         @if (!empty($data['image']))
             <div class="col-md-5">
-                <img src="{{ asset('storage/'.$data['image']) }}" class="img-fluid md-grayscale" alt="{{ $data['heading'] ?? '' }}">
+                <img src="{{ asset('storage/'.$data['image']) }}" class="img-fluid" alt="{{ $data['heading'] ?? '' }}">
             </div>
         @endif
     </div>
