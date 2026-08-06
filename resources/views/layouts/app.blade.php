@@ -37,6 +37,7 @@
                         @if ($item->show_category_menu)
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle d-none d-lg-block" href="{{ $item->url }}" data-bs-toggle="dropdown">{{ $item->label }}</a>
+                                <button type="button" class="nav-link mcn-open-trigger d-lg-none" data-mcn-open="root">{{ $item->label }}</button>
                                 <div class="dropdown-menu mega-menu p-3 d-none d-lg-block">
                                     <div class="row">
                                         @foreach ($topLevelCategories as $topCategory)
@@ -64,6 +65,9 @@
                         @endif
                     @endforeach
                 </ul>
+                <div class="mcn d-lg-none" data-mcn>
+                    @include('partials.mobile-category-panel', ['nodes' => $categoryTree])
+                </div>
                 <form class="site-search-form d-flex flex-grow-1 mx-3" style="max-width: 480px;" action="{{ route('catalog.search') }}" method="GET">
                     <input class="form-control me-2 flex-grow-1" type="search" name="q" placeholder="Search for item by keyword or product number" value="{{ request('q') }}">
                     <button class="btn btn-outline-primary" type="submit">Search</button>
