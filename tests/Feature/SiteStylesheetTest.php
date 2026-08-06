@@ -70,4 +70,16 @@ class SiteStylesheetTest extends TestCase
         $this->assertStringContainsString('.mcn-panel.is-active', $css);
         $this->assertStringContainsString('.mcn-hidden', $css);
     }
+
+    public function test_the_stylesheet_hides_the_desktop_mega_menu_below_the_lg_breakpoint(): void
+    {
+        $css = file_get_contents(public_path('css/site.css'));
+
+        // Scoped inside a max-width media query rather than a d-lg-block
+        // utility class on the element itself, so it never competes with
+        // Bootstrap's own (non-!important) .dropdown-menu.show rule at
+        // lg+ — see MegaMenuTest for the bug this caused when it did.
+        $this->assertStringContainsString('@media (max-width: 991.98px)', $css);
+        $this->assertMatchesRegularExpression('/\.mega-menu\s*\{\s*display:\s*none\s*!important;/', $css);
+    }
 }

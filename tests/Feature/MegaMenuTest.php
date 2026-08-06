@@ -62,8 +62,16 @@ class MegaMenuTest extends TestCase
         $response->assertSee('About Us');
     }
 
-    public function test_the_desktop_mega_menu_is_hidden_below_the_lg_breakpoint(): void
+    public function test_the_desktop_mega_menu_markup_does_not_use_display_utility_classes(): void
     {
+        // Bootstrap's d-none/d-lg-block utilities set `display` with
+        // !important, which beats the (non-!important) CSS rule Bootstrap's
+        // own dropdown JS uses to show/hide .dropdown-menu via a .show
+        // class — that combination forced the mega-menu permanently visible
+        // on desktop regardless of whether it was actually open. Mobile
+        // hiding is done in CSS via a max-width media query instead (see
+        // SiteStylesheetTest::test_the_stylesheet_hides_the_desktop_mega_menu_below_the_lg_breakpoint),
+        // which never touches display at the lg+ breakpoint at all.
         NavItem::factory()->create([
             'label' => 'Products', 'url' => '/products', 'location' => 'header',
             'parent_id' => null, 'show_category_menu' => true,
@@ -72,6 +80,7 @@ class MegaMenuTest extends TestCase
         $response = $this->get('/');
 
         $response->assertOk();
-        $response->assertSee('mega-menu p-3 d-none d-lg-block', false);
+        $response->assertDontSee('mega-menu p-3 d-none d-lg-block', false);
+        $response->assertSee('class="dropdown-menu mega-menu p-3"', false);
     }
 }

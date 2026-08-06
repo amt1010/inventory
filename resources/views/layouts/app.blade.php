@@ -38,7 +38,7 @@
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle d-none d-lg-block" href="{{ $item->url }}" data-bs-toggle="dropdown">{{ $item->label }}</a>
                                 <button type="button" class="nav-link mcn-open-trigger d-lg-none" data-mcn-open="root">{{ $item->label }}</button>
-                                <div class="dropdown-menu mega-menu p-3 d-none d-lg-block">
+                                <div class="dropdown-menu mega-menu p-3">
                                     <div class="row">
                                         @foreach ($topLevelCategories as $topCategory)
                                             <div class="col-6 col-md-3 mb-3">
