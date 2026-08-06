@@ -17,15 +17,21 @@ class MobileCategoryDrillDownTest extends TestCase
         parent::setUp();
 
         Page::factory()->create(['slug' => 'home', 'status' => 'published']);
-    }
 
-    public function test_the_mobile_products_trigger_opens_the_root_panel(): void
-    {
+        // The mobile drill-down only renders when some header NavItem opts
+        // into the category menu — same flag the desktop mega-menu already
+        // requires. Without this, every test below would fail after the
+        // fix that made rendering conditional (previously unconditional
+        // rendering leaked every category name into every page's header,
+        // regardless of nav configuration — see PageBlockRenderingTest).
         NavItem::factory()->create([
             'label' => 'Products', 'url' => '/products', 'location' => 'header',
             'parent_id' => null, 'show_category_menu' => true,
         ]);
+    }
 
+    public function test_the_mobile_products_trigger_opens_the_root_panel(): void
+    {
         $response = $this->get('/');
 
         $response->assertOk();
@@ -86,5 +92,17 @@ class MobileCategoryDrillDownTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('href="'.url('/products/'.$category->slug).'"', false);
+    }
+
+    public function test_the_mobile_nav_script_is_linked_and_defines_the_panel_switching_hooks(): void
+    {
+        $response = $this->get('/');
+
+        $response->assertOk();
+        $response->assertSee('js/mobile-category-nav.js', false);
+
+        $js = file_get_contents(public_path('js/mobile-category-nav.js'));
+        $this->assertStringContainsString('data-mcn-open', $js);
+        $this->assertStringContainsString('data-mcn-back', $js);
     }
 }

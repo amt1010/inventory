@@ -65,9 +65,11 @@
                         @endif
                     @endforeach
                 </ul>
-                <div class="mcn d-lg-none" data-mcn>
-                    @include('partials.mobile-category-panel', ['nodes' => $categoryTree])
-                </div>
+                @if ($headerNavItems->contains->show_category_menu)
+                    <div class="mcn d-lg-none" data-mcn>
+                        @include('partials.mobile-category-panel', ['nodes' => $categoryTree])
+                    </div>
+                @endif
                 <form class="site-search-form d-flex flex-grow-1 mx-3" style="max-width: 480px;" action="{{ route('catalog.search') }}" method="GET">
                     <input class="form-control me-2 flex-grow-1" type="search" name="q" placeholder="Search for item by keyword or product number" value="{{ request('q') }}">
                     <button class="btn btn-outline-primary" type="submit">Search</button>
@@ -162,6 +164,7 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ asset('js/mobile-category-nav.js') }}"></script>
     @include('partials.cookie-consent-banner')
 </body>
 </html>
