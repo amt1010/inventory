@@ -24,6 +24,17 @@ class SellerImportMonitorTest extends TestCase
         $this->assertTrue(Schema::hasColumn('imports', 'stuck_notified_at'));
     }
 
+    public function test_stuck_after_minutes_config_is_always_an_int(): void
+    {
+        // env() returns a string when IMPORT_STUCK_THRESHOLD_MINUTES is
+        // actually set in .env, but the literal int fallback (15) when it's
+        // absent — that inconsistency previously reached Carbon's
+        // addMinutes(), which requires int|float and throws on a numeric
+        // string. Assert the config always casts, regardless of which path
+        // produced the value.
+        $this->assertIsInt(config('imports.stuck_after_minutes'));
+    }
+
     public function test_the_stuck_mail_names_the_file_and_shows_progress(): void
     {
         Import::polymorphicUserRelationship();
