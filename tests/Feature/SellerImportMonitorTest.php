@@ -4,7 +4,9 @@ namespace Tests\Feature;
 
 use App\Filament\Imports\SellerImporter;
 use App\Jobs\MonitorSellerImports;
+use App\Listeners\StartSellerImportMonitor;
 use App\Mail\SellerImportStuck;
+use Filament\Actions\Imports\Events\ImportStarted;
 use Filament\Actions\Imports\Models\Import;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
@@ -141,5 +143,61 @@ class SellerImportMonitorTest extends TestCase
         (new MonitorSellerImports())->handle();
 
         $this->assertNotNull($import->fresh()->stuck_notified_at);
+    }
+
+    public function test_it_dispatches_the_monitor_job_when_a_seller_import_starts(): void
+    {
+        Bus::fake();
+        Cache::forget('import-monitor:seller-active');
+
+        Import::polymorphicUserRelationship();
+        $import = Import::create([
+            'file_name' => 'sellers.csv',
+            'file_path' => 'sellers.csv',
+            'importer' => SellerImporter::class,
+            'total_rows' => 500,
+        ]);
+
+        (new StartSellerImportMonitor())->handle(new ImportStarted($import, [], []));
+
+        Bus::assertDispatched(MonitorSellerImports::class);
+    }
+
+    public function test_it_does_not_start_a_second_loop_while_one_is_already_active(): void
+    {
+        Bus::fake();
+        Cache::forget('import-monitor:seller-active');
+
+        Import::polymorphicUserRelationship();
+        $import = Import::create([
+            'file_name' => 'sellers.csv',
+            'file_path' => 'sellers.csv',
+            'importer' => SellerImporter::class,
+            'total_rows' => 500,
+        ]);
+
+        $listener = new StartSellerImportMonitor();
+        $listener->handle(new ImportStarted($import, [], []));
+        $listener->handle(new ImportStarted($import, [], []));
+
+        Bus::assertDispatchedTimes(MonitorSellerImports::class, 1);
+    }
+
+    public function test_it_ignores_imports_from_a_different_importer(): void
+    {
+        Bus::fake();
+        Cache::forget('import-monitor:seller-active');
+
+        Import::polymorphicUserRelationship();
+        $import = Import::create([
+            'file_name' => 'other.csv',
+            'file_path' => 'other.csv',
+            'importer' => 'App\\Filament\\Imports\\SomeOtherImporter',
+            'total_rows' => 10,
+        ]);
+
+        (new StartSellerImportMonitor())->handle(new ImportStarted($import, [], []));
+
+        Bus::assertNotDispatched(MonitorSellerImports::class);
     }
 }
