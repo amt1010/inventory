@@ -50,6 +50,49 @@ class QuoteRequestResourceTest extends TestCase
             ->assertSee('26080317300001');
     }
 
+    public function test_the_category_column_shows_the_products_category(): void
+    {
+        $sales = Staff::factory()->create();
+        $sales->assignRole('sales');
+        $this->actingAs($sales, 'staff');
+
+        $category = \App\Models\Category::factory()->create(['name' => 'Fibre Optic Cables']);
+        $product = \App\Models\Product::factory()->create(['category_id' => $category->id]);
+        QuoteRequest::factory()->create(['product_id' => $product->id]);
+
+        Livewire::test(ListQuoteRequests::class)
+            ->assertSuccessful()
+            ->assertSee('Fibre Optic Cables');
+    }
+
+    public function test_the_category_column_shows_general_inquiry_when_there_is_no_product(): void
+    {
+        $sales = Staff::factory()->create();
+        $sales->assignRole('sales');
+        $this->actingAs($sales, 'staff');
+
+        QuoteRequest::factory()->create(['product_id' => null]);
+
+        Livewire::test(ListQuoteRequests::class)
+            ->assertSuccessful()
+            ->assertSee('General inquiry');
+    }
+
+    public function test_the_date_filter_shows_only_requests_from_the_selected_day(): void
+    {
+        $sales = Staff::factory()->create();
+        $sales->assignRole('sales');
+        $this->actingAs($sales, 'staff');
+
+        $today = QuoteRequest::factory()->create(['created_at' => now()]);
+        $yesterday = QuoteRequest::factory()->create(['created_at' => now()->subDay()]);
+
+        Livewire::test(ListQuoteRequests::class)
+            ->filterTable('date', ['date' => now()->toDateString()])
+            ->assertCanSeeTableRecords([$today])
+            ->assertCanNotSeeTableRecords([$yesterday]);
+    }
+
     public function test_content_editor_gets_a_403_visiting_the_quote_requests_list(): void
     {
         $editor = Staff::factory()->create();

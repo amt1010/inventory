@@ -23,10 +23,15 @@ class AdminNavigationOrderTest extends TestCase
 
         $response->assertOk();
 
-        $labels = ['Dashboard', 'Site Settings', 'Nav Items', 'Pages', 'Categories', 'Products', 'Quote Requests', 'Sellers'];
-        $positions = array_map(fn (string $label) => strpos($response->getContent(), $label), $labels);
+        // Scoped to the sidebar item labels specifically (not a whole-page
+        // text search) so dashboard widget headings that happen to share a
+        // word with a nav label (e.g. "Categories by Status") can't shift
+        // the result.
+        preg_match_all('/fi-sidebar-item-label[^>]*>\s*(.+?)\s*</s', $response->getContent(), $matches);
 
-        $this->assertNotContains(false, $positions, 'Every expected nav label should appear in the sidebar.');
-        $this->assertSame($positions, collect($positions)->sort()->values()->all());
+        $this->assertSame(
+            ['Dashboard', 'Site Settings', 'Nav Items', 'Pages', 'Categories', 'Products', 'Quote Requests', 'Sellers'],
+            $matches[1],
+        );
     }
 }

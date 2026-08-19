@@ -6,14 +6,17 @@ use App\Filament\Resources\QuoteRequestResource\Pages;
 use App\Filament\Resources\QuoteRequestResource\RelationManagers\NotesRelationManager;
 use App\Models\QuoteRequest;
 use App\Models\Staff;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class QuoteRequestResource extends Resource
 {
@@ -61,6 +64,7 @@ class QuoteRequestResource extends Resource
                     ->searchable(['first_name', 'last_name']),
                 TextColumn::make('email')->searchable(),
                 TextColumn::make('product.name')->label('Product')->placeholder('General inquiry'),
+                TextColumn::make('product.category.name')->label('Category')->placeholder('General inquiry'),
                 TextColumn::make('status')->badge()->sortable(),
                 TextColumn::make('assignee.name')->label('Assigned To')->placeholder('Unassigned'),
             ])
@@ -72,6 +76,12 @@ class QuoteRequestResource extends Resource
                 ]),
                 SelectFilter::make('assigned_to')->label('Assigned To')->options(fn () => Staff::query()->pluck('name', 'id')),
                 SelectFilter::make('product_id')->label('Product')->relationship('product', 'name'),
+                Filter::make('date')
+                    ->form([DatePicker::make('date')])
+                    ->query(fn (Builder $query, array $data) => $query->when(
+                        $data['date'] ?? null,
+                        fn (Builder $query, string $date) => $query->whereDate('created_at', $date),
+                    )),
             ])
             ->headerActions([
                 Action::make('export')
