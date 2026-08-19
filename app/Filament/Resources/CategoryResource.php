@@ -26,6 +26,8 @@ class CategoryResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static ?int $navigationSort = 4;
+
     /**
      * Depth-first ordering of every category and its indentation depth, rebuilt
      * once per table render so the list reads as a parent → child tree. Kept on

@@ -145,6 +145,33 @@ class SettingsTest extends TestCase
         $this->assertSame('#00ff00', Setting::current()->theme_accent_color);
     }
 
+    public function test_seller_branding_defaults_to_an_emerald_accent_and_the_app_name(): void
+    {
+        $setting = Setting::current();
+
+        $this->assertSame('#059669', $setting->seller_theme_accent_color);
+        $this->assertSame(config('app.name'), $setting->seller_site_name);
+        $this->assertNull($setting->seller_logo_path);
+    }
+
+    public function test_an_admin_can_save_seller_portal_branding(): void
+    {
+        $staff = Staff::factory()->create();
+        $staff->assignRole('admin');
+        $this->actingAs($staff, 'staff');
+
+        \Livewire\Livewire::test(\App\Filament\Pages\ManageSettings::class)
+            ->fillForm([
+                'seller_site_name' => 'Acme Seller Hub',
+                'seller_theme_accent_color' => '#112233',
+            ])
+            ->call('save');
+
+        $setting = Setting::current();
+        $this->assertSame('Acme Seller Hub', $setting->seller_site_name);
+        $this->assertSame('#112233', $setting->seller_theme_accent_color);
+    }
+
     public function test_an_admin_can_access_the_settings_page(): void
     {
         $staff = Staff::factory()->create();

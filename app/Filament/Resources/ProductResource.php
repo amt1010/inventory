@@ -29,6 +29,8 @@ class ProductResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-cube';
 
+    protected static ?int $navigationSort = 5;
+
     public static function form(Form $form): Form
     {
         $canSetPrice = auth('staff')->user()?->can('setPrice', Product::class) ?? false;

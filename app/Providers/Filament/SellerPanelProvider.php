@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Models\Setting;
 use Filament\Facades\Filament;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -20,6 +21,7 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\HtmlString;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
@@ -48,14 +50,22 @@ class SellerPanelProvider extends PanelProvider
 
     public function panel(Panel $panel): Panel
     {
+        // Reading branding from the database at boot means this must survive
+        // the `settings` table (or its seller_* columns) not existing yet --
+        // this provider boots on every artisan invocation, including the
+        // `migrate` command that creates that very table.
+        $branding = Schema::hasTable('settings') ? Setting::current() : null;
+
         return $panel
             ->id('seller')
             ->path('seller')
             ->login()
             ->authGuard('seller')
             ->colors([
-                'primary' => Color::Emerald,
+                'primary' => Color::hex($branding?->seller_theme_accent_color ?? '#059669'),
             ])
+            ->brandName($branding?->seller_site_name ?? config('app.name'))
+            ->brandLogo($branding?->seller_logo_path ? asset('storage/'.$branding->seller_logo_path) : null)
             ->discoverResources(in: app_path('Filament/Seller/Resources'), for: 'App\\Filament\\Seller\\Resources')
             ->discoverPages(in: app_path('Filament/Seller/Pages'), for: 'App\\Filament\\Seller\\Pages')
             ->pages([

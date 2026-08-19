@@ -22,6 +22,8 @@ class ManageSettings extends Page implements HasForms
 
     protected static ?string $navigationLabel = 'Site Settings';
 
+    protected static ?int $navigationSort = 1;
+
     protected static string $view = 'filament.pages.manage-settings';
 
     public ?array $data = [];
@@ -35,6 +37,7 @@ class ManageSettings extends Page implements HasForms
     {
         $this->form->fill(Setting::current()->only([
             'site_name', 'logo_path', 'theme_accent_color',
+            'seller_site_name', 'seller_logo_path', 'seller_theme_accent_color',
             'footer_copyright', 'footer_address', 'footer_phone', 'footer_email',
             'social_facebook', 'social_twitter', 'social_linkedin', 'social_instagram', 'social_youtube',
         ]));
@@ -53,6 +56,20 @@ class ManageSettings extends Page implements HasForms
                 ->hex()
                 ->helperText('Used for buttons, tags, and highlights across the public site.')
                 ->required(),
+            Section::make('Seller Portal Branding')
+                ->description('Branding shown on the seller portal (/seller), independent of the main site above.')
+                ->schema([
+                    TextInput::make('seller_site_name')->label('Seller Portal Name')->required(),
+                    FileUpload::make('seller_logo_path')
+                        ->label('Seller Portal Logo')
+                        ->image()
+                        ->directory('branding'),
+                    ColorPicker::make('seller_theme_accent_color')
+                        ->label('Seller Portal Accent Color')
+                        ->hex()
+                        ->required(),
+                ])
+                ->columns(2),
             Section::make('Footer')
                 ->description('Content shown in the site footer.')
                 ->schema([

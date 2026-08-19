@@ -8,6 +8,7 @@ class Setting extends Model
 {
     protected $fillable = [
         'site_name', 'logo_path', 'theme_accent_color',
+        'seller_site_name', 'seller_logo_path', 'seller_theme_accent_color',
         'footer_copyright', 'footer_address', 'footer_phone', 'footer_email',
         'social_facebook', 'social_twitter', 'social_linkedin', 'social_instagram', 'social_youtube',
     ];
@@ -29,6 +30,8 @@ class Setting extends Model
         return self::firstOrCreate(['id' => 1], [
             'site_name' => config('app.name'),
             'theme_accent_color' => '#ff6a00',
+            'seller_site_name' => config('app.name'),
+            'seller_theme_accent_color' => '#059669',
         ]);
     }
 

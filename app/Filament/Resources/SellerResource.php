@@ -26,6 +26,8 @@ class SellerResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-building-storefront';
 
+    protected static ?int $navigationSort = 7;
+
     protected static function statusOptions(): array
     {
         return [

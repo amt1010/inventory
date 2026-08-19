@@ -18,6 +18,8 @@ class NavItemResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-bars-3';
 
+    protected static ?int $navigationSort = 2;
+
     public static function form(Form $form): Form
     {
         return $form->schema([
