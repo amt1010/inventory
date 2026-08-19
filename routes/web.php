@@ -9,6 +9,7 @@ use App\Http\Controllers\QuoteRequestController;
 use App\Http\Controllers\QuoteRequestHistoryController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\SearchSuggestController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\Seller\ActivationController;
 use App\Http\Controllers\Seller\RegistrationController as SellerRegistrationController;
@@ -17,6 +18,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [PageController::class, 'show'])->defaults('slug', 'home')->name('home');
 
 Route::get('/search', SearchController::class)->name('catalog.search');
+
+Route::get('/search/suggest', SearchSuggestController::class)->name('catalog.search.suggest');
 
 Route::post('/quote-requests', [QuoteRequestController::class, 'store'])->name('quote-requests.store');
 

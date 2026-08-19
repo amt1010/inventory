@@ -71,7 +71,9 @@
                     </div>
                 @endif
                 <form class="site-search-form d-flex flex-grow-1 mx-3" style="max-width: 480px;" action="{{ route('catalog.search') }}" method="GET">
-                    <input class="form-control me-2 flex-grow-1" type="search" name="q" placeholder="Search for item by keyword or product number" value="{{ request('q') }}">
+                    <div class="search-suggest position-relative flex-grow-1 me-2" data-search-suggest="{{ route('catalog.search.suggest') }}">
+                        <input class="form-control w-100" type="search" name="q" placeholder="Search for item by keyword or product number" value="{{ request('q') }}" autocomplete="off">
+                    </div>
                     <button class="btn btn-outline-primary" type="submit">Search</button>
                 </form>
                 <ul class="navbar-nav ms-2">
@@ -165,6 +167,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('js/mobile-category-nav.js') }}"></script>
+    <script src="{{ asset('js/search-suggest.js') }}"></script>
     @include('partials.cookie-consent-banner')
 </body>
 </html>
