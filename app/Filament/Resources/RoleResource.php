@@ -3,8 +3,8 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\RoleResource\Pages;
-use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\ViewField;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\EditAction;
@@ -24,6 +24,7 @@ class RoleResource extends Resource
     public const AREAS = [
         'dashboard' => 'Dashboard',
         'staff' => 'Staff',
+        'roles' => 'Roles',
         'categories' => 'Categories',
         'products' => 'Products',
         'sellers' => 'Sellers',
@@ -43,11 +44,10 @@ class RoleResource extends Resource
                 ->rule(fn ($record) => Rule::unique('roles', 'name')
                     ->where(fn ($query) => $query->where('guard_name', 'staff'))
                     ->ignore($record?->id)),
-            CheckboxList::make('permissions')
+            ViewField::make('permissions')
                 ->label('Permissions')
-                ->options(self::permissionOptions())
-                ->columns(3)
-                ->bulkToggleable(),
+                ->view('filament.forms.permission-matrix')
+                ->dehydrated(),
         ]);
     }
 
