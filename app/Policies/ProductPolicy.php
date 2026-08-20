@@ -9,36 +9,36 @@ class ProductPolicy
 {
     public function viewAny(Staff $staff): bool
     {
-        return $staff->hasAnyRole(['admin', 'content_editor', 'sales']);
+        return $staff->hasAnyPermission(['products.read', 'products.write', 'products.full']);
     }
 
     public function view(Staff $staff, Product $product): bool
     {
-        return $staff->hasAnyRole(['admin', 'content_editor', 'sales']);
+        return $staff->hasAnyPermission(['products.read', 'products.write', 'products.full']);
     }
 
     public function create(Staff $staff): bool
     {
-        return $staff->hasAnyRole(['admin', 'content_editor']);
+        return $staff->hasAnyPermission(['products.write', 'products.full']);
     }
 
     public function update(Staff $staff, Product $product): bool
     {
-        return $staff->hasAnyRole(['admin', 'content_editor']);
+        return $staff->hasAnyPermission(['products.write', 'products.full']);
     }
 
     public function delete(Staff $staff, Product $product): bool
     {
-        return $staff->hasRole('admin');
+        return $staff->hasPermissionTo('products.full');
     }
 
     public function setPrice(Staff $staff): bool
     {
-        return $staff->hasRole('admin');
+        return $staff->hasPermissionTo('products.full');
     }
 
     public function approve(Staff $staff): bool
     {
-        return $staff->hasRole('admin');
+        return $staff->hasPermissionTo('products.full');
     }
 }
