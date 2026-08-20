@@ -64,6 +64,31 @@ class RoleResourceTest extends TestCase
         $this->assertSame(['categories.full'], $role->fresh()->permissions->pluck('name')->all());
     }
 
+    public function test_admin_and_content_editor_roles_can_save_roles_access(): void
+    {
+        $admin = Staff::factory()->create();
+        $admin->assignRole('admin');
+        $this->actingAs($admin, 'staff');
+
+        foreach (['admin', 'content_editor'] as $roleName) {
+            $role = Role::findByName($roleName, 'staff');
+
+            Livewire::test(EditRole::class, ['record' => $role->id])
+                ->fillForm([
+                    'name' => $roleName,
+                    'permissions' => array_merge(
+                        $roleName === 'admin' ? ['roles.full'] : [],
+                        ['dashboard.read'],
+                    ),
+                ])
+                ->call('save')
+                ->assertHasNoFormErrors();
+        }
+
+        $this->assertTrue(Role::findByName('admin', 'staff')->hasPermissionTo('roles.full'));
+        $this->assertTrue(Role::findByName('content_editor', 'staff')->hasPermissionTo('dashboard.read'));
+    }
+
     public function test_deleting_a_role_still_assigned_to_staff_is_rejected(): void
     {
         $admin = Staff::factory()->create();
