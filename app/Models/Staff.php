@@ -27,7 +27,6 @@ class Staff extends Authenticatable implements FilamentUser
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return $panel->getId() === 'admin'
-            && $this->hasAnyRole(['admin', 'content_editor', 'sales']);
+        return $panel->getId() === 'admin';
     }
 }
