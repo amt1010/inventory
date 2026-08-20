@@ -33,6 +33,12 @@ class AdminPanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         $branding = Schema::hasTable('settings') ? Setting::current() : null;
+        $accentColor = filled($branding?->theme_accent_color)
+            ? $branding->theme_accent_color
+            : '#ff6a00';
+        $brandName = filled($branding?->site_name)
+            ? $branding->site_name
+            : config('app.name');
 
         return $panel
             ->default()
@@ -41,9 +47,9 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->authGuard('staff')
             ->colors([
-                'primary' => Color::hex($branding?->theme_accent_color ?? '#ff6a00'),
+                'primary' => Color::hex($accentColor),
             ])
-            ->brandName($branding?->site_name ?? config('app.name'))
+            ->brandName($brandName)
             ->brandLogo($branding?->logo_path ? asset('storage/'.$branding->logo_path) : null)
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
