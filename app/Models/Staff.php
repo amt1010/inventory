@@ -17,13 +17,16 @@ class Staff extends Authenticatable implements FilamentUser
 
     protected $table = 'staff';
 
-    protected $fillable = ['name', 'email', 'password'];
+    protected $fillable = ['name', 'email', 'password', 'must_change_password'];
 
     protected $hidden = ['password', 'remember_token'];
 
+    protected $casts = [
+        'must_change_password' => 'boolean',
+    ];
+
     public function canAccessPanel(Panel $panel): bool
     {
-        return $panel->getId() === 'admin'
-            && $this->hasAnyRole(['admin', 'content_editor', 'sales']);
+        return $panel->getId() === 'admin';
     }
 }

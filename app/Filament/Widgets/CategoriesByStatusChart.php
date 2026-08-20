@@ -41,7 +41,13 @@ class CategoriesByStatusChart extends ChartWidget
     {
         return [
             'datasets' => [
-                ['label' => 'Categories', 'data' => array_values($this->statusCounts())],
+                [
+                    'label' => 'Categories',
+                    'data' => array_values($this->statusCounts()),
+                    'backgroundColor' => ['#f59e0b', '#10b981'],
+                    'borderColor' => ['#d97706', '#059669'],
+                    'borderWidth' => 2,
+                ],
             ],
             'labels' => array_keys($this->statusCounts()),
         ];

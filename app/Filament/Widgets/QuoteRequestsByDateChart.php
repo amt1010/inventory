@@ -52,7 +52,13 @@ class QuoteRequestsByDateChart extends ChartWidget
 
         return [
             'datasets' => [
-                ['label' => 'Quote Requests', 'data' => array_values($counts)],
+                [
+                    'label' => 'Quote Requests',
+                    'data' => array_values($counts),
+                    'backgroundColor' => '#f97316',
+                    'borderColor' => '#ea580c',
+                    'borderWidth' => 2,
+                ],
             ],
             'labels' => array_keys($counts),
         ];

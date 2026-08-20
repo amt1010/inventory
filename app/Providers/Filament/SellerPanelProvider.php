@@ -62,10 +62,10 @@ class SellerPanelProvider extends PanelProvider
             ->login()
             ->authGuard('seller')
             ->colors([
-                'primary' => Color::hex($branding?->seller_theme_accent_color ?? '#059669'),
+                'primary' => Color::hex($branding?->theme_accent_color ?? '#ff6a00'),
             ])
-            ->brandName($branding?->seller_site_name ?? config('app.name'))
-            ->brandLogo($branding?->seller_logo_path ? asset('storage/'.$branding->seller_logo_path) : null)
+            ->brandName($branding?->site_name ?? config('app.name'))
+            ->brandLogo($branding?->logo_path ? asset('storage/'.$branding->logo_path) : null)
             ->discoverResources(in: app_path('Filament/Seller/Resources'), for: 'App\\Filament\\Seller\\Resources')
             ->discoverPages(in: app_path('Filament/Seller/Pages'), for: 'App\\Filament\\Seller\\Pages')
             ->pages([

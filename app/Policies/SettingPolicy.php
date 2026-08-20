@@ -9,6 +9,6 @@ class SettingPolicy
 {
     public function manage(Staff $staff, ?Setting $setting = null): bool
     {
-        return $staff->hasRole('admin');
+        return $staff->hasPermissionTo('settings.full');
     }
 }
