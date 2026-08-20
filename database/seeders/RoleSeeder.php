@@ -3,14 +3,49 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 class RoleSeeder extends Seeder
 {
+    private const AREAS = ['categories', 'products', 'sellers', 'quote_requests', 'pages', 'nav_items', 'settings'];
+
+    private const TIERS = ['read', 'write', 'full'];
+
+    private const ROLE_MATRIX = [
+        'admin' => [
+            'categories' => 'full', 'products' => 'full', 'sellers' => 'full',
+            'quote_requests' => 'full', 'pages' => 'full', 'nav_items' => 'full', 'settings' => 'full',
+        ],
+        'content_editor' => [
+            'categories' => 'full', 'products' => 'write', 'sellers' => null,
+            'quote_requests' => null, 'pages' => 'full', 'nav_items' => 'full', 'settings' => null,
+        ],
+        'sales' => [
+            'categories' => 'read', 'products' => 'read', 'sellers' => null,
+            'quote_requests' => 'write', 'pages' => 'read', 'nav_items' => 'read', 'settings' => null,
+        ],
+    ];
+
     public function run(): void
     {
-        foreach (['admin', 'content_editor', 'sales'] as $role) {
-            Role::firstOrCreate(['name' => $role, 'guard_name' => 'staff']);
+        foreach (self::AREAS as $area) {
+            foreach (self::TIERS as $tier) {
+                Permission::firstOrCreate(['name' => "{$area}.{$tier}", 'guard_name' => 'staff']);
+            }
+        }
+
+        foreach (self::ROLE_MATRIX as $roleName => $areaTiers) {
+            $role = Role::firstOrCreate(['name' => $roleName, 'guard_name' => 'staff']);
+
+            $permissions = [];
+            foreach ($areaTiers as $area => $tier) {
+                if ($tier !== null) {
+                    $permissions[] = "{$area}.{$tier}";
+                }
+            }
+
+            $role->syncPermissions($permissions);
         }
     }
 }
