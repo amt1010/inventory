@@ -894,11 +894,14 @@ git commit -m "refactor: SettingPolicy checks a permission instead of a role nam
 
 **Files:**
 - Create: `app/Policies/RolePolicy.php`
+- Modify: `app/Providers/AppServiceProvider.php`
 - Test: `tests/Feature/RolePolicyTest.php`
 
 **Interfaces:**
-- Consumes: `Spatie\Permission\Models\Role` (the model `RoleResource`, Task 13, manages). Laravel's policy auto-discovery resolves this from the model's class basename (`Role` → `App\Policies\RolePolicy`), the same convention already used for every other `App\Models\*` ↔ `App\Policies\*Policy` pair in this codebase — no explicit registration needed.
+- Consumes: `Spatie\Permission\Models\Role` (the model `RoleResource`, Task 13, manages).
 - Produces: `viewAny`, `view`, `create`, `update`, `delete` — all `hasRole('admin')`, unconditionally. This is the permanent exception described in Global Constraints — never converted to permission checks by a future task.
+
+**Note (discovered during implementation):** Laravel's policy auto-discovery (`Gate::guessPolicyName()`) only searches within a model's *own* namespace tree (e.g. `Spatie\Permission\Models\Policies\RolePolicy`, `Spatie\Permission\Policies\RolePolicy`) — it never substitutes in `App\Policies`. That substitution only appears to work for `App\Models\*` classes because their own namespace tree happens to contain `App\Policies`. Since `Role` lives in `Spatie\Permission\Models`, `RolePolicy` needs an explicit `Gate::policy(Role::class, RolePolicy::class)` registration in `AppServiceProvider::boot()` — added as Step 3a below.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -991,6 +994,29 @@ class RolePolicy
 }
 ```
 
+- [ ] **Step 3a: Register it explicitly (auto-discovery doesn't reach it)**
+
+In `app/Providers/AppServiceProvider.php`, add imports:
+
+```php
+use App\Policies\RolePolicy;
+use Illuminate\Support\Facades\Gate;
+use Spatie\Permission\Models\Role;
+```
+
+Then at the top of `boot()`:
+
+```php
+    public function boot(): void
+    {
+        // Laravel's policy auto-discovery only guesses within a model's own
+        // namespace tree, so it never finds App\Policies\RolePolicy for
+        // spatie's Spatie\Permission\Models\Role — register it explicitly.
+        Gate::policy(Role::class, RolePolicy::class);
+
+        // ...rest of existing boot() body unchanged
+```
+
 - [ ] **Step 4: Run tests to verify they pass**
 
 Run: `php artisan test --filter=RolePolicyTest`
@@ -999,7 +1025,7 @@ Expected: PASS
 - [ ] **Step 5: Commit**
 
 ```bash
-git add app/Policies/RolePolicy.php tests/Feature/RolePolicyTest.php
+git add app/Policies/RolePolicy.php app/Providers/AppServiceProvider.php tests/Feature/RolePolicyTest.php
 git commit -m "feat: add hardcoded admin-only RolePolicy"
 ```
 

@@ -5,11 +5,14 @@ namespace App\Providers;
 use App\Models\Category;
 use App\Models\NavItem;
 use App\Models\Setting;
+use App\Policies\RolePolicy;
 use App\Support\CategoryHierarchy;
 use Filament\Support\Facades\FilamentView;
 use Filament\View\PanelsRenderHook;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use Spatie\Permission\Models\Role;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,6 +29,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Laravel's policy auto-discovery only guesses within a model's own
+        // namespace tree, so it never finds App\Policies\RolePolicy for
+        // spatie's Spatie\Permission\Models\Role — register it explicitly.
+        Gate::policy(Role::class, RolePolicy::class);
+
         // Give the Filament admin/seller panels a full-height vertical divider
         // between the sidebar and the content. The sidebar is a sticky,
         // viewport-tall element, so a border on its content-facing edge reads
