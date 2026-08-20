@@ -3,12 +3,14 @@
 namespace App\Providers\Filament;
 
 use App\Http\Middleware\EnsureStaffPasswordIsCurrent;
+use App\Models\Setting;
 use Filament\Actions\Imports\Models\Import;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Pages;
+use App\Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -18,6 +20,7 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
@@ -29,6 +32,8 @@ class AdminPanelProvider extends PanelProvider
 
     public function panel(Panel $panel): Panel
     {
+        $branding = Schema::hasTable('settings') ? Setting::current() : null;
+
         return $panel
             ->default()
             ->id('admin')
@@ -36,12 +41,14 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->authGuard('staff')
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::hex($branding?->theme_accent_color ?? '#ff6a00'),
             ])
+            ->brandName($branding?->site_name ?? config('app.name'))
+            ->brandLogo($branding?->logo_path ? asset('storage/'.$branding->logo_path) : null)
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
-                Pages\Dashboard::class,
+                Dashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([

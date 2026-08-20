@@ -35,7 +35,9 @@ class EditRole extends EditRecord
 
     protected function mutateFormDataBeforeFill(array $data): array
     {
-        return array_merge($data, RoleResource::tiersFromRecord($this->record));
+        return array_merge($data, [
+            'permissions' => $this->record->permissions->pluck('name')->all(),
+        ]);
     }
 
     protected function handleRecordUpdate(Model $record, array $data): Model

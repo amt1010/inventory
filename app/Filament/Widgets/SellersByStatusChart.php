@@ -44,7 +44,13 @@ class SellersByStatusChart extends ChartWidget
     {
         return [
             'datasets' => [
-                ['label' => 'Sellers', 'data' => array_values($this->statusCounts())],
+                [
+                    'label' => 'Sellers',
+                    'data' => array_values($this->statusCounts()),
+                    'backgroundColor' => ['#f59e0b', '#3b82f6', '#10b981', '#ef4444', '#64748b'],
+                    'borderColor' => ['#d97706', '#2563eb', '#059669', '#dc2626', '#475569'],
+                    'borderWidth' => 2,
+                ],
             ],
             'labels' => array_keys($this->statusCounts()),
         ];

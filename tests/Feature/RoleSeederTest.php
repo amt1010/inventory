@@ -16,7 +16,7 @@ class RoleSeederTest extends TestCase
     {
         $this->seed(RoleSeeder::class);
 
-        $this->assertSame(21, Permission::where('guard_name', 'staff')->count());
+        $this->assertSame(27, Permission::where('guard_name', 'staff')->count());
     }
 
     public function test_admin_role_gets_full_permission_in_every_area(): void
@@ -26,8 +26,8 @@ class RoleSeederTest extends TestCase
         $permissions = Role::findByName('admin', 'staff')->permissions->pluck('name')->sort()->values()->all();
 
         $this->assertSame([
-            'categories.full', 'nav_items.full', 'pages.full', 'products.full',
-            'quote_requests.full', 'sellers.full', 'settings.full',
+            'categories.full', 'dashboard.full', 'nav_items.full', 'pages.full', 'products.full',
+            'quote_requests.full', 'sellers.full', 'settings.full', 'staff.full',
         ], $permissions);
     }
 
@@ -38,7 +38,7 @@ class RoleSeederTest extends TestCase
         $permissions = Role::findByName('content_editor', 'staff')->permissions->pluck('name')->sort()->values()->all();
 
         $this->assertSame([
-            'categories.full', 'nav_items.full', 'pages.full', 'products.write',
+            'categories.full', 'dashboard.read', 'nav_items.full', 'pages.full', 'products.write',
         ], $permissions);
     }
 
@@ -49,7 +49,7 @@ class RoleSeederTest extends TestCase
         $permissions = Role::findByName('sales', 'staff')->permissions->pluck('name')->sort()->values()->all();
 
         $this->assertSame([
-            'categories.read', 'nav_items.read', 'pages.read', 'products.read', 'quote_requests.write',
+            'categories.read', 'dashboard.read', 'nav_items.read', 'pages.read', 'products.read', 'quote_requests.write',
         ], $permissions);
     }
 }

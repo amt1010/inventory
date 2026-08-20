@@ -22,7 +22,7 @@ class RoleResourceTest extends TestCase
         $this->seed(RoleSeeder::class);
     }
 
-    public function test_creating_a_role_with_chosen_tiers_attaches_exactly_the_right_permissions(): void
+    public function test_creating_a_role_with_checked_permissions_attaches_exactly_the_right_permissions(): void
     {
         $admin = Staff::factory()->create();
         $admin->assignRole('admin');
@@ -31,13 +31,7 @@ class RoleResourceTest extends TestCase
         Livewire::test(CreateRole::class)
             ->fillForm([
                 'name' => 'field_manager',
-                'tier_categories' => 'read',
-                'tier_products' => 'write',
-                'tier_sellers' => 'none',
-                'tier_quote_requests' => 'none',
-                'tier_pages' => 'none',
-                'tier_nav_items' => 'none',
-                'tier_settings' => 'none',
+                'permissions' => ['categories.read', 'products.write'],
             ])
             ->call('create')
             ->assertHasNoFormErrors();
@@ -50,7 +44,7 @@ class RoleResourceTest extends TestCase
         );
     }
 
-    public function test_changing_a_tier_and_resaving_updates_instead_of_accumulating_permissions(): void
+    public function test_changing_checked_permissions_and_resaving_updates_instead_of_accumulating_permissions(): void
     {
         $admin = Staff::factory()->create();
         $admin->assignRole('admin');
@@ -62,13 +56,7 @@ class RoleResourceTest extends TestCase
         Livewire::test(EditRole::class, ['record' => $role->id])
             ->fillForm([
                 'name' => 'field_manager',
-                'tier_categories' => 'full',
-                'tier_products' => 'none',
-                'tier_sellers' => 'none',
-                'tier_quote_requests' => 'none',
-                'tier_pages' => 'none',
-                'tier_nav_items' => 'none',
-                'tier_settings' => 'none',
+                'permissions' => ['categories.full'],
             ])
             ->call('save')
             ->assertHasNoFormErrors();

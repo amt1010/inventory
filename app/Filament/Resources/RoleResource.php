@@ -3,7 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\RoleResource\Pages;
-use Filament\Forms\Components\Select;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -22,6 +22,8 @@ class RoleResource extends Resource
     protected static ?int $navigationSort = 8;
 
     public const AREAS = [
+        'dashboard' => 'Dashboard',
+        'staff' => 'Staff',
         'categories' => 'Categories',
         'products' => 'Products',
         'sellers' => 'Sellers',
@@ -31,12 +33,7 @@ class RoleResource extends Resource
         'settings' => 'Settings',
     ];
 
-    public const TIERS = [
-        'none' => 'None',
-        'read' => 'Read',
-        'write' => 'Write',
-        'full' => 'Full',
-    ];
+    public const TIERS = ['read' => 'Read', 'write' => 'Write', 'full' => 'Full'];
 
     public static function form(Form $form): Form
     {
@@ -46,13 +43,11 @@ class RoleResource extends Resource
                 ->rule(fn ($record) => Rule::unique('roles', 'name')
                     ->where(fn ($query) => $query->where('guard_name', 'staff'))
                     ->ignore($record?->id)),
-            Select::make('tier_categories')->label('Categories')->options(self::TIERS)->default('none')->required(),
-            Select::make('tier_products')->label('Products')->options(self::TIERS)->default('none')->required(),
-            Select::make('tier_sellers')->label('Sellers')->options(self::TIERS)->default('none')->required(),
-            Select::make('tier_quote_requests')->label('Quote Requests')->options(self::TIERS)->default('none')->required(),
-            Select::make('tier_pages')->label('Pages')->options(self::TIERS)->default('none')->required(),
-            Select::make('tier_nav_items')->label('Nav Items')->options(self::TIERS)->default('none')->required(),
-            Select::make('tier_settings')->label('Settings')->options(self::TIERS)->default('none')->required(),
+            CheckboxList::make('permissions')
+                ->label('Permissions')
+                ->options(self::permissionOptions())
+                ->columns(3)
+                ->bulkToggleable(),
         ]);
     }
 
@@ -81,6 +76,10 @@ class RoleResource extends Resource
 
     public static function permissionsFromFormData(array $data): array
     {
+        if (! empty($data['permissions']) || ! array_key_exists('tier_categories', $data)) {
+            return array_values(array_filter($data['permissions'] ?? []));
+        }
+
         $permissions = [];
 
         foreach (array_keys(self::AREAS) as $area) {
@@ -111,6 +110,19 @@ class RoleResource extends Resource
         }
 
         return $tiers;
+    }
+
+    public static function permissionOptions(): array
+    {
+        $options = [];
+
+        foreach (self::AREAS as $area => $label) {
+            foreach (self::TIERS as $tier => $tierLabel) {
+                $options["{$area}.{$tier}"] = "{$label}: {$tierLabel}";
+            }
+        }
+
+        return $options;
     }
 
     public static function summarize(Role $record): string

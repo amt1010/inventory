@@ -8,20 +8,23 @@ use Spatie\Permission\Models\Role;
 
 class RoleSeeder extends Seeder
 {
-    private const AREAS = ['categories', 'products', 'sellers', 'quote_requests', 'pages', 'nav_items', 'settings'];
+    private const AREAS = ['dashboard', 'staff', 'categories', 'products', 'sellers', 'quote_requests', 'pages', 'nav_items', 'settings'];
 
     private const TIERS = ['read', 'write', 'full'];
 
     private const ROLE_MATRIX = [
         'admin' => [
+            'dashboard' => 'full', 'staff' => 'full',
             'categories' => 'full', 'products' => 'full', 'sellers' => 'full',
             'quote_requests' => 'full', 'pages' => 'full', 'nav_items' => 'full', 'settings' => 'full',
         ],
         'content_editor' => [
+            'dashboard' => 'read', 'staff' => null,
             'categories' => 'full', 'products' => 'write', 'sellers' => null,
             'quote_requests' => null, 'pages' => 'full', 'nav_items' => 'full', 'settings' => null,
         ],
         'sales' => [
+            'dashboard' => 'read', 'staff' => null,
             'categories' => 'read', 'products' => 'read', 'sellers' => null,
             'quote_requests' => 'write', 'pages' => 'read', 'nav_items' => 'read', 'settings' => null,
         ],

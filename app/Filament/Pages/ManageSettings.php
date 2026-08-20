@@ -46,30 +46,18 @@ class ManageSettings extends Page implements HasForms
     public function form(Form $form): Form
     {
         return $form->schema([
-            TextInput::make('site_name')->required(),
+            TextInput::make('site_name')->requiredWithout('logo_path'),
             FileUpload::make('logo_path')
                 ->label('Logo')
                 ->image()
+                ->disk('public')
+                ->requiredWithout('site_name')
                 ->directory('branding'),
             ColorPicker::make('theme_accent_color')
                 ->label('Theme Accent Color')
                 ->hex()
                 ->helperText('Used for buttons, tags, and highlights across the public site.')
                 ->required(),
-            Section::make('Seller Portal Branding')
-                ->description('Branding shown on the seller portal (/seller), independent of the main site above.')
-                ->schema([
-                    TextInput::make('seller_site_name')->label('Seller Portal Name')->required(),
-                    FileUpload::make('seller_logo_path')
-                        ->label('Seller Portal Logo')
-                        ->image()
-                        ->directory('branding'),
-                    ColorPicker::make('seller_theme_accent_color')
-                        ->label('Seller Portal Accent Color')
-                        ->hex()
-                        ->required(),
-                ])
-                ->columns(2),
             Section::make('Footer')
                 ->description('Content shown in the site footer.')
                 ->schema([
