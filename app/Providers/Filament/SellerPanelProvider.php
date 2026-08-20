@@ -55,6 +55,12 @@ class SellerPanelProvider extends PanelProvider
         // this provider boots on every artisan invocation, including the
         // `migrate` command that creates that very table.
         $branding = Schema::hasTable('settings') ? Setting::current() : null;
+        $accentColor = filled($branding?->theme_accent_color)
+            ? $branding->theme_accent_color
+            : '#ff6a00';
+        $brandName = filled($branding?->site_name)
+            ? $branding->site_name
+            : config('app.name');
 
         return $panel
             ->id('seller')
@@ -62,9 +68,9 @@ class SellerPanelProvider extends PanelProvider
             ->login()
             ->authGuard('seller')
             ->colors([
-                'primary' => Color::hex($branding?->theme_accent_color ?? '#ff6a00'),
+                'primary' => Color::hex($accentColor),
             ])
-            ->brandName($branding?->site_name ?? config('app.name'))
+            ->brandName($brandName)
             ->brandLogo($branding?->logo_path ? asset('storage/'.$branding->logo_path) : null)
             ->discoverResources(in: app_path('Filament/Seller/Resources'), for: 'App\\Filament\\Seller\\Resources')
             ->discoverPages(in: app_path('Filament/Seller/Pages'), for: 'App\\Filament\\Seller\\Pages')

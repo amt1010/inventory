@@ -181,6 +181,17 @@ class SettingsTest extends TestCase
         $response->assertOk();
     }
 
+    public function test_admin_login_survives_empty_saved_branding_values(): void
+    {
+        Setting::current()->update([
+            'theme_accent_color' => '',
+        ]);
+
+        $response = $this->get('/admin/login');
+
+        $response->assertOk();
+    }
+
     public function test_a_content_editor_cannot_access_the_settings_page(): void
     {
         $staff = Staff::factory()->create();
