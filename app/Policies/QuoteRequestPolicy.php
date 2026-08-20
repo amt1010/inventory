@@ -9,12 +9,12 @@ class QuoteRequestPolicy
 {
     public function viewAny(Staff $staff): bool
     {
-        return $staff->hasAnyRole(['admin', 'sales']);
+        return $staff->hasAnyPermission(['quote_requests.read', 'quote_requests.write', 'quote_requests.full']);
     }
 
     public function view(Staff $staff, QuoteRequest $quoteRequest): bool
     {
-        return $staff->hasAnyRole(['admin', 'sales']);
+        return $staff->hasAnyPermission(['quote_requests.read', 'quote_requests.write', 'quote_requests.full']);
     }
 
     public function create(Staff $staff): bool
@@ -24,11 +24,11 @@ class QuoteRequestPolicy
 
     public function update(Staff $staff, QuoteRequest $quoteRequest): bool
     {
-        return $staff->hasAnyRole(['admin', 'sales']);
+        return $staff->hasAnyPermission(['quote_requests.write', 'quote_requests.full']);
     }
 
     public function delete(Staff $staff, QuoteRequest $quoteRequest): bool
     {
-        return $staff->hasRole('admin');
+        return $staff->hasPermissionTo('quote_requests.full');
     }
 }
