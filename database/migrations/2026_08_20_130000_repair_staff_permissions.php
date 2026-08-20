@@ -8,7 +8,7 @@ use Spatie\Permission\Models\Role;
 return new class extends Migration
 {
     private const AREAS = [
-        'dashboard', 'staff', 'categories', 'products', 'sellers',
+        'dashboard', 'staff', 'roles', 'categories', 'products', 'sellers',
         'quote_requests', 'pages', 'nav_items', 'settings',
     ];
 
@@ -16,7 +16,7 @@ return new class extends Migration
 
     private const ROLE_PERMISSIONS = [
         'admin' => [
-            'dashboard.full', 'staff.full', 'categories.full', 'products.full',
+            'dashboard.full', 'staff.full', 'roles.full', 'categories.full', 'products.full',
             'sellers.full', 'quote_requests.full', 'pages.full', 'nav_items.full', 'settings.full',
         ],
         'content_editor' => [
