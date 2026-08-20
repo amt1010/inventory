@@ -2233,3 +2233,5 @@ git commit -m "feat: force a password change on a staff member's first login"
 
 Run: `php artisan test`
 Expected: PASS, zero failures, zero regressions across every existing test file touched or left alone by this plan.
+
+**Note (discovered during implementation):** this surfaced one legitimate, expected regression not called out by the spec: `tests/Feature/AdminNavigationOrderTest.php` asserts the exhaustive, ordered list of admin sidebar nav labels. Adding `RoleResource` (`navigationSort = 8`) and `StaffResource` (`navigationSort = 9`) adds two real nav items ("Roles", "Staff") after "Sellers". Update that test's expected array to append `'Roles', 'Staff'` — this is not a sign the permission matrix is wrong (per the Task 4 caveat above), it's a correct reflection of new, intentional UI.
