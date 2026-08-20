@@ -13,6 +13,7 @@ use App\Http\Controllers\SearchSuggestController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\Seller\ActivationController;
 use App\Http\Controllers\Seller\RegistrationController as SellerRegistrationController;
+use App\Http\Controllers\StaffPasswordController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [PageController::class, 'show'])->defaults('slug', 'home')->name('home');
@@ -49,6 +50,8 @@ Route::middleware('auth:web')->group(function () {
 Route::middleware('auth:staff')->group(function () {
     Route::get('/preview/product/{product}', [PreviewController::class, 'product'])->name('staff.preview.product');
     Route::get('/preview/category/{category}', [PreviewController::class, 'category'])->name('staff.preview.category');
+    Route::get('/admin/change-password', [StaffPasswordController::class, 'edit'])->name('admin.change-password');
+    Route::post('/admin/change-password', [StaffPasswordController::class, 'update'])->name('admin.change-password.update');
 });
 
 Route::get('/products/{path?}', [CatalogController::class, 'show'])
