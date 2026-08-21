@@ -2,8 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Resources\PageResource\Pages\ListPages;
 use App\Filament\Resources\ProductResource\Pages\ListProducts;
 use App\Models\Category;
+use App\Models\Page;
 use App\Models\Product;
 use App\Models\Staff;
 use Database\Seeders\RoleSeeder;
@@ -82,6 +84,45 @@ class StaffPreviewTest extends TestCase
         $this->actingAs($this->admin(), 'staff');
 
         Livewire::test(ListProducts::class)
+            ->assertTableActionExists('preview')
+            ->assertTableActionVisible('preview', $draft)
+            ->assertTableActionVisible('viewLive', $published)
+            ->assertTableActionHidden('viewLive', $draft);
+    }
+
+    public function test_staff_can_preview_an_unpublished_page(): void
+    {
+        $page = Page::factory()->create([
+            'title' => 'Unreleased Landing Page',
+            'status' => 'draft',
+        ]);
+
+        $response = $this->actingAs($this->admin(), 'staff')
+            ->get(route('staff.preview.page', $page));
+
+        $response->assertOk();
+        $response->assertSee('Unreleased Landing Page');
+        $response->assertSee('Staff preview');
+    }
+
+    public function test_a_guest_cannot_access_the_page_preview(): void
+    {
+        $page = Page::factory()->create(['status' => 'draft']);
+
+        $response = $this->get(route('staff.preview.page', $page));
+
+        $response->assertRedirect();
+        $this->assertGuest('staff');
+    }
+
+    public function test_the_pages_list_links_to_preview_always_and_live_only_when_published(): void
+    {
+        $published = Page::factory()->create(['status' => 'published']);
+        $draft = Page::factory()->create(['status' => 'draft']);
+
+        $this->actingAs($this->admin(), 'staff');
+
+        Livewire::test(ListPages::class)
             ->assertTableActionExists('preview')
             ->assertTableActionVisible('preview', $draft)
             ->assertTableActionVisible('viewLive', $published)

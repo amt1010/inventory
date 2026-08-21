@@ -50,6 +50,7 @@ Route::middleware('auth:web')->group(function () {
 Route::middleware('auth:staff')->group(function () {
     Route::get('/preview/product/{product}', [PreviewController::class, 'product'])->name('staff.preview.product');
     Route::get('/preview/category/{category}', [PreviewController::class, 'category'])->name('staff.preview.category');
+    Route::get('/preview/page/{page}', [PreviewController::class, 'page'])->name('staff.preview.page');
     Route::get('/admin/change-password', [StaffPasswordController::class, 'edit'])->name('admin.change-password');
     Route::post('/admin/change-password', [StaffPasswordController::class, 'update'])->name('admin.change-password.update');
 });

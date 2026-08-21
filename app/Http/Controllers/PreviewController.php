@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Page;
 use App\Models\Product;
 use Illuminate\View\View;
 
@@ -30,6 +31,14 @@ class PreviewController extends Controller
             'children' => $category->children()->orderBy('sort_order')->get(),
             'products' => $category->products()->orderBy('sort_order')->paginate(9),
             'filterGroups' => collect(),
+            'preview' => true,
+        ]);
+    }
+
+    public function page(Page $page): View
+    {
+        return view('pages.show', [
+            'page' => $page,
             'preview' => true,
         ]);
     }

@@ -13,6 +13,7 @@ use App\Models\Seller;
 use App\Models\Staff;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use ReflectionMethod;
 use Tests\TestCase;
 
 class DashboardChartsTest extends TestCase
@@ -73,11 +74,92 @@ class DashboardChartsTest extends TestCase
     {
         QuoteRequest::factory()->count(2)->create(['created_at' => now()]);
         QuoteRequest::factory()->count(1)->create(['created_at' => now()->subDay()]);
+        QuoteRequest::factory()->count(4)->create(['created_at' => now()->subDays(5)->setTime(23, 45)]);
+        // Older than the 30-day window, must not appear anywhere.
+        QuoteRequest::factory()->count(9)->create(['created_at' => now()->subDays(45)]);
 
         $counts = (new QuoteRequestsByDateChart())->dailyCounts();
 
+        $this->assertCount(30, $counts);
         $this->assertSame(2, $counts[now()->toDateString()]);
         $this->assertSame(1, $counts[now()->subDay()->toDateString()]);
+        $this->assertSame(4, $counts[now()->subDays(5)->toDateString()]);
+        $this->assertSame(0, $counts[now()->subDays(3)->toDateString()]);
+        $this->assertSame(7, array_sum($counts));
+    }
+
+    /**
+     * Each of these three widgets draws one differently-colored bar per
+     * status, but Chart.js's default legend renderer only shows a single
+     * swatch for the whole dataset, and it doesn't reflect the per-bar
+     * colors correctly. Each widget must override getOptions() with a
+     * generateLabels callback so the legend shows one correctly-colored
+     * entry per status.
+     */
+    public function test_products_by_status_chart_options_generate_one_legend_label_per_bar(): void
+    {
+        $method = new \ReflectionMethod(ProductsByStatusChart::class, 'getOptions');
+        $method->setAccessible(true);
+        $js = (string) $method->invoke(new ProductsByStatusChart());
+
+        $this->assertStringContainsString('generateLabels', $js);
+    }
+
+    public function test_categories_by_status_chart_options_generate_one_legend_label_per_bar(): void
+    {
+        $method = new \ReflectionMethod(CategoriesByStatusChart::class, 'getOptions');
+        $method->setAccessible(true);
+        $js = (string) $method->invoke(new CategoriesByStatusChart());
+
+        $this->assertStringContainsString('generateLabels', $js);
+    }
+
+    public function test_sellers_by_status_chart_options_generate_one_legend_label_per_bar(): void
+    {
+        $method = new \ReflectionMethod(SellersByStatusChart::class, 'getOptions');
+        $method->setAccessible(true);
+        $js = (string) $method->invoke(new SellersByStatusChart());
+
+        $this->assertStringContainsString('generateLabels', $js);
+    }
+
+    /**
+     * Filament renders a chart widget's options with `@js()` straight into the
+     * `x-data="chart({...})"` attribute. Unlike the dataset, RawJs is emitted
+     * verbatim, so a single raw `"` in it closes the attribute early, Alpine
+     * gets a syntax error, and the canvas stays blank.
+     */
+    public function test_quote_requests_chart_options_js_is_safe_inside_a_double_quoted_html_attribute(): void
+    {
+        QuoteRequest::factory()->create(['created_at' => now()]);
+
+        $method = new \ReflectionMethod(QuoteRequestsByDateChart::class, 'getOptions');
+        $method->setAccessible(true);
+        $js = $method->invoke(new QuoteRequestsByDateChart())->toHtml();
+
+        $this->assertStringNotContainsString('"', $js);
+    }
+
+    public function test_the_quote_requests_chart_x_data_attribute_is_not_truncated_on_the_dashboard(): void
+    {
+        QuoteRequest::factory()->create(['created_at' => now()]);
+
+        $staff = Staff::factory()->create();
+        $staff->assignRole('admin');
+        $this->actingAs($staff, 'staff');
+
+        $html = $this->get('/admin')->assertOk()->getContent();
+
+        preg_match_all('/x-data="([^"]*)"/', $html, $matches);
+
+        $chartAttribute = collect($matches[1])->first(
+            fn (string $value): bool => str_contains($value, 'onClick')
+        );
+
+        $this->assertNotNull($chartAttribute, 'The quote requests chart x-data attribute was not found.');
+        // The whole `chart({...})` call has to survive inside one attribute.
+        $this->assertStringContainsString("type: 'bar'", $chartAttribute);
+        $this->assertStringEndsWith('})', trim($chartAttribute));
     }
 
     public function test_an_admin_sees_all_four_dashboard_charts(): void

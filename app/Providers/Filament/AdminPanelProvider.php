@@ -5,6 +5,7 @@ namespace App\Providers\Filament;
 use App\Http\Middleware\EnsureStaffPasswordIsCurrent;
 use App\Models\Setting;
 use Filament\Actions\Imports\Models\Import;
+use Filament\Facades\Filament;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -14,7 +15,10 @@ use App\Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\Support\Facades\FilamentView;
+use Filament\View\PanelsRenderHook;
 use Filament\Widgets;
+use Illuminate\Contracts\View\View;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -28,6 +32,19 @@ class AdminPanelProvider extends PanelProvider
     public function boot(): void
     {
         Import::polymorphicUserRelationship();
+
+        // Makes the sidebar/content divider draggable. Registered per panel and
+        // guarded on the current panel id rather than passed as `scopes:` --
+        // render-hook scopes match Livewire component classes, not panel ids,
+        // and both panel providers boot on every request, so an unguarded
+        // registration in each would inject the partial twice. See the same
+        // pattern in SellerPanelProvider::boot().
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::HEAD_END,
+            fn (): View|string => Filament::getCurrentPanel()?->getId() === 'admin'
+                ? view('filament.partials.resizable-sidebar')
+                : '',
+        );
     }
 
     public function panel(Panel $panel): Panel

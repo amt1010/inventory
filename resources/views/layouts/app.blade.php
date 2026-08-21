@@ -24,8 +24,9 @@
             <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url('/') }}">
                 @if ($siteSettings->logo_path)
                     <img src="{{ asset('storage/'.$siteSettings->logo_path) }}" alt="{{ $siteSettings->site_name }}" height="36">
-                @else
-                    {{ $siteSettings->site_name }}
+                @endif
+                @if (filled($siteSettings->site_name))
+                    <span>{{ $siteSettings->site_name }}</span>
                 @endif
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">

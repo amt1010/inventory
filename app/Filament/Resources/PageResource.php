@@ -17,6 +17,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
@@ -213,6 +214,19 @@ class PageResource extends Resource
                 TextColumn::make('title')->searchable(),
                 TextColumn::make('slug'),
                 TextColumn::make('status')->badge(),
+            ])
+            ->actions([
+                Action::make('preview')
+                    ->label('Preview')
+                    ->icon('heroicon-o-eye')
+                    ->color('gray')
+                    ->url(fn (Page $record) => route('staff.preview.page', $record))->openUrlInNewTab(),
+                Action::make('viewLive')
+                    ->label('View live')
+                    ->icon('heroicon-o-arrow-top-right-on-square')
+                    ->color('gray')
+                    ->visible(fn (Page $record) => $record->status === 'published')
+                    ->url(fn (Page $record) => $record->slug === 'home' ? url('/') : url('/'.$record->slug))->openUrlInNewTab(),
             ]);
     }
 

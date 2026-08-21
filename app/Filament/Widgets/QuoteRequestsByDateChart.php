@@ -6,6 +6,7 @@ use App\Filament\Resources\QuoteRequestResource;
 use App\Models\QuoteRequest;
 use Filament\Support\RawJs;
 use Filament\Widgets\ChartWidget;
+use Illuminate\Support\Js;
 
 class QuoteRequestsByDateChart extends ChartWidget
 {
@@ -71,8 +72,12 @@ class QuoteRequestsByDateChart extends ChartWidget
 
     protected function getOptions(): array | RawJs | null
     {
-        $dates = json_encode(array_keys($this->dailyCounts()));
-        $baseUrl = json_encode(QuoteRequestResource::getUrl('index'));
+        // Filament prints these options verbatim into the widget's
+        // x-data="chart({...})" attribute. A raw `"` would close that attribute
+        // early and leave Alpine with a syntax error (blank canvas), so encode
+        // through Js, which hex-escapes quotes the same way Blade's @js does.
+        $dates = Js::from(array_keys($this->dailyCounts()))->toHtml();
+        $baseUrl = Js::from(QuoteRequestResource::getUrl('index'))->toHtml();
 
         return RawJs::make(<<<JS
             {

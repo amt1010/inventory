@@ -3,6 +3,7 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Product;
+use Filament\Support\RawJs;
 use Filament\Widgets\ChartWidget;
 
 class ProductsByStatusChart extends ChartWidget
@@ -59,5 +60,36 @@ class ProductsByStatusChart extends ChartWidget
     protected function getType(): string
     {
         return 'bar';
+    }
+
+    /**
+     * Chart.js's default legend shows a single swatch for the whole
+     * dataset, which doesn't reflect this chart's per-bar colors. Build
+     * one legend entry per bar/status instead, using that bar's own
+     * background/border color.
+     */
+    protected function getOptions(): array | RawJs | null
+    {
+        return RawJs::make(<<<'JS'
+            {
+                plugins: {
+                    legend: {
+                        labels: {
+                            generateLabels: (chart) => {
+                                const data = chart.data;
+
+                                return data.labels.map((label, i) => ({
+                                    text: label,
+                                    fillStyle: data.datasets[0].backgroundColor[i],
+                                    strokeStyle: data.datasets[0].borderColor[i],
+                                    lineWidth: 2,
+                                    index: i,
+                                }));
+                            },
+                        },
+                    },
+                },
+            }
+        JS);
     }
 }

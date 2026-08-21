@@ -58,7 +58,8 @@ class RoleResource extends Resource
                 TextColumn::make('name'),
                 TextColumn::make('access')
                     ->label('Access')
-                    ->state(fn (Role $record) => self::summarize($record)),
+                    ->state(fn (Role $record) => self::summarize($record))
+                    ->wrap(),
             ])
             ->actions([
                 EditAction::make(),

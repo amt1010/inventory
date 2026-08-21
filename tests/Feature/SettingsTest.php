@@ -42,6 +42,22 @@ class SettingsTest extends TestCase
         $response->assertSee('Acme Cable Co.');
     }
 
+    public function test_the_public_layout_shows_both_the_logo_and_site_name_when_both_are_configured(): void
+    {
+        Setting::current()->update([
+            'site_name' => 'Acme Cable Co.',
+            'logo_path' => 'logos/acme.png',
+        ]);
+
+        $response = $this->get('/');
+
+        $response->assertOk();
+        // assertSeeText strips tags/attributes first, so this only matches the
+        // site name rendered as visible text, not the img's alt attribute.
+        $response->assertSeeText('Acme Cable Co.');
+        $response->assertSee('storage/logos/acme.png', false);
+    }
+
     public function test_copyright_text_resolves_the_year_placeholder(): void
     {
         $setting = Setting::current();

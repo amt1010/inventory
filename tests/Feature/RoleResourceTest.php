@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Filament\Resources\RoleResource\Pages\CreateRole;
 use App\Filament\Resources\RoleResource\Pages\EditRole;
+use App\Filament\Resources\RoleResource\Pages\ListRoles;
 use App\Models\Staff;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -87,6 +88,17 @@ class RoleResourceTest extends TestCase
 
         $this->assertTrue(Role::findByName('admin', 'staff')->hasPermissionTo('roles.full'));
         $this->assertTrue(Role::findByName('content_editor', 'staff')->hasPermissionTo('dashboard.read'));
+    }
+
+    public function test_the_access_column_wraps_instead_of_truncating(): void
+    {
+        $admin = Staff::factory()->create();
+        $admin->assignRole('admin');
+        $this->actingAs($admin, 'staff');
+
+        $column = Livewire::test(ListRoles::class)->instance()->getTable()->getColumn('access');
+
+        $this->assertTrue($column->canWrap());
     }
 
     public function test_deleting_a_role_still_assigned_to_staff_is_rejected(): void

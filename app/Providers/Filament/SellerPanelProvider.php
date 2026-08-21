@@ -16,6 +16,7 @@ use Filament\Support\Facades\FilamentView;
 use Filament\View\PanelsRenderHook;
 use Filament\Widgets;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Contracts\View\View;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -45,6 +46,16 @@ class SellerPanelProvider extends PanelProvider
                     '<p class="mt-4 text-center">New seller? <a href="'.route('seller.register').'">Register here</a></p>'
                 );
             },
+        );
+
+        // Makes the sidebar/content divider draggable. Same manual panel guard
+        // as above: both panel providers boot on every request, so registering
+        // this unscoped in each one would inject the partial twice.
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::HEAD_END,
+            fn (): View|string => Filament::getCurrentPanel()?->getId() === 'seller'
+                ? view('filament.partials.resizable-sidebar')
+                : '',
         );
     }
 
