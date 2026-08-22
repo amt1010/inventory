@@ -41,6 +41,8 @@
 
                 @include('partials.terms-and-conditions-modal', ['termsPage' => $termsPage])
 
+                @include('partials.recaptcha-widget')
+
                 <button type="submit" class="btn btn-primary">Create Account</button>
                 <a href="{{ route('login') }}" class="btn btn-link">Already have an account?</a>
             </form>

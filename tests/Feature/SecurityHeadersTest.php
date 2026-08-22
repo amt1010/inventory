@@ -30,6 +30,17 @@ class SecurityHeadersTest extends TestCase
         $this->assertStringContainsString('fonts.gstatic.com', $csp);
     }
 
+    public function test_the_content_security_policy_allows_the_recaptcha_script_and_frame(): void
+    {
+        $response = $this->get(route('login'));
+
+        $csp = $response->headers->get('Content-Security-Policy');
+
+        $this->assertStringContainsString('www.google.com/recaptcha/', $csp);
+        $this->assertStringContainsString('www.gstatic.com/recaptcha/', $csp);
+        $this->assertStringContainsString('frame-src', $csp);
+    }
+
     public function test_hsts_is_sent_on_secure_requests_but_not_on_plain_http(): void
     {
         $secure = $this->get('https://surpluskart.test/login');

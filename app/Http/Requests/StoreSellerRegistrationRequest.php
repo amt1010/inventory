@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\Recaptcha;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Password;
 
@@ -27,6 +28,7 @@ class StoreSellerRegistrationRequest extends FormRequest
             'terms_accepted' => ['required', 'accepted'],
             'documents' => ['nullable', 'array'],
             'documents.*' => ['file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
+            'g-recaptcha-response' => [new Recaptcha()],
         ];
     }
 }

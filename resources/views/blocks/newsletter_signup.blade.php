@@ -6,9 +6,14 @@
     @if (!empty($data['subheading']))
         <p class="text-muted">{{ $data['subheading'] }}</p>
     @endif
-    <form class="d-flex justify-content-center gap-2 mt-3" style="max-width: 480px; margin: 0 auto;" action="{{ route('newsletter.subscribe') }}" method="POST">
+    <form class="mt-3" style="max-width: 480px; margin: 0 auto;" action="{{ route('newsletter.subscribe') }}" method="POST">
         @csrf
-        <input type="email" name="email" class="form-control" placeholder="Enter your email" required>
-        <button type="submit" class="md-btn md-btn-primary">Subscribe</button>
+        <div class="d-flex justify-content-center gap-2">
+            <input type="email" name="email" class="form-control" placeholder="Enter your email" required>
+            <button type="submit" class="md-btn md-btn-primary">Subscribe</button>
+        </div>
+        <div class="d-flex justify-content-center mt-2">
+            @include('partials.recaptcha-widget')
+        </div>
     </form>
 </div>

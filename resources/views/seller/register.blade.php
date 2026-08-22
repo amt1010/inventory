@@ -79,6 +79,8 @@
 
         @include('partials.terms-and-conditions-modal', ['termsPage' => $termsPage, 'idSuffix' => '-seller'])
 
+        @include('partials.recaptcha-widget')
+
         <button type="submit" class="btn btn-primary">Register</button>
     </form>
 @endsection

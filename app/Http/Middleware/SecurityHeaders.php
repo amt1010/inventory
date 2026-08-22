@@ -13,11 +13,12 @@ class SecurityHeaders
      * so 'self' covers both panels — only the public catalog layout pulls from a CDN.
      */
     private const CSP = "default-src 'self'; "
-        ."script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; "
+        ."script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/; "
         ."style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; "
         ."font-src 'self' https://fonts.gstatic.com data:; "
         ."img-src 'self' data: blob:; "
         ."connect-src 'self'; "
+        ."frame-src 'self' https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/; "
         ."frame-ancestors 'self'; "
         ."object-src 'none'; "
         ."base-uri 'self'; "

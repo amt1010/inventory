@@ -93,9 +93,7 @@
         <label class="form-check-label" for="privacy{{ $idSuffix }}">I have read and accepted the Privacy Policy.</label>
     </div>
 
-    @if (config('services.recaptcha.site_key'))
-        <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}"></div>
-    @endif
+    @include('partials.recaptcha-widget')
 
     <div class="d-flex justify-content-end gap-2 mt-2">
         @if ($modal ?? false)

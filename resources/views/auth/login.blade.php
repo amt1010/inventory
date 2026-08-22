@@ -30,6 +30,8 @@
                     <input type="password" name="password" class="form-control" required>
                 </div>
 
+                @include('partials.recaptcha-widget')
+
                 <button type="submit" class="btn btn-primary">Log In</button>
                 <a href="{{ route('register') }}" class="btn btn-link">Create an account</a>
             </form>

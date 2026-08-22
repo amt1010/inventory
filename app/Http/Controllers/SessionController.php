@@ -17,7 +17,7 @@ class SessionController extends Controller
 
     public function store(AuthenticateUserRequest $request): RedirectResponse
     {
-        if (! Auth::guard('web')->attempt($request->validated(), $request->boolean('remember'))) {
+        if (! Auth::guard('web')->attempt($request->only('email', 'password'), $request->boolean('remember'))) {
             throw ValidationException::withMessages([
                 'email' => 'These credentials do not match our records.',
             ]);
