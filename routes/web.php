@@ -18,13 +18,13 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [PageController::class, 'show'])->defaults('slug', 'home')->name('home');
 
-Route::get('/search', SearchController::class)->name('catalog.search');
+Route::get('/search', SearchController::class)->middleware('throttle:30,1')->name('catalog.search');
 
-Route::get('/search/suggest', SearchSuggestController::class)->name('catalog.search.suggest');
+Route::get('/search/suggest', SearchSuggestController::class)->middleware('throttle:60,1')->name('catalog.search.suggest');
 
-Route::post('/quote-requests', [QuoteRequestController::class, 'store'])->name('quote-requests.store');
+Route::post('/quote-requests', [QuoteRequestController::class, 'store'])->middleware('throttle:5,1')->name('quote-requests.store');
 
-Route::post('/newsletter/subscribe', [NewsletterController::class, 'store'])->name('newsletter.subscribe');
+Route::post('/newsletter/subscribe', [NewsletterController::class, 'store'])->middleware('throttle:5,1')->name('newsletter.subscribe');
 
 Route::get('/register', [RegistrationController::class, 'create'])->name('register');
 Route::post('/register', [RegistrationController::class, 'store'])->middleware('throttle:6,1')->name('register.store');
@@ -34,7 +34,7 @@ Route::post('/login', [SessionController::class, 'store'])->middleware('throttle
 Route::post('/logout', [SessionController::class, 'destroy'])->name('logout');
 
 Route::get('/seller/register', [SellerRegistrationController::class, 'create'])->name('seller.register');
-Route::post('/seller/register', [SellerRegistrationController::class, 'store'])->name('seller.register.store');
+Route::post('/seller/register', [SellerRegistrationController::class, 'store'])->middleware('throttle:6,1')->name('seller.register.store');
 Route::view('/seller/register/submitted', 'seller.registration-submitted')->name('seller.registration.submitted');
 
 Route::get('/seller/activate/{seller}', [ActivationController::class, 'show'])->middleware('signed')->name('seller.activate');
