@@ -81,7 +81,7 @@ On the app service's **Variables** tab:
 | `POSTMARK_TOKEN` | your Postmark Server API Token | read by `config/services.php` → `postmark.token`; requires `composer require symfony/postmark-mailer symfony/http-client` (already installed) |
 | `MAIL_FROM_ADDRESS` | the email address verified as a Postmark Sender Signature (or a verified sending domain, once one exists) | Postmark rejects sends from an unverified `From` address |
 | `MAIL_FROM_NAME` | `${APP_NAME}` | |
-| `RECAPTCHA_SITE_KEY` / `RECAPTCHA_SECRET_KEY` | your production reCAPTCHA keys | only if the RFQ form's recaptcha check is enabled — see `.env.example` |
+| `RECAPTCHA_SITE_KEY` / `RECAPTCHA_SECRET_KEY` | your production reCAPTCHA v2 (Checkbox) keys, registered for the live domain at [google.com/recaptcha/admin](https://www.google.com/recaptcha/admin) | gates the reCAPTCHA widget on every public form (RFQ, seller registration, newsletter signup, buyer login/registration) — `App\Rules\Recaptcha` no-ops and no widget renders while either is unset, so this is safe to leave blank until keys exist |
 
 Do not copy values from your local `.env` — generate fresh credentials for
 production, particularly `APP_KEY` and any mail/recaptcha secrets.
