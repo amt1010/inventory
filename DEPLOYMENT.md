@@ -69,6 +69,7 @@ On the app service's **Variables** tab:
 | `DB_CONNECTION` | `mysql` | |
 | `DB_URL` | `${{MySQL.MYSQL_URL}}` (reference Railway's MySQL service variable — exact name per step 2) | |
 | `SESSION_DRIVER` | `redis` | rides on the `redis` cache store (Laravel's `SessionManager` resolves sessions through `cache()->store('redis')`) — same durability across redeploys as the old `database` driver, without hitting MySQL on every request |
+| `SESSION_SECURE_COOKIE` | `true` | **Required** — `config/session.php` defaults this to `env('SESSION_SECURE_COOKIE')` with no fallback, and Laravel treats an unset value as `false`, so without this the session cookie is sent over plain HTTP too. Left unset in `.env.example` since local dev runs over `http://127.0.0.1` without TLS |
 | `CACHE_STORE` | `redis` | offloads cache reads/writes from MySQL |
 | `QUEUE_CONNECTION` | `redis` | this app queues its outbound emails (seller activation/approval/rejection, product-listing notifications, RFQ notifications — see `CLAUDE.md`), so a real queue backend is required; needs the queue-worker service in step 7 actually running to process jobs |
 | `REDIS_URL` | `${{Redis.REDIS_URL}}` (reference Railway's Redis service variable — exact name per step 3) | Laravel's `ConfigurationUrlParser` derives host/port/password from this URL and those values take precedence over any discrete `REDIS_HOST`/`REDIS_PORT`/`REDIS_PASSWORD` vars, so `REDIS_URL` alone is sufficient — no need to set the discrete vars in production |
