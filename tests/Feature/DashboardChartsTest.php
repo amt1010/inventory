@@ -124,6 +124,52 @@ class DashboardChartsTest extends TestCase
     }
 
     /**
+     * These three charts label each bar via the legend (generateLabels
+     * above), so the y-axis count scale is redundant -- hide it.
+     */
+    public function test_products_by_status_chart_hides_the_y_axis_ticks(): void
+    {
+        $method = new \ReflectionMethod(ProductsByStatusChart::class, 'getOptions');
+        $method->setAccessible(true);
+        $js = (string) $method->invoke(new ProductsByStatusChart());
+
+        $this->assertStringContainsString('ticks: { display: false }', $js);
+    }
+
+    public function test_categories_by_status_chart_hides_the_y_axis_ticks(): void
+    {
+        $method = new \ReflectionMethod(CategoriesByStatusChart::class, 'getOptions');
+        $method->setAccessible(true);
+        $js = (string) $method->invoke(new CategoriesByStatusChart());
+
+        $this->assertStringContainsString('ticks: { display: false }', $js);
+    }
+
+    public function test_sellers_by_status_chart_hides_the_y_axis_ticks(): void
+    {
+        $method = new \ReflectionMethod(SellersByStatusChart::class, 'getOptions');
+        $method->setAccessible(true);
+        $js = (string) $method->invoke(new SellersByStatusChart());
+
+        $this->assertStringContainsString('ticks: { display: false }', $js);
+    }
+
+    /**
+     * Unlike the three status charts, this one has no per-bar legend
+     * (legend is disabled outright), so its y-axis counts must stay visible.
+     */
+    public function test_quote_requests_chart_keeps_the_y_axis_ticks_visible(): void
+    {
+        QuoteRequest::factory()->create(['created_at' => now()]);
+
+        $method = new \ReflectionMethod(QuoteRequestsByDateChart::class, 'getOptions');
+        $method->setAccessible(true);
+        $js = $method->invoke(new QuoteRequestsByDateChart())->toHtml();
+
+        $this->assertStringNotContainsString('ticks:', $js);
+    }
+
+    /**
      * Filament renders a chart widget's options with `@js()` straight into the
      * `x-data="chart({...})"` attribute. Unlike the dataset, RawJs is emitted
      * verbatim, so a single raw `"` in it closes the attribute early, Alpine

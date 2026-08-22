@@ -66,12 +66,19 @@ class ProductsByStatusChart extends ChartWidget
      * Chart.js's default legend shows a single swatch for the whole
      * dataset, which doesn't reflect this chart's per-bar colors. Build
      * one legend entry per bar/status instead, using that bar's own
-     * background/border color.
+     * background/border color. The legend already names each bar, so the
+     * y-axis count labels are redundant here -- hide them (unlike
+     * QuoteRequestsByDateChart, which has no per-bar legend and keeps them).
      */
     protected function getOptions(): array | RawJs | null
     {
         return RawJs::make(<<<'JS'
             {
+                scales: {
+                    y: {
+                        ticks: { display: false },
+                    },
+                },
                 plugins: {
                     legend: {
                         labels: {
