@@ -11,6 +11,7 @@ use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\EditAction;
@@ -132,6 +133,21 @@ class CategoryResource extends Resource
                     ->color('gray')
                     ->visible(fn (Category $record) => $record->status === 'published')
                     ->url(fn (Category $record) => url('/products/'.$record->path()))->openUrlInNewTab(),
+                Action::make('unpublish')
+                    ->label('Unpublish')
+                    ->icon('heroicon-o-eye-slash')
+                    ->color('danger')
+                    ->visible(fn (Category $record) => $record->status === 'published'
+                        && (auth('staff')->user()?->can('update', $record) ?? false))
+                    ->requiresConfirmation()
+                    ->action(function (Category $record) {
+                        $record->unpublish();
+
+                        Notification::make()
+                            ->title('Category unpublished')
+                            ->success()
+                            ->send();
+                    }),
                 EditAction::make(),
             ])
             ->paginated(false)

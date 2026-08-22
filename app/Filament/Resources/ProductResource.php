@@ -178,6 +178,21 @@ class ProductResource extends Resource
                             ]);
                         }
                     }),
+                Action::make('unpublish')
+                    ->label('Unpublish')
+                    ->icon('heroicon-o-eye-slash')
+                    ->color('danger')
+                    ->visible(fn (Product $record) => $record->status === 'published'
+                        && (auth('staff')->user()?->can('approve', Product::class) ?? false))
+                    ->requiresConfirmation()
+                    ->action(function (Product $record) {
+                        $record->unpublish();
+
+                        Notification::make()
+                            ->title('Product unpublished')
+                            ->success()
+                            ->send();
+                    }),
             ]);
     }
 

@@ -16,6 +16,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
@@ -227,6 +228,21 @@ class PageResource extends Resource
                     ->color('gray')
                     ->visible(fn (Page $record) => $record->status === 'published')
                     ->url(fn (Page $record) => $record->slug === 'home' ? url('/') : url('/'.$record->slug))->openUrlInNewTab(),
+                Action::make('unpublish')
+                    ->label('Unpublish')
+                    ->icon('heroicon-o-eye-slash')
+                    ->color('danger')
+                    ->visible(fn (Page $record) => $record->status === 'published'
+                        && (auth('staff')->user()?->can('update', $record) ?? false))
+                    ->requiresConfirmation()
+                    ->action(function (Page $record) {
+                        $record->unpublish();
+
+                        Notification::make()
+                            ->title('Page unpublished')
+                            ->success()
+                            ->send();
+                    }),
             ]);
     }
 

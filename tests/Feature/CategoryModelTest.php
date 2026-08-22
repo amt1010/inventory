@@ -32,4 +32,13 @@ class CategoryModelTest extends TestCase
 
         $this->assertNull($category->proposedBy);
     }
+
+    public function test_a_published_category_can_be_unpublished(): void
+    {
+        $category = Category::factory()->create(['status' => 'published']);
+
+        $category->unpublish();
+
+        $this->assertSame('draft', $category->fresh()->status);
+    }
 }

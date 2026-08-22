@@ -46,6 +46,15 @@ class ProductModelTest extends TestCase
         $this->assertSame('published', $product->fresh()->status);
     }
 
+    public function test_a_published_product_can_be_unpublished(): void
+    {
+        $product = Product::factory()->create(['status' => 'published', 'price_display' => '₹1,000']);
+
+        $product->unpublish();
+
+        $this->assertSame('pending_review', $product->fresh()->status);
+    }
+
     public function test_quantity_is_fillable_and_nullable(): void
     {
         $product = Product::factory()->create(['quantity' => 500]);

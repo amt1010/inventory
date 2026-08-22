@@ -105,6 +105,12 @@ class Product extends Model
         return $this->status === 'published' ? 'pending_review' : $this->status;
     }
 
+    public function unpublish(): void
+    {
+        $this->status = 'pending_review';
+        $this->save();
+    }
+
     public function primaryImage(): ?ProductImage
     {
         return $this->images->firstWhere('is_primary', true) ?? $this->images->first();

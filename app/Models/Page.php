@@ -21,4 +21,10 @@ class Page extends Model
     {
         return $this->status === 'published';
     }
+
+    public function unpublish(): void
+    {
+        $this->status = 'draft';
+        $this->save();
+    }
 }
