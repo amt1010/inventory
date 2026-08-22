@@ -64,7 +64,7 @@ On the app service's **Variables** tab:
 | `APP_KEY` | generate locally with `php artisan key:generate --show`, paste the output | Laravel refuses to boot without one |
 | `APP_ENV` | `production` | |
 | `APP_DEBUG` | `false` | **Required** — this project has 3 known, accepted `laravel/framework` advisories that are only exploitable in debug mode (see `CLAUDE.md` "Known issues") |
-| `APP_URL` | your Railway-assigned or custom domain, e.g. `https://your-app.up.railway.app` | used to build absolute URLs (RFQ/seller emails, sitemaps, etc.) |
+| `APP_URL` | your Railway-assigned or custom domain, e.g. `https://your-app.up.railway.app` | used to build absolute URLs (RFQ/seller emails, sitemaps, etc.) — **must exactly match the domain and scheme you actually browse the site on, and be kept in sync if you add a custom domain later.** `config/filesystems.php`'s `public` disk builds every uploaded file's URL (product images, page hero images, the site logo) from this value directly, not from the current request, so a stale or mismatched `APP_URL` makes Filament's image upload fields spin on "Waiting for size" forever with no visible error — reproduced locally by pointing `APP_URL` at the wrong port |
 | `APP_TIMEZONE` | `Asia/Kolkata` | this is an India-based business; pricing/GST features assume IST |
 | `DB_CONNECTION` | `mysql` | |
 | `DB_URL` | `${{MySQL.MYSQL_URL}}` (reference Railway's MySQL service variable — exact name per step 2) | |

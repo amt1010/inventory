@@ -61,28 +61,31 @@ class SellerPanelProvider extends PanelProvider
 
     public function panel(Panel $panel): Panel
     {
-        // Reading branding from the database at boot means this must survive
-        // the `settings` table (or its seller_* columns) not existing yet --
-        // this provider boots on every artisan invocation, including the
-        // `migrate` command that creates that very table.
-        $branding = Schema::hasTable('settings') ? Setting::current() : null;
-        $accentColor = filled($branding?->theme_accent_color)
-            ? $branding->theme_accent_color
-            : '#ff6a00';
-        $brandName = filled($branding?->site_name)
-            ? $branding->site_name
-            : config('app.name');
+        // Resolved via closures (evaluated per-render, not once at boot) so
+        // branding changes take effect without needing a process restart --
+        // matches the public layout's view-composer pattern in
+        // AppServiceProvider::boot(), which already re-reads on every render.
+        // Also must survive the `settings` table (or its seller_* columns)
+        // not existing yet, since this provider boots on every artisan
+        // invocation, including the `migrate` command that creates it.
+        $branding = fn () => Schema::hasTable('settings') ? Setting::current() : null;
+        $brandName = fn () => filled($branding()?->site_name) ? $branding()->site_name : config('app.name');
 
         return $panel
             ->id('seller')
             ->path('seller')
             ->login()
             ->authGuard('seller')
-            ->colors([
-                'primary' => Color::hex($accentColor),
+            ->colors(fn () => [
+                'primary' => Color::hex(filled($branding()?->theme_accent_color) ? $branding()->theme_accent_color : '#ff6a00'),
             ])
             ->brandName($brandName)
-            ->brandLogo($branding?->logo_path ? asset('storage/'.$branding->logo_path) : null)
+            ->brandLogo(fn () => $branding()?->logo_path
+                ? view('filament.partials.brand', [
+                    'logoUrl' => asset('storage/'.$branding()->logo_path),
+                    'brandName' => $brandName(),
+                ])
+                : null)
             ->discoverResources(in: app_path('Filament/Seller/Resources'), for: 'App\\Filament\\Seller\\Resources')
             ->discoverPages(in: app_path('Filament/Seller/Pages'), for: 'App\\Filament\\Seller\\Pages')
             ->pages([

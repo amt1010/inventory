@@ -197,6 +197,28 @@ class SettingsTest extends TestCase
         $response->assertOk();
     }
 
+    public function test_the_admin_panel_shows_both_the_logo_and_the_site_name_when_a_logo_is_set(): void
+    {
+        Setting::current()->update(['site_name' => 'Acme Portal', 'logo_path' => 'logos/acme.png']);
+
+        $response = $this->get('/admin/login');
+
+        $response->assertOk();
+        $response->assertSee('storage/logos/acme.png', false);
+        $response->assertSee('Acme Portal');
+    }
+
+    public function test_the_seller_panel_shows_both_the_logo_and_the_site_name_when_a_logo_is_set(): void
+    {
+        Setting::current()->update(['site_name' => 'Acme Portal', 'logo_path' => 'logos/acme.png']);
+
+        $response = $this->get('/seller/login');
+
+        $response->assertOk();
+        $response->assertSee('storage/logos/acme.png', false);
+        $response->assertSee('Acme Portal');
+    }
+
     public function test_admin_login_survives_empty_saved_branding_values(): void
     {
         Setting::current()->update([

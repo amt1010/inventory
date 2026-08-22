@@ -49,13 +49,14 @@ class AdminPanelProvider extends PanelProvider
 
     public function panel(Panel $panel): Panel
     {
-        $branding = Schema::hasTable('settings') ? Setting::current() : null;
-        $accentColor = filled($branding?->theme_accent_color)
-            ? $branding->theme_accent_color
-            : '#ff6a00';
-        $brandName = filled($branding?->site_name)
-            ? $branding->site_name
-            : config('app.name');
+        // Panel providers boot once per process (not per request under a
+        // long-running server), but PHP-FPM's traditional one-request-per-boot
+        // model means this has never surfaced -- still, resolving branding via
+        // closures rather than baking in values read here keeps it correct
+        // either way, and matches the public layout's view-composer pattern
+        // (AppServiceProvider::boot()), which already re-reads on every render.
+        $branding = fn () => Schema::hasTable('settings') ? Setting::current() : null;
+        $brandName = fn () => filled($branding()?->site_name) ? $branding()->site_name : config('app.name');
 
         return $panel
             ->default()
@@ -63,11 +64,16 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->authGuard('staff')
-            ->colors([
-                'primary' => Color::hex($accentColor),
+            ->colors(fn () => [
+                'primary' => Color::hex(filled($branding()?->theme_accent_color) ? $branding()->theme_accent_color : '#ff6a00'),
             ])
             ->brandName($brandName)
-            ->brandLogo($branding?->logo_path ? asset('storage/'.$branding->logo_path) : null)
+            ->brandLogo(fn () => $branding()?->logo_path
+                ? view('filament.partials.brand', [
+                    'logoUrl' => asset('storage/'.$branding()->logo_path),
+                    'brandName' => $brandName(),
+                ])
+                : null)
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
