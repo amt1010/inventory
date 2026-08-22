@@ -219,6 +219,30 @@ class SettingsTest extends TestCase
         $response->assertSee('Acme Portal');
     }
 
+    public function test_the_public_layout_uses_the_brand_favicon(): void
+    {
+        $response = $this->get('/');
+
+        $response->assertOk();
+        $response->assertSee('<link rel="icon" type="image/svg+xml" href="'.asset('favicon.svg').'">', false);
+    }
+
+    public function test_the_admin_panel_uses_the_brand_favicon(): void
+    {
+        $response = $this->get('/admin/login');
+
+        $response->assertOk();
+        $response->assertSee('href="'.asset('favicon.svg').'"', false);
+    }
+
+    public function test_the_seller_panel_uses_the_brand_favicon(): void
+    {
+        $response = $this->get('/seller/login');
+
+        $response->assertOk();
+        $response->assertSee('href="'.asset('favicon.svg').'"', false);
+    }
+
     public function test_admin_login_survives_empty_saved_branding_values(): void
     {
         Setting::current()->update([

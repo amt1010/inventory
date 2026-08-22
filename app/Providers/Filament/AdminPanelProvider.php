@@ -64,6 +64,7 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->authGuard('staff')
+            ->favicon(asset('favicon.svg'))
             ->colors(fn () => [
                 'primary' => Color::hex(filled($branding()?->theme_accent_color) ? $branding()->theme_accent_color : '#ff6a00'),
             ])
