@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -18,6 +19,8 @@ return Application::configure(basePath: dirname(__DIR__))
         // The edge's IP isn't fixed, and the container has no other public
         // ingress, so trusting all proxies here is safe.
         $middleware->trustProxies(at: '*');
+
+        $middleware->append(SecurityHeaders::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
