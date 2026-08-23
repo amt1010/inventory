@@ -4,11 +4,11 @@ namespace App\Filament\Imports;
 
 use App\Models\AuditLog;
 use App\Models\Product;
-use App\Services\CategoryChainResolver;
+use App\Services\CategoryProductRowResolver;
+use App\Support\MaterialType;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class CategoryProductImporter extends Importer
@@ -46,41 +46,12 @@ class CategoryProductImporter extends Importer
 
     public function resolveRecord(): ?Product
     {
-        $category = (new CategoryChainResolver())->resolve([
-            'parent_name' => $this->data['parent_name'] ?? null,
-            'parent_description' => $this->data['parent_description'] ?? null,
-            'sub1_name' => $this->data['sub1_name'] ?? null,
-            'sub1_description' => $this->data['sub1_description'] ?? null,
-            'sub2_name' => $this->data['sub2_name'] ?? null,
-            'sub2_description' => $this->data['sub2_description'] ?? null,
-        ]);
-
-        $name = trim((string) ($this->data['product_name'] ?? ''));
-
-        if ($name === '') {
-            return null;
-        }
-
-        $existing = Product::query()
-            ->where('category_id', $category->id)
-            ->whereRaw('LOWER(name) = ?', [mb_strtolower($name)])
-            ->first();
-
-        if ($existing) {
-            return null;
-        }
-
-        $product = new Product();
-        $product->category_id = $category->id;
-        $product->name = $name;
-        $product->slug = $this->uniqueSlug($name, $category->id);
-
-        return $product;
+        return (new CategoryProductRowResolver())->resolveProduct($this->data);
     }
 
     protected function beforeCreate(): void
     {
-        $materialType = $this->normalizeMaterialType($this->data['type'] ?? null);
+        $materialType = MaterialType::normalize($this->data['type'] ?? null);
 
         if ($materialType === null) {
             throw ValidationException::withMessages([
@@ -92,31 +63,6 @@ class CategoryProductImporter extends Importer
         $this->record->status = 'pending_review';
         $this->record->seller_id = null;
         $this->record->created_by = 'admin_bulk_upload';
-    }
-
-    private function normalizeMaterialType(?string $value): ?string
-    {
-        $normalized = mb_strtolower(trim((string) $value));
-
-        return match (true) {
-            $normalized === 'raw material' => 'raw_material',
-            in_array($normalized, ['finished good', 'finished goods'], true) => 'finished_good',
-            default => null,
-        };
-    }
-
-    private function uniqueSlug(string $name, int $categoryId): string
-    {
-        $base = Str::slug($name);
-        $slug = $base;
-        $suffix = 2;
-
-        while (Product::query()->where('category_id', $categoryId)->where('slug', $slug)->exists()) {
-            $slug = "{$base}-{$suffix}";
-            $suffix++;
-        }
-
-        return $slug;
     }
 
     public static function getCompletedNotificationBody(Import $import): string
