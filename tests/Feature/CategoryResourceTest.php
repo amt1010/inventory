@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Staff;
 use Database\Seeders\RoleSeeder;
 use Filament\Forms\Components\Select;
+use Filament\Notifications\Notification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -104,6 +105,33 @@ class CategoryResourceTest extends TestCase
 
         $newParent = Category::where('name', 'New Parent')->firstOrFail();
         $this->assertSame($newParent->id, $orphan->refresh()->parent_id);
+    }
+
+    public function test_linking_an_existing_category_that_would_form_a_cycle_is_rejected(): void
+    {
+        $this->seed(RoleSeeder::class);
+        $admin = Staff::factory()->create();
+        $admin->assignRole('admin');
+        $this->actingAs($admin, 'staff');
+
+        $existing = Category::factory()->create(['name' => 'Electronics', 'parent_id' => null]);
+
+        // Creating "Consumer Electronics" as a child of "Electronics" while
+        // also linking "Electronics" underneath the new record in the same
+        // request would make the two categories each other's ancestor.
+        Livewire::test(CreateCategory::class)
+            ->fillForm([
+                'name' => 'Consumer Electronics',
+                'slug' => 'consumer-electronics',
+                'status' => 'draft',
+                'parent_id' => $existing->id,
+                'link_existing' => [$existing->id],
+            ])
+            ->call('create');
+
+        Notification::assertNotified();
+        $this->assertNull($existing->fresh()->parent_id);
+        $this->assertFalse(Category::where('name', 'Consumer Electronics')->exists());
     }
 
     public function test_the_subcategories_field_appears_before_the_description_field(): void

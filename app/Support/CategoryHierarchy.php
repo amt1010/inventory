@@ -74,7 +74,15 @@ class CategoryHierarchy
         }
 
         $ids = [];
-        $collect = function (int $id) use (&$collect, $childrenOf, &$ids): void {
+        $seen = [];
+        // A corrupt tree (categories pointing at each other, however it got that
+        // way) would otherwise recurse forever here -- the same guard path() and
+        // pathLabel() already use to stay bounded.
+        $collect = function (int $id) use (&$collect, $childrenOf, &$ids, &$seen): void {
+            if (isset($seen[$id])) {
+                return;
+            }
+            $seen[$id] = true;
             $ids[] = $id;
             foreach ($childrenOf[$id] ?? [] as $childId) {
                 $collect($childId);
