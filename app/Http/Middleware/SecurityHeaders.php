@@ -11,12 +11,14 @@ class SecurityHeaders
     /**
      * Filament (admin/seller) ships its own JS/CSS locally (public/js|css/filament/*),
      * so 'self' covers both panels — only the public catalog layout pulls from a CDN.
+     * ui-avatars.com is Filament's default AvatarProvider (no custom one is
+     * registered) — every staff/seller user menu avatar loads from there.
      */
     private const CSP = "default-src 'self'; "
         ."script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/; "
         ."style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; "
         ."font-src 'self' https://fonts.gstatic.com data:; "
-        ."img-src 'self' data: blob:; "
+        ."img-src 'self' data: blob: https://ui-avatars.com; "
         ."connect-src 'self'; "
         ."frame-src 'self' https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/; "
         ."frame-ancestors 'self'; "

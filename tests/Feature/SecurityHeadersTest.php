@@ -41,6 +41,16 @@ class SecurityHeadersTest extends TestCase
         $this->assertStringContainsString('frame-src', $csp);
     }
 
+    public function test_the_content_security_policy_allows_filaments_default_avatar_provider(): void
+    {
+        $response = $this->get(route('login'));
+
+        $csp = $response->headers->get('Content-Security-Policy');
+
+        $this->assertStringContainsString('img-src', $csp);
+        $this->assertStringContainsString('https://ui-avatars.com', $csp);
+    }
+
     public function test_hsts_is_sent_on_secure_requests_but_not_on_plain_http(): void
     {
         $secure = $this->get('https://surpluskart.test/login');
