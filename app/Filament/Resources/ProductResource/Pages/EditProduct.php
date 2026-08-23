@@ -27,7 +27,7 @@ class EditProduct extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        if ($this->record->status !== 'pending_review') {
+        if ($this->record->status !== 'pending_review' || $this->record->seller_id === null) {
             return $data;
         }
 

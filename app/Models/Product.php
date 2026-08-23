@@ -90,6 +90,10 @@ class Product extends Model
     {
         $blockers = [];
 
+        if (blank($this->seller_id)) {
+            $blockers[] = "Assign a seller on the product's edit form before publishing.";
+        }
+
         if (blank($this->price_display)) {
             $blockers[] = 'Set a price on the product’s edit form (the “Price” field, Admin only).';
         }
