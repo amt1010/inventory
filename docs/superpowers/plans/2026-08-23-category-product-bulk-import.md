@@ -935,9 +935,17 @@ class CategoryProductImporterTest extends TestCase
 
     public function test_a_blank_type_cell_fails_the_row(): void
     {
+        // Mirrors how Filament's own import job invokes an Importer in
+        // production (vendor/filament/actions/src/Imports/Jobs/ImportCsv.php)
+        // -- it catches ValidationException from a row and logs it as a
+        // failed row rather than letting it abort the whole batch.
         $importer = new CategoryProductImporter($this->makeImport(), $this->columnMap(), []);
 
-        $importer($this->baseRow(['type' => '']));
+        try {
+            $importer($this->baseRow(['type' => '']));
+        } catch (\Illuminate\Validation\ValidationException) {
+            // expected -- a real import job would log this as a failed row
+        }
 
         $this->assertSame(0, Product::count());
     }
@@ -981,6 +989,15 @@ Expected: FAIL — `Class "App\Filament\Imports\CategoryProductImporter" not fou
 
 - [ ] **Step 4: Write `CategoryProductImporter`**
 
+**Discovered during execution:** Filament's default `fillRecord()` step
+(which runs after `resolveRecord()`) tries to write *every* declared
+`ImportColumn` onto the resolved model by matching name — but `product_name`,
+`type`, and the six category-chain columns aren't real `Product` columns,
+so this raised `SQLSTATE[...] table products has no column named
+product_name`. Each of those eight columns needs an explicit no-op
+`->fillRecordUsing(fn () => null)` to suppress that default write (the code
+below already includes this — it wasn't in the original plan draft).
+
 ```php
 <?php
 
@@ -1000,15 +1017,17 @@ class CategoryProductImporter extends Importer
 
     public static function getColumns(): array
     {
+        $noop = fn () => null;
+
         return [
-            ImportColumn::make('product_name')->label('Product NAME'),
-            ImportColumn::make('type')->label('TYPE'),
-            ImportColumn::make('parent_name')->label('PARENT CATEGORY NAME')->requiredMapping(),
-            ImportColumn::make('parent_description')->label('PARENT CATEGORY Description'),
-            ImportColumn::make('sub1_name')->label('Sub-Category-1 Name'),
-            ImportColumn::make('sub1_description')->label('Sub-Category-1 Description'),
-            ImportColumn::make('sub2_name')->label('Sub-Category-2 Name'),
-            ImportColumn::make('sub2_description')->label('Sub-Category-2 Description'),
+            ImportColumn::make('product_name')->label('Product NAME')->fillRecordUsing($noop),
+            ImportColumn::make('type')->label('TYPE')->fillRecordUsing($noop),
+            ImportColumn::make('parent_name')->label('PARENT CATEGORY NAME')->requiredMapping()->fillRecordUsing($noop),
+            ImportColumn::make('parent_description')->label('PARENT CATEGORY Description')->fillRecordUsing($noop),
+            ImportColumn::make('sub1_name')->label('Sub-Category-1 Name')->fillRecordUsing($noop),
+            ImportColumn::make('sub1_description')->label('Sub-Category-1 Description')->fillRecordUsing($noop),
+            ImportColumn::make('sub2_name')->label('Sub-Category-2 Name')->fillRecordUsing($noop),
+            ImportColumn::make('sub2_description')->label('Sub-Category-2 Description')->fillRecordUsing($noop),
             ImportColumn::make('sku')->label('SKU / Product Number'),
             ImportColumn::make('short_description')->label('Product Short Description'),
             ImportColumn::make('features')->label('Product Feature'),
