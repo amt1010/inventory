@@ -513,6 +513,39 @@ In `app/Models/Product.php`, add a check to the `publishBlockers()` method:
     }
 ```
 
+- [ ] **Step 3.5: Drop `seller_id`'s form-level `->required()` on the admin form (discovered during execution)**
+
+`ProductResource::form()`'s `Select::make('seller_id')` was `->required()`.
+Filament revalidates the *whole* form on every save, not just changed fields
+— so a seller-less product couldn't be saved at all (any edit, not just
+publishing) without an admin picking a seller in that same step, defeating
+the "assign a seller later, while approving for publish" design. Fix it the
+same way `price_display` already works in this exact form: optional at the
+form level, enforced only by `publishBlockers()` where it actually matters.
+
+In `app/Filament/Resources/ProductResource.php`, change:
+
+```php
+            Select::make('seller_id')
+                ->label('Seller')
+                ->options(fn () => Seller::query()->pluck('company_name', 'id'))
+                ->searchable()
+                ->required(),
+```
+
+to:
+
+```php
+            Select::make('seller_id')
+                ->label('Seller')
+                ->options(fn () => Seller::query()->pluck('company_name', 'id'))
+                ->searchable()
+                ->helperText('Optional for a bulk-imported product until it\'s ready to publish — required only at that point, enforced by the Publish action.'),
+```
+
+No existing test asserts `seller_id` is form-required (confirmed via
+`grep -rn "seller_id.*required" tests/Feature`), so this is a safe removal.
+
 - [ ] **Step 4: Update `EditProduct`'s early return**
 
 In `app/Filament/Resources/ProductResource/Pages/EditProduct.php`, change:
