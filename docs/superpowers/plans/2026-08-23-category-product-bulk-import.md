@@ -1357,7 +1357,15 @@ Expected: PASS (2 tests)
 - [ ] **Step 8: Run the full suite to check for regressions**
 
 Run: `php artisan test`
-Expected: PASS — no existing test enumerates `RoleSeeder::AREAS`/`ROLE_MATRIX` directly, so adding `audit_logs` to both is a no-op for every other test.
+Expected: FAIL in `tests/Feature/RoleSeederTest.php` — it enumerates the
+exact resulting permission list, not the `AREAS`/`ROLE_MATRIX` constants
+directly (a plain grep for those constant names won't find it). Fix it:
+`test_it_creates_21_staff_guard_permissions` expects `30`, change to `33`
+(11 areas × 3 tiers, up from 10); `test_admin_role_gets_full_permission_in_every_area`
+needs `'audit_logs.full'` added (alphabetically first) to its expected array.
+`content_editor`/`sales` tests need no change — `audit_logs` is `null` for
+both. Re-run `php artisan test --filter=RoleSeederTest`, then the full suite
+again to confirm.
 
 - [ ] **Step 9: Apply the migration to the dev database and commit**
 
