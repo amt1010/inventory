@@ -198,6 +198,42 @@ needed there).
   calls `AuditLog::recordCompletion($import, 'Category & Product Import')`
   (see below).
 
+## XLSX Support (added post-launch)
+
+The CSV-only importer above shipped first; the actual issue and its attached
+sample sheet call for Excel too. Filament v3's `Importer`/`ImportAction` is
+CSV-only end-to-end in the installed version (`v3.3.54`) — file validation,
+the column-mapping preview, and the queued row-processing job all assume
+`league/csv` directly, with no v3-level escape hatch to feed it `.xlsx`.
+Native XLSX import only exists in Filament v4 (a breaking major upgrade),
+so this is handled independently instead:
+
+- The category/product-resolution rules (`CategoryChainResolver`'s row
+  algorithm, duplicate-skip, blank-name placeholder) were extracted out of
+  `CategoryProductImporter` into `App\Services\CategoryProductRowResolver`,
+  and the material-type parsing into `App\Support\MaterialType` — both
+  pure refactors, so the existing CSV behavior and its tests are unchanged.
+- `App\Services\CategoryProductXlsxImportRunner` reads an uploaded workbook
+  directly with `openspout/openspout` (already installed as a transitive
+  dependency of Filament's own XLSX *export* feature — no new Composer
+  dependency), matching header text case-insensitively to the same
+  fourteen canonical fields, and calls the two shared services above per
+  row so both formats produce identical results from the same data.
+- Runs synchronously in the request, not through Filament's queued `Import`
+  infrastructure — sheets for this feature are small (dozens to low
+  hundreds of rows), and standing up a second queued pipeline just to
+  mirror Filament's CSV path wasn't worth the added complexity.
+- Wired in as a second, independent header action, "Import from Excel
+  (.xlsx)", next to the existing CSV one on `/admin/products` — not merged
+  into one button, since overriding Filament's internal CSV-only upload
+  validation/preview to also accept `.xlsx` would mean reaching into
+  package internals not designed for that, for comparatively little UX
+  gain over a second button.
+- Writes to the same `AuditLog` trail as the CSV path, but in one shot
+  (created with final counts already known) rather than the CSV path's
+  two-phase dispatch-then-complete pattern, since there's no queue boundary
+  to bridge here.
+
 ## Audit Logs
 
 - `App\Models\AuditLog`, table `audit_logs` (see Data Model above).
