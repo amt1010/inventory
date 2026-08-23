@@ -10,6 +10,7 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -101,6 +102,10 @@ class CategoryResource extends Resource
                 ->options(['draft' => 'Draft', 'published' => 'Published'])
                 ->default('draft')
                 ->required(),
+            Toggle::make('show_in_breadcrumb')
+                ->label('Show in Breadcrumb')
+                ->helperText('When off, this category\'s name is skipped in the public breadcrumb trail -- its descendants still link correctly.')
+                ->default(true),
             TextInput::make('sort_order')
                 ->numeric()
                 ->default(0),
