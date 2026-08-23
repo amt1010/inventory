@@ -17,6 +17,7 @@ class Product extends Model
         'seller_id', 'category_id', 'name', 'slug', 'sku', 'short_description',
         'description', 'features', 'applications', 'spec_sheet_path',
         'price_display', 'quantity', 'status', 'rejection_reason', 'sort_order',
+        'material_type', 'created_by',
     ];
 
     public function category(): BelongsTo
