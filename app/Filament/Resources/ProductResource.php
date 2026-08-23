@@ -46,6 +46,10 @@ class ProductResource extends Resource
                 ->options(fn () => CategoryHierarchy::options())
                 ->searchable()
                 ->required(),
+            Select::make('material_type')
+                ->label('Raw Material or Finished Good')
+                ->options(['raw_material' => 'Raw Material', 'finished_good' => 'Finished Good'])
+                ->required(),
             TextInput::make('name')
                 ->required()
                 ->live(onBlur: true)

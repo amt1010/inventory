@@ -95,6 +95,10 @@ class ProductResource extends Resource
                 ->label('')
                 ->content('Category status: Draft — an administrator needs to review and publish this category before your product can go live.')
                 ->visible(fn (callable $get) => optional(Category::find($get('category_id')))->status === 'draft'),
+            Select::make('material_type')
+                ->label('Raw Material or Finished Good')
+                ->options(['raw_material' => 'Raw Material', 'finished_good' => 'Finished Good'])
+                ->required(),
             TextInput::make('name')
                 ->required()
                 ->live(onBlur: true)
