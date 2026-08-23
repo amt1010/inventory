@@ -125,33 +125,35 @@ class DashboardChartsTest extends TestCase
 
     /**
      * These three charts label each bar via the legend (generateLabels
-     * above), so the y-axis count scale is redundant -- hide it.
+     * above), so both axes' tick labels are redundant -- the x-axis repeats
+     * the same status names the legend already shows under each swatch, and
+     * the y-axis repeats the counts each bar's height already conveys.
      */
-    public function test_products_by_status_chart_hides_the_y_axis_ticks(): void
+    public function test_products_by_status_chart_hides_both_axes_ticks(): void
     {
         $method = new \ReflectionMethod(ProductsByStatusChart::class, 'getOptions');
         $method->setAccessible(true);
         $js = (string) $method->invoke(new ProductsByStatusChart());
 
-        $this->assertStringContainsString('ticks: { display: false }', $js);
+        $this->assertSame(2, substr_count($js, 'ticks: { display: false }'));
     }
 
-    public function test_categories_by_status_chart_hides_the_y_axis_ticks(): void
+    public function test_categories_by_status_chart_hides_both_axes_ticks(): void
     {
         $method = new \ReflectionMethod(CategoriesByStatusChart::class, 'getOptions');
         $method->setAccessible(true);
         $js = (string) $method->invoke(new CategoriesByStatusChart());
 
-        $this->assertStringContainsString('ticks: { display: false }', $js);
+        $this->assertSame(2, substr_count($js, 'ticks: { display: false }'));
     }
 
-    public function test_sellers_by_status_chart_hides_the_y_axis_ticks(): void
+    public function test_sellers_by_status_chart_hides_both_axes_ticks(): void
     {
         $method = new \ReflectionMethod(SellersByStatusChart::class, 'getOptions');
         $method->setAccessible(true);
         $js = (string) $method->invoke(new SellersByStatusChart());
 
-        $this->assertStringContainsString('ticks: { display: false }', $js);
+        $this->assertSame(2, substr_count($js, 'ticks: { display: false }'));
     }
 
     /**

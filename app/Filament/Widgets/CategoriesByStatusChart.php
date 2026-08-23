@@ -63,8 +63,8 @@ class CategoriesByStatusChart extends ChartWidget
      * Chart.js's default legend shows a single swatch for the whole
      * dataset, which doesn't reflect this chart's per-bar colors. Build
      * one legend entry per bar/status instead, using that bar's own
-     * background/border color. The legend already names each bar, so the
-     * y-axis count labels are redundant here -- hide them (unlike
+     * background/border color. The legend already names each bar, so both
+     * axes' tick labels are redundant here -- hide them (unlike
      * QuoteRequestsByDateChart, which has no per-bar legend and keeps them).
      */
     protected function getOptions(): array | RawJs | null
@@ -72,6 +72,9 @@ class CategoriesByStatusChart extends ChartWidget
         return RawJs::make(<<<'JS'
             {
                 scales: {
+                    x: {
+                        ticks: { display: false },
+                    },
                     y: {
                         ticks: { display: false },
                     },
