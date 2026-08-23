@@ -1686,12 +1686,19 @@ Expected: PASS (2 tests)
 - [ ] **Step 7: Run the full suite to check for regressions**
 
 Run: `php artisan test`
-Expected: PASS.
+Expected: FAIL in `tests/Feature/AdminNavigationOrderTest.php` — it asserts
+the exact sidebar nav label order, and the new resource has no
+`navigationSort` yet so its position is unpredictable. Fix it: add
+`protected static ?int $navigationSort = 10;` to `AuditLogResource` (every
+other resource is numbered 1–9 in nav order already — `ManageSettings` is 1,
+`StaffResource` is 9 — so 10 places Audit Logs last), then add `'Audit Logs'`
+to the end of the expected array in `AdminNavigationOrderTest`. Re-run both
+that test and the full suite to confirm.
 
 - [ ] **Step 8: Commit**
 
 ```bash
-git add app/Filament/Resources/AuditLogResource.php app/Filament/Resources/AuditLogResource/Pages/ListAuditLogs.php app/Policies/AuditLogPolicy.php tests/Feature/AuditLogResourceTest.php
+git add app/Filament/Resources/AuditLogResource.php app/Filament/Resources/AuditLogResource/Pages/ListAuditLogs.php app/Policies/AuditLogPolicy.php tests/Feature/AuditLogResourceTest.php tests/Feature/AdminNavigationOrderTest.php
 git commit -m "feat: add read-only Audit Logs page for admin"
 ```
 
