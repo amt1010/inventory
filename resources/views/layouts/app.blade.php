@@ -92,7 +92,7 @@
                             </form>
                         </li>
                     @endguest
-                    <li class="nav-item"><a class="nav-link" href="{{ route('filament.seller.auth.login') }}">Login as Seller</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('seller.landing') }}">Sell With Us</a></li>
                 </ul>
             </div>
         </div>
