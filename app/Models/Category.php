@@ -14,8 +14,11 @@ class Category extends Model
 {
     use HasFactory, Searchable;
 
+    public const PLACEHOLDER = 'TO BE ADDED';
+
     protected $fillable = [
         'parent_id', 'proposed_by_seller_id', 'name', 'slug', 'description', 'image', 'status', 'sort_order',
+        'created_by',
     ];
 
     protected static function booted(): void

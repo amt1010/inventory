@@ -7,6 +7,7 @@ use App\Filament\Seller\Resources\CategoryResource\Pages\CreateCategory;
 use App\Filament\Seller\Resources\CategoryResource\Pages\ListCategories;
 use App\Models\Category;
 use App\Models\Seller;
+use Filament\Notifications\Notification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -119,6 +120,32 @@ class SellerCategoryResourceTest extends TestCase
 
         $newParent = Category::where('name', 'New Top Level')->firstOrFail();
         $this->assertSame($newParent->id, $orphan->refresh()->parent_id);
+    }
+
+    public function test_linking_an_existing_category_that_would_form_a_cycle_is_rejected(): void
+    {
+        $seller = Seller::factory()->create(['status' => 'approved']);
+        $existing = Category::factory()->create([
+            'name' => 'Electronics',
+            'parent_id' => null,
+            'status' => 'draft',
+            'proposed_by_seller_id' => $seller->id,
+        ]);
+        $this->actingAs($seller, 'seller');
+
+        // Same trap as the admin panel: the new category's own parent_id and
+        // its "link_existing" selection point at each other.
+        Livewire::test(CreateCategory::class)
+            ->fillForm([
+                'name' => 'Consumer Electronics',
+                'parent_id' => $existing->id,
+                'link_existing' => [$existing->id],
+            ])
+            ->call('create');
+
+        Notification::assertNotified();
+        $this->assertNull($existing->fresh()->parent_id);
+        $this->assertFalse(Category::where('name', 'Consumer Electronics')->exists());
     }
 
     public function test_a_seller_cannot_link_another_sellers_category(): void

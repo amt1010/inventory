@@ -40,6 +40,7 @@ class ProductResourceDehydrationSecurityTest extends TestCase
                 'category_id' => $category->id,
                 'name' => 'Test Product',
                 'slug' => 'test-product',
+                'material_type' => 'raw_material',
                 'price_display' => '₹1,200 – ₹1,800 per reel',
             ])
             ->call('create')
@@ -72,6 +73,7 @@ class ProductResourceDehydrationSecurityTest extends TestCase
                 'category_id' => $category->id,
                 'name' => 'Sneaky Product',
                 'slug' => 'sneaky-product',
+                'material_type' => 'raw_material',
                 'price_display' => '₹1,200 – ₹1,800 per reel',
                 'status' => 'published',
             ])
@@ -148,6 +150,7 @@ class ProductResourceDehydrationSecurityTest extends TestCase
                 'category_id' => $category->id,
                 'name' => 'Editor Product',
                 'slug' => 'editor-product',
+                'material_type' => 'raw_material',
                 'price_display' => '₹9,999 – hacked',
                 'status' => 'published',
             ])
@@ -177,6 +180,7 @@ class ProductResourceDehydrationSecurityTest extends TestCase
                 'category_id' => $category->id,
                 'name' => 'Editor Created Product',
                 'slug' => 'editor-created-product',
+                'material_type' => 'raw_material',
             ])
             ->call('create')
             ->assertHasNoFormErrors();

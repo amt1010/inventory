@@ -2,6 +2,7 @@
 
 namespace App\Filament\Imports;
 
+use App\Models\AuditLog;
 use App\Models\Seller;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Importer;
@@ -72,6 +73,8 @@ class SellerImporter extends Importer
         if ($failedRowsCount > 0) {
             $body .= ' '.number_format($failedRowsCount).' '.str('row')->plural($failedRowsCount).' failed to import.';
         }
+
+        AuditLog::recordCompletion($import, $body);
 
         return $body;
     }

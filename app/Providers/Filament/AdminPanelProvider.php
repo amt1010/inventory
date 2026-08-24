@@ -2,7 +2,10 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Imports\CategoryProductImporter;
+use App\Filament\Imports\SellerImporter;
 use App\Http\Middleware\EnsureStaffPasswordIsCurrent;
+use App\Models\AuditLog;
 use App\Models\Setting;
 use Filament\Actions\Imports\Models\Import;
 use Filament\Facades\Filament;
@@ -32,6 +35,26 @@ class AdminPanelProvider extends PanelProvider
     public function boot(): void
     {
         Import::polymorphicUserRelationship();
+
+        // Captured here (at dispatch time, in the same request as the admin
+        // clicking "Import") rather than in getCompletedNotificationBody(),
+        // since that method may run in a queue worker process with no
+        // session/auth context in production -- this is the one reliable
+        // moment auth('staff')->user() is guaranteed available.
+        Import::created(function (Import $import): void {
+            $label = match ($import->importer) {
+                SellerImporter::class => 'Seller Import',
+                CategoryProductImporter::class => 'Category & Product Import',
+                default => $import->importer,
+            };
+
+            AuditLog::create([
+                'importer_label' => $label,
+                'performed_by_staff_id' => auth('staff')->id(),
+                'file_name' => $import->file_name,
+                'filament_import_id' => $import->id,
+            ]);
+        });
 
         // Makes the sidebar/content divider draggable. Registered per panel and
         // guarded on the current panel id rather than passed as `scopes:` --

@@ -157,4 +157,29 @@ class AdminProductEditTrailTest extends TestCase
 
         $this->assertSame('pending_seller_acceptance', $product->fresh()->status);
     }
+
+    public function test_editing_a_seller_less_pending_review_product_sends_no_email_and_creates_no_trail(): void
+    {
+        Mail::fake();
+
+        $admin = Staff::factory()->create();
+        $admin->assignRole('admin');
+        $this->actingAs($admin, 'staff');
+
+        $product = Product::factory()->create([
+            'seller_id' => null,
+            'status' => 'pending_review',
+            'name' => 'Old Name',
+        ]);
+
+        Livewire::test(EditProduct::class, ['record' => $product->getRouteKey()])
+            ->fillForm(['name' => 'New Name'])
+            ->call('save');
+
+        $product->refresh();
+        $this->assertSame('New Name', $product->name);
+        $this->assertSame('pending_review', $product->status);
+        $this->assertSame(0, $product->editTrails()->count());
+        Mail::assertNothingQueued();
+    }
 }

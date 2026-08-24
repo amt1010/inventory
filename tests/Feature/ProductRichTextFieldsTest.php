@@ -52,6 +52,7 @@ class ProductRichTextFieldsTest extends TestCase
                 'category_id' => $category->id,
                 'name' => 'Rich Product',
                 'slug' => 'rich-product',
+                'material_type' => 'raw_material',
                 'features' => '<ul><li>One</li><li>Two</li></ul>',
                 'applications' => '<p>Broad use</p>',
             ])

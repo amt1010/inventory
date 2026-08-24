@@ -39,6 +39,7 @@ class ProductPriceFormattingTest extends TestCase
                 'category_id' => $category->id,
                 'name' => 'Priced Product',
                 'slug' => 'priced-product',
+                'material_type' => 'raw_material',
                 'price_display' => '100000 - 180000 per reel',
             ])
             ->call('create')

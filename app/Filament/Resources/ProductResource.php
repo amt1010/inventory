@@ -40,11 +40,15 @@ class ProductResource extends Resource
                 ->label('Seller')
                 ->options(fn () => Seller::query()->pluck('company_name', 'id'))
                 ->searchable()
-                ->required(),
+                ->helperText('Optional for a bulk-imported product until it\'s ready to publish — required only at that point, enforced by the Publish action.'),
             Select::make('category_id')
                 ->label('Category')
                 ->options(fn () => CategoryHierarchy::options())
                 ->searchable()
+                ->required(),
+            Select::make('material_type')
+                ->label('Raw Material or Finished Good')
+                ->options(['raw_material' => 'Raw Material', 'finished_good' => 'Finished Good'])
                 ->required(),
             TextInput::make('name')
                 ->required()

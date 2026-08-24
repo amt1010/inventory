@@ -48,6 +48,26 @@ class CategoryHierarchyTest extends TestCase
         $this->assertSame($expected, $ids);
     }
 
+    public function test_descendant_and_self_ids_terminates_when_the_tree_already_contains_a_cycle(): void
+    {
+        $a = Category::factory()->create(['name' => 'A']);
+        $b = Category::factory()->create(['name' => 'B', 'parent_id' => $a->id]);
+
+        // Simulate a tree corrupted by something that bypassed the model's
+        // cycle guard (e.g. a raw mass update) -- A and B now point at each
+        // other. withoutEvents() reproduces that without hanging the test.
+        Category::withoutEvents(function () use ($a, $b) {
+            $a->update(['parent_id' => $b->id]);
+        });
+
+        $ids = CategoryHierarchy::descendantAndSelfIds($a->fresh());
+
+        sort($ids);
+        $expected = [$a->id, $b->id];
+        sort($expected);
+        $this->assertSame($expected, $ids);
+    }
+
     public function test_admin_product_category_select_shows_the_hierarchy_path(): void
     {
         $this->seed(RoleSeeder::class);

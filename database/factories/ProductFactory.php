@@ -30,6 +30,7 @@ class ProductFactory extends Factory
             'quantity' => $this->faker->numberBetween(10, 1000),
             'status' => 'published',
             'sort_order' => 0,
+            'material_type' => $this->faker->randomElement(['raw_material', 'finished_good']),
         ];
     }
 }

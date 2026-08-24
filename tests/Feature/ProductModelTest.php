@@ -156,4 +156,35 @@ class ProductModelTest extends TestCase
 
         $this->assertSame([], $product->publishBlockers());
     }
+
+    public function test_a_product_with_no_seller_cannot_be_published(): void
+    {
+        $category = Category::factory()->create(['status' => 'published']);
+        $product = Product::factory()->create([
+            'seller_id' => null,
+            'category_id' => $category->id,
+            'price_display' => '₹1,000',
+            'status' => 'pending_review',
+        ]);
+
+        $result = $product->publish();
+
+        $this->assertFalse($result);
+        $this->assertSame('pending_review', $product->fresh()->status);
+    }
+
+    public function test_publish_blockers_reports_a_missing_seller(): void
+    {
+        $category = Category::factory()->create(['status' => 'published']);
+        $product = Product::factory()->create([
+            'seller_id' => null,
+            'category_id' => $category->id,
+            'price_display' => '₹1,000',
+        ]);
+
+        $this->assertContains(
+            "Assign a seller on the product's edit form before publishing.",
+            $product->publishBlockers()
+        );
+    }
 }

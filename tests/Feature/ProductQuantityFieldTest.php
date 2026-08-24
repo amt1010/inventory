@@ -38,6 +38,7 @@ class ProductQuantityFieldTest extends TestCase
                 'category_id' => $category->id,
                 'name' => 'Quantity Test Product',
                 'slug' => 'quantity-test-product',
+                'material_type' => 'raw_material',
                 'quantity' => 250,
             ])
             ->call('create')

@@ -17,6 +17,7 @@ class Product extends Model
         'seller_id', 'category_id', 'name', 'slug', 'sku', 'short_description',
         'description', 'features', 'applications', 'spec_sheet_path',
         'price_display', 'quantity', 'status', 'rejection_reason', 'sort_order',
+        'material_type', 'created_by',
     ];
 
     public function category(): BelongsTo
@@ -88,6 +89,10 @@ class Product extends Model
     public function publishBlockers(): array
     {
         $blockers = [];
+
+        if (blank($this->seller_id)) {
+            $blockers[] = "Assign a seller on the product's edit form before publishing.";
+        }
 
         if (blank($this->price_display)) {
             $blockers[] = 'Set a price on the product’s edit form (the “Price” field, Admin only).';

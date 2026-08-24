@@ -26,6 +26,7 @@ class SellerProductResourceTest extends TestCase
                 'category_id' => $category->id,
                 'name' => 'Aerial Fiber Cable',
                 'slug' => 'aerial-fiber-cable',
+                'material_type' => 'raw_material',
                 'quantity' => 1000,
             ])
             ->call('create')
@@ -55,6 +56,7 @@ class SellerProductResourceTest extends TestCase
                 'category_id' => $category->id,
                 'name' => 'Sneaky Product',
                 'slug' => 'sneaky-product',
+                'material_type' => 'raw_material',
                 'price_display' => '₹9,999 hacked',
                 'status' => 'published',
                 'seller_id' => $otherSeller->id,
