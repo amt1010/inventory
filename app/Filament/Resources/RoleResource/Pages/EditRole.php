@@ -18,17 +18,15 @@ class EditRole extends EditRecord
     {
         return [
             Actions\DeleteAction::make()
-                ->action(function (Role $record) {
+                ->before(function (Actions\DeleteAction $action, Role $record) {
                     if (Staff::role($record->name)->exists()) {
                         Notification::make()
                             ->title('Cannot delete a role assigned to staff')
                             ->danger()
                             ->send();
 
-                        return;
+                        $action->halt();
                     }
-
-                    $record->delete();
                 }),
         ];
     }

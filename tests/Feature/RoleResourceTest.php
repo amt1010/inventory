@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Resources\RoleResource;
 use App\Filament\Resources\RoleResource\Pages\CreateRole;
 use App\Filament\Resources\RoleResource\Pages\EditRole;
 use App\Filament\Resources\RoleResource\Pages\ListRoles;
@@ -116,5 +117,20 @@ class RoleResourceTest extends TestCase
             ->callAction('delete');
 
         $this->assertNotNull($role->fresh());
+    }
+
+    public function test_deleting_a_role_not_assigned_to_staff_succeeds_and_redirects(): void
+    {
+        $admin = Staff::factory()->create();
+        $admin->assignRole('admin');
+        $this->actingAs($admin, 'staff');
+
+        $role = Role::create(['name' => 'field_manager', 'guard_name' => 'staff']);
+
+        Livewire::test(EditRole::class, ['record' => $role->id])
+            ->callAction('delete')
+            ->assertRedirect(RoleResource::getUrl('index'));
+
+        $this->assertNull($role->fresh());
     }
 }
