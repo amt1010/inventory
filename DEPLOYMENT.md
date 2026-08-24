@@ -247,6 +247,24 @@ duplicate at once regardless of how many times it was run:
 ```
 then run `php artisan db:seed --class=CatalogSeeder` once, cleanly.
 
+**Admin panel 500s right after login, log shows
+`Spatie\Permission\Exceptions\PermissionDoesNotExist: There is no
+permission named 'X.tier' for guard 'staff'`** — a new area was added to
+`RoleSeeder::AREAS` (or a new tier/role) after the last time `RoleSeeder`
+was run against this database, so a Policy's `hasPermissionTo(...)` check
+throws instead of returning `false` because the permission row doesn't
+exist at all yet — Spatie only returns `false` for a permission that
+exists but isn't assigned, not for one that's missing outright. This bit
+`audit_logs.full` on 2026-08-24: the area was added to `RoleSeeder` in
+commit `bccc9be` but the Pre-Deploy Command never seeds (see above), so
+production's `permissions` table never got the new rows. Fix: run once
+via the Console tab:
+```
+php artisan db:seed --class=RoleSeeder
+```
+Safe to re-run any time a new area/tier/role is added to the matrix —
+`firstOrCreate`/`syncPermissions` make it idempotent.
+
 **Hyperlinks render Bootstrap's default blue instead of the brand orange**
 — `public/css/site.css` set `--bs-link-color`, but Bootstrap 5.3's actual
 CSS rule for `<a>` reads `--bs-link-color-rgb` (an RGB triplet, not a hex
