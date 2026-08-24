@@ -8,12 +8,7 @@
     @endif
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ url('/products') }}">Home</a></li>
-            @foreach ($breadcrumb as $crumb)
-                <li class="breadcrumb-item">
-                    <a href="{{ url('/products/'.collect($breadcrumb)->take($loop->iteration)->pluck('slug')->implode('/')) }}">{{ $crumb->name }}</a>
-                </li>
-            @endforeach
+            @include('catalog.partials.breadcrumb', ['breadcrumb' => $breadcrumb])
             <li class="breadcrumb-item active">{{ $product->name }}</li>
         </ol>
     </nav>

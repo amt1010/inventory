@@ -18,7 +18,11 @@ class Category extends Model
 
     protected $fillable = [
         'parent_id', 'proposed_by_seller_id', 'name', 'slug', 'description', 'image', 'status', 'sort_order',
-        'created_by',
+        'created_by', 'show_in_breadcrumb',
+    ];
+
+    protected $casts = [
+        'show_in_breadcrumb' => 'boolean',
     ];
 
     protected static function booted(): void
