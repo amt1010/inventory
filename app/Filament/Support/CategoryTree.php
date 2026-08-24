@@ -5,6 +5,7 @@ namespace App\Filament\Support;
 use App\Models\Category;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\TextInput;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 
 class CategoryTree
@@ -66,6 +67,33 @@ class CategoryTree
             ]));
 
             self::persist($child, $node['subcategories'] ?? [], $attributes);
+        }
+    }
+
+    /**
+     * Re-parent existing categories under $parent. Always goes through a
+     * normal Eloquent save per record -- never a query-builder mass update --
+     * so Category::booted()'s cycle guard actually runs. A raw ->update(...)
+     * bypasses model events entirely, which is exactly how two categories
+     * could end up parents of each other with no error raised.
+     *
+     * @param  list<int>  $ids
+     * @param  (\Closure(Builder): mixed)|null  $constrain
+     */
+    public static function linkExisting(Category $parent, array $ids, ?\Closure $constrain = null): void
+    {
+        if ($ids === []) {
+            return;
+        }
+
+        $query = Category::query()->whereIn('id', $ids)->whereKeyNot($parent->id);
+
+        if ($constrain) {
+            $constrain($query);
+        }
+
+        foreach ($query->get() as $category) {
+            $category->update(['parent_id' => $parent->id]);
         }
     }
 

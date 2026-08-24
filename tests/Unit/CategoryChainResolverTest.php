@@ -90,6 +90,30 @@ class CategoryChainResolverTest extends TestCase
         $this->assertSame(1, Category::where('name', 'Screws')->count());
     }
 
+    public function test_resolving_a_reversed_chain_never_reparents_an_existing_category(): void
+    {
+        // Row 1: "Electronics" > "Consumer Electronics".
+        $consumerElectronics = (new CategoryChainResolver())->resolve([
+            'parent_name' => 'Electronics',
+            'sub1_name' => 'Consumer Electronics',
+        ]);
+
+        // Row 2 names the same two categories in the opposite order. The
+        // resolver must never point an *existing* category's parent_id back
+        // at one of its own descendants -- it can only create new rows or
+        // reuse a category already sitting at that exact parent slot.
+        (new CategoryChainResolver())->resolve([
+            'parent_name' => 'Consumer Electronics',
+            'sub1_name' => 'Electronics',
+        ]);
+
+        $this->assertSame(
+            'Electronics',
+            $consumerElectronics->fresh()->parent->name,
+            'The original "Electronics" > "Consumer Electronics" chain must be untouched by the reversed row.'
+        );
+    }
+
     public function test_slugs_are_deduplicated_among_siblings(): void
     {
         Category::factory()->create(['parent_id' => null, 'name' => 'Existing Metal', 'slug' => 'metal']);
