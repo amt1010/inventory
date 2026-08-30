@@ -23,6 +23,7 @@ class Seller extends Authenticatable implements FilamentUser, HasName
         'business_address', 'gst_number', 'status', 'created_by',
         'rejection_reason', 'email_verified_at', 'approved_at', 'approved_by',
         'seller_code', 'manufacturing_activity', 'availability_hours', 'password_set_at',
+        'clerk_user_id',
     ];
 
     protected $hidden = ['password', 'remember_token'];
