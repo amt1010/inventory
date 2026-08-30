@@ -59,4 +59,39 @@ class SecurityHeadersTest extends TestCase
         $plain = $this->get('http://surpluskart.test/login');
         $plain->assertHeaderMissing('Strict-Transport-Security');
     }
+
+    public function test_the_content_security_policy_has_no_clerk_host_when_clerk_is_unconfigured(): void
+    {
+        config([
+            'services.clerk.publishable_key' => null,
+            'services.clerk.frontend_api' => null,
+        ]);
+
+        $response = $this->get(route('register'));
+
+        $csp = $response->headers->get('Content-Security-Policy');
+
+        $this->assertStringNotContainsString('clerk', $csp);
+    }
+
+    public function test_the_content_security_policy_allows_the_configured_clerk_host(): void
+    {
+        config([
+            'services.clerk.publishable_key' => 'pk_test_dummy',
+            'services.clerk.frontend_api' => 'test.clerk.accounts.dev',
+        ]);
+
+        $response = $this->get(route('register'));
+
+        $csp = $response->headers->get('Content-Security-Policy');
+
+        $this->assertMatchesRegularExpression(
+            "/script-src[^;]*https:\/\/test\.clerk\.accounts\.dev/",
+            $csp
+        );
+        $this->assertMatchesRegularExpression(
+            "/connect-src[^;]*https:\/\/test\.clerk\.accounts\.dev/",
+            $csp
+        );
+    }
 }
