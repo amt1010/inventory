@@ -36,6 +36,8 @@ Route::get('/login', [SessionController::class, 'create'])->name('login');
 Route::post('/login', [SessionController::class, 'store'])->middleware('throttle:6,1')->name('login.store');
 Route::post('/logout', [SessionController::class, 'destroy'])->name('logout');
 
+Route::view('/auth/clerk/complete', 'auth.clerk-complete')->name('auth.clerk.complete');
+
 Route::post('/auth/clerk/buyer', [ClerkBuyerAuthController::class, 'store'])
     ->middleware('throttle:6,1')
     ->name('auth.clerk.buyer');
