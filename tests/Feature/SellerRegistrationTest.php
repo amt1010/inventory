@@ -101,6 +101,56 @@ class SellerRegistrationTest extends TestCase
         ]);
     }
 
+    public function test_a_clerk_identified_registration_skips_password_and_email_verification(): void
+    {
+        Mail::fake();
+
+        $this->withSession(['seller_clerk_identity' => [
+            'id' => 'user_456',
+            'email' => 'asha@raotraders.example',
+            'name' => 'Asha Rao',
+        ]]);
+
+        $payload = $this->validPayload();
+        unset($payload['password'], $payload['password_confirmation']);
+
+        $response = $this->post(route('seller.register.store'), $payload);
+
+        $response->assertRedirect(route('seller.registration.submitted'));
+
+        $this->assertDatabaseHas('sellers', [
+            'email' => 'asha@raotraders.example',
+            'clerk_user_id' => 'user_456',
+            'status' => 'pending_admin_approval',
+            'password' => null,
+        ]);
+
+        $seller = Seller::where('email', 'asha@raotraders.example')->firstOrFail();
+        $this->assertNotNull($seller->email_verified_at);
+
+        Mail::assertNothingQueued();
+        $this->assertNull(session('seller_clerk_identity'));
+    }
+
+    public function test_a_clerk_identified_registration_is_rejected_if_the_email_is_already_taken(): void
+    {
+        Seller::factory()->create(['email' => 'asha@raotraders.example']);
+
+        $this->withSession(['seller_clerk_identity' => [
+            'id' => 'user_456',
+            'email' => 'asha@raotraders.example',
+            'name' => 'Asha Rao',
+        ]]);
+
+        $payload = $this->validPayload(['company_name' => 'A Second Company']);
+        unset($payload['password'], $payload['password_confirmation']);
+
+        $response = $this->post(route('seller.register.store'), $payload);
+
+        $response->assertSessionHasErrors(['email']);
+        $this->assertDatabaseCount('sellers', 1);
+    }
+
     private function validPayload(array $overrides = []): array
     {
         return array_merge([

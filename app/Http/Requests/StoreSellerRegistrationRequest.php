@@ -24,7 +24,9 @@ class StoreSellerRegistrationRequest extends FormRequest
             'gst_number' => ['required', 'string', 'regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/'],
             'manufacturing_activity' => ['nullable', 'string', 'max:255'],
             'availability_hours' => ['nullable', 'string', 'max:255'],
-            'password' => ['required', 'confirmed', Password::min(8)],
+            'password' => session()->has('seller_clerk_identity')
+                ? ['nullable']
+                : ['required', 'confirmed', Password::min(8)],
             'terms_accepted' => ['required', 'accepted'],
             'documents' => ['nullable', 'array'],
             'documents.*' => ['file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
