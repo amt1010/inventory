@@ -13,6 +13,7 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SearchSuggestController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\Seller\ActivationController;
+use App\Http\Controllers\Seller\ClerkPanelLoginController;
 use App\Http\Controllers\Seller\ClerkRegistrationIdentityController;
 use App\Http\Controllers\Seller\RegistrationController as SellerRegistrationController;
 use App\Http\Controllers\StaffPasswordController;
@@ -48,6 +49,10 @@ Route::view('/seller/register/submitted', 'seller.registration-submitted')->name
 Route::post('/auth/clerk/seller/register', [ClerkRegistrationIdentityController::class, 'store'])
     ->middleware('throttle:6,1')
     ->name('seller.clerk.register');
+
+Route::post('/auth/clerk/seller/login', [ClerkPanelLoginController::class, 'store'])
+    ->middleware('throttle:6,1')
+    ->name('seller.clerk.login');
 
 Route::get('/seller/activate/{seller}', [ActivationController::class, 'show'])->middleware('signed')->name('seller.activate');
 Route::post('/seller/activate/{seller}', [ActivationController::class, 'store'])->middleware('signed')->name('seller.activate.store');
