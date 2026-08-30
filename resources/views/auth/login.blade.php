@@ -8,6 +8,8 @@
         <div class="col-md-6">
             <h1>Log In</h1>
 
+            @include('partials.clerk-google-button', ['intent' => 'buyer'])
+
             <form method="POST" action="{{ route('login.store') }}">
                 @csrf
 

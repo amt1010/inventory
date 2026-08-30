@@ -5,6 +5,12 @@
 @section('content')
     <h1>Seller Registration</h1>
 
+    @unless ($clerkIdentity)
+        <div class="col-md-6">
+            @include('partials.clerk-google-button', ['intent' => 'seller_register'])
+        </div>
+    @endunless
+
     @if ($errors->any())
         <div class="alert alert-danger">
             <ul class="mb-0">

@@ -9,6 +9,8 @@
             <h1>Create an Account</h1>
             <p class="text-muted">Optional — track your past quote requests and save favorites.</p>
 
+            @include('partials.clerk-google-button', ['intent' => 'buyer'])
+
             <form method="POST" action="{{ route('register.store') }}">
                 @csrf
 

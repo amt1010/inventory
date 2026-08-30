@@ -15,6 +15,10 @@
                 <a href="{{ route('seller.register') }}" class="btn btn-primary btn-lg">Register as a Seller</a>
                 <a href="{{ route('filament.seller.auth.login') }}" class="btn btn-outline-secondary btn-lg">Already a seller? Log In</a>
             </div>
+
+            <div class="col-md-4 mx-auto mt-4">
+                @include('partials.clerk-google-button', ['intent' => 'seller_register'])
+            </div>
         </div>
     </div>
 @endsection
