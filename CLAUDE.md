@@ -3,6 +3,8 @@
 This file gives Claude Code (and any other engineer) the context needed to work in
 this repository without re-deriving it from scratch.
 
+@SESSION-LOGGING.md
+
 ## What this project is
 
 A B2B marketplace platform (Alibaba-style), styled after AFL's public catalog site.
