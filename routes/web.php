@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CatalogController;
+use App\Http\Controllers\ClerkBuyerAuthController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\PageController;
@@ -32,6 +33,10 @@ Route::post('/register', [RegistrationController::class, 'store'])->middleware('
 Route::get('/login', [SessionController::class, 'create'])->name('login');
 Route::post('/login', [SessionController::class, 'store'])->middleware('throttle:6,1')->name('login.store');
 Route::post('/logout', [SessionController::class, 'destroy'])->name('logout');
+
+Route::post('/auth/clerk/buyer', [ClerkBuyerAuthController::class, 'store'])
+    ->middleware('throttle:6,1')
+    ->name('auth.clerk.buyer');
 
 Route::view('/sellers', 'seller.landing')->name('seller.landing');
 
