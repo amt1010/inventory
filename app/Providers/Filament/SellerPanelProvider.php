@@ -48,6 +48,17 @@ class SellerPanelProvider extends PanelProvider
             },
         );
 
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::AUTH_LOGIN_FORM_BEFORE,
+            function (): Htmlable {
+                if (Filament::getCurrentPanel()?->getId() !== 'seller') {
+                    return new HtmlString('');
+                }
+
+                return new HtmlString(view('filament.partials.clerk-login-button')->render());
+            },
+        );
+
         // Makes the sidebar/content divider draggable. Same manual panel guard
         // as above: both panel providers boot on every request, so registering
         // this unscoped in each one would inject the partial twice.
