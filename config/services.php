@@ -40,4 +40,10 @@ return [
         'secret_key' => env('RECAPTCHA_SECRET_KEY'),
     ],
 
+    'clerk' => [
+        'publishable_key' => env('CLERK_PUBLISHABLE_KEY'),
+        'secret_key' => env('CLERK_SECRET_KEY'),
+        'frontend_api' => env('CLERK_FRONTEND_API'),
+    ],
+
 ];

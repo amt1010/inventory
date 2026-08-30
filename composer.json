@@ -11,6 +11,7 @@
         "ext-pdo_mysql": "*",
         "ext-zip": "*",
         "filament/filament": "^3.2",
+        "firebase/php-jwt": "^6.10",
         "guzzlehttp/guzzle": "^7.14",
         "intervention/image": "^2.7",
         "laravel/framework": "^11.31",
