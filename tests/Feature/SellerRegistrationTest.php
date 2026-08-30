@@ -151,6 +151,27 @@ class SellerRegistrationTest extends TestCase
         $this->assertDatabaseCount('sellers', 1);
     }
 
+    public function test_a_clerk_identified_registration_succeeds_even_if_the_browser_sends_no_email_field(): void
+    {
+        $this->withSession(['seller_clerk_identity' => [
+            'id' => 'user_456',
+            'email' => 'asha@raotraders.example',
+            'name' => 'Asha Rao',
+        ]]);
+
+        $payload = $this->validPayload();
+        unset($payload['email'], $payload['password'], $payload['password_confirmation']);
+
+        $response = $this->post(route('seller.register.store'), $payload);
+
+        $response->assertRedirect(route('seller.registration.submitted'));
+        $this->assertDatabaseHas('sellers', [
+            'email' => 'asha@raotraders.example',
+            'clerk_user_id' => 'user_456',
+            'status' => 'pending_admin_approval',
+        ]);
+    }
+
     private function validPayload(array $overrides = []): array
     {
         return array_merge([

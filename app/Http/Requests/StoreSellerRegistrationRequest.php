@@ -19,7 +19,9 @@ class StoreSellerRegistrationRequest extends FormRequest
             'company_name' => ['required', 'string', 'max:255'],
             'contact_person' => ['required', 'string', 'max:255'],
             'phone' => ['required', 'string', 'max:50'],
-            'email' => ['required', 'email', 'max:255', 'unique:sellers,email'],
+            'email' => session()->has('seller_clerk_identity')
+                ? ['nullable']
+                : ['required', 'email', 'max:255', 'unique:sellers,email'],
             'business_address' => ['required', 'string', 'max:500'],
             'gst_number' => ['required', 'string', 'regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/'],
             'manufacturing_activity' => ['nullable', 'string', 'max:255'],

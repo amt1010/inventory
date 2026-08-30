@@ -32,7 +32,7 @@
             <div class="col-md-6 mb-3">
                 <label class="form-label">Email</label>
                 @if ($clerkIdentity)
-                    <input type="email" class="form-control" value="{{ $clerkIdentity['email'] }}" readonly>
+                    <input type="email" name="email" class="form-control" value="{{ $clerkIdentity['email'] }}" readonly>
                     <div class="form-text">Signed in as {{ $clerkIdentity['email'] }} via Google.</div>
                 @else
                     <input type="email" name="email" class="form-control" value="{{ old('email') }}" required>
