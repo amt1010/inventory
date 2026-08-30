@@ -194,6 +194,31 @@ trigger the flow you want to check (submit an RFQ, approve a seller, etc.)
 and watch it execute in the worker terminal instead of inline. Revert
 `.env` back to the `sync`/`database`/`file` defaults afterward.
 
+### Clerk Google sign-in (optional locally)
+
+Buyer register/login and seller register/panel-login have an optional
+"Continue with Google" path via Clerk (see
+`docs/superpowers/specs/2026-08-30-clerk-google-auth-design.md`). It's
+off by default — every Clerk button and script tag is gated on
+`CLERK_PUBLISHABLE_KEY` being set, so an empty `.env` behaves exactly
+like before this feature existed.
+
+To exercise it locally: create (or reuse) a Clerk application at
+https://dashboard.clerk.com, enable the Google OAuth connection, and add
+your local URL (e.g. `http://localhost:8000/auth/clerk/complete`) to its
+allowed redirect URLs. Then set in `.env`:
+
+```
+CLERK_PUBLISHABLE_KEY=pk_test_...
+CLERK_SECRET_KEY=sk_test_...
+CLERK_FRONTEND_API=your-app-name.clerk.accounts.dev
+```
+
+`CLERK_FRONTEND_API` is the bare host shown on the dashboard's API Keys
+page — no `https://` prefix. Restart `php artisan serve` after changing
+it (config is cached per-request, not per-file-change, but a fresh
+process picks up `.env` cleanly either way).
+
 ### Known issues
 
 `composer audit` reports 3 pre-existing `laravel/framework` advisories at the
