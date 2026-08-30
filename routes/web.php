@@ -13,6 +13,7 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SearchSuggestController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\Seller\ActivationController;
+use App\Http\Controllers\Seller\ClerkRegistrationIdentityController;
 use App\Http\Controllers\Seller\RegistrationController as SellerRegistrationController;
 use App\Http\Controllers\StaffPasswordController;
 use Illuminate\Support\Facades\Route;
@@ -43,6 +44,10 @@ Route::view('/sellers', 'seller.landing')->name('seller.landing');
 Route::get('/seller/register', [SellerRegistrationController::class, 'create'])->name('seller.register');
 Route::post('/seller/register', [SellerRegistrationController::class, 'store'])->middleware('throttle:6,1')->name('seller.register.store');
 Route::view('/seller/register/submitted', 'seller.registration-submitted')->name('seller.registration.submitted');
+
+Route::post('/auth/clerk/seller/register', [ClerkRegistrationIdentityController::class, 'store'])
+    ->middleware('throttle:6,1')
+    ->name('seller.clerk.register');
 
 Route::get('/seller/activate/{seller}', [ActivationController::class, 'show'])->middleware('signed')->name('seller.activate');
 Route::post('/seller/activate/{seller}', [ActivationController::class, 'store'])->middleware('signed')->name('seller.activate.store');
