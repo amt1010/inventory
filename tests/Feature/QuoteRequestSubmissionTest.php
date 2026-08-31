@@ -6,6 +6,7 @@ use App\Mail\QuoteRequestConfirmation;
 use App\Mail\QuoteRequestReceived;
 use App\Models\Category;
 use App\Models\Product;
+use Database\Seeders\EmailTemplateSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
@@ -13,6 +14,13 @@ use Tests\TestCase;
 class QuoteRequestSubmissionTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->seed(EmailTemplateSeeder::class);
+    }
 
     public function test_a_valid_submission_creates_a_quote_request_and_sends_the_notification_email(): void
     {
