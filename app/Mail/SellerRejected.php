@@ -2,7 +2,9 @@
 
 namespace App\Mail;
 
+use App\Models\EmailTemplate;
 use App\Models\Seller;
+use App\Services\EmailTemplateRenderer;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -19,14 +21,32 @@ class SellerRejected extends Mailable implements ShouldQueue
     {
     }
 
+    private function tokens(): array
+    {
+        return [
+            'company_name' => $this->seller->company_name,
+            'rejection_reason' => $this->seller->rejection_reason,
+        ];
+    }
+
     public function envelope(): Envelope
     {
-        return new Envelope(subject: 'Update on your seller application');
+        $template = EmailTemplate::forKey('seller_rejected');
+
+        return new Envelope(
+            subject: app(EmailTemplateRenderer::class)->render($template->subject, $this->tokens()),
+            cc: $template->ccAddresses(),
+            bcc: $template->bccAddresses(),
+        );
     }
 
     public function content(): Content
     {
-        return new Content(view: 'emails.seller-rejected', with: ['seller' => $this->seller]);
+        $template = EmailTemplate::forKey('seller_rejected');
+
+        return new Content(
+            htmlString: app(EmailTemplateRenderer::class)->render($template->body, $this->tokens()),
+        );
     }
 
     public function failed(\Throwable $exception): void
