@@ -125,3 +125,55 @@ no guard against Clerk-only accounts, buyers had none at all).
 - The final review's deferred trait-refactor suggestion (memoize the
   double `EmailTemplate::forKey()` lookup per mailable, ~85 lines of
   boilerplate across 7 files) is a legitimate follow-up, not done here.
+
+---
+
+## 2026-08-31 17:57 UTC — Fix issues #54/#55: automate RoleSeeder+EmailTemplateSeeder in Pre-Deploy Command
+
+- Branch: `master`
+- Commit: `b43b81a`
+- Working tree at log time:
+```
+ M DEPLOYMENT.md
+ M railway/init-app.sh
+```
+
+## Goal
+Fix two issues logged at https://github.com/amt1010/inventory/issues:
+- #54: emails not sent (staff invitation, seller activation)
+- #55: Email Template section not visible in Admin Dashboard
+
+## Changes
+- railway/init-app.sh: run `db:seed --class=RoleSeeder --force` and
+  `db:seed --class=EmailTemplateSeeder --force` after `migrate --force`,
+  on every Pre-Deploy run (both seeders are idempotent).
+- DEPLOYMENT.md: updated step 6 to describe the new automatic seeding,
+  and updated both related troubleshooting entries (audit_logs.full /
+  RBAC nav-hiding, and the email-template ModelNotFoundException entry)
+  to note the fix and keep them as historical diagnosis reference.
+
+## Decisions
+- Root cause for both issues was the same gap: RoleSeeder and
+  EmailTemplateSeeder are documented as safe/idempotent to re-run, but
+  the Pre-Deploy Command never called them, so a new permission area
+  (email_templates.*) or new template key added in a later deploy never
+  reached production until someone remembered to run it manually via the
+  Railway Console. A prior review (docs/superpowers/reviews/2026-08-31-
+  email-templates-and-password-reset-review.md) had already hit this
+  exact gap once and fixed it with documentation only, which is why it
+  recurred as these two new issues. Automating both seeders in the
+  Pre-Deploy script closes the whole class of bug instead of relying on
+  someone remembering a manual step again.
+- Did not add StaffSeeder/PageSeeder/NavItemSeeder to the Pre-Deploy
+  script (unrelated to these issues, out of scope) and explicitly did
+  not add CatalogSeeder (documented as non-idempotent, would duplicate
+  demo data on every deploy).
+
+## Open items / next steps
+- The existing production database still needs a one-time catch-up run
+  of both seeders (this fix only prevents recurrence going forward) —
+  requires Railway Console access, which this session doesn't have:
+  php artisan db:seed --class=RoleSeeder --force
+  php artisan db:seed --class=EmailTemplateSeeder --force
+- Full test suite: 629 passed, 1766 assertions, 0 failures (unchanged —
+  this fix only touches deploy script + docs, no app code).

@@ -103,10 +103,21 @@ chmod +x ./railway/init-app.sh && sh ./railway/init-app.sh
 
 This runs `railway/init-app.sh` (checked into this repo) after each build,
 before traffic is routed to the new instance: applies any new migrations
-(non-destructively — `migrate --force`, never `migrate:fresh`) and rebuilds
-Laravel's config/route/view/event caches. It deliberately does **not** run
-`storage:link` — see the troubleshooting section below for why that doesn't
-work here.
+(non-destructively — `migrate --force`, never `migrate:fresh`), re-runs
+`RoleSeeder` and `EmailTemplateSeeder`, and rebuilds Laravel's
+config/route/view/event caches. `RoleSeeder` and `EmailTemplateSeeder` are
+the two seeders in `DatabaseSeeder` that are both idempotent (`firstOrCreate`
+/ lookup-before-`create()`) and need to stay in sync with code on every
+deploy — a new permission area or a new template key added in a PR is
+useless in production until the corresponding seeder re-runs. Running them
+in the Pre-Deploy Command means that happens automatically instead of
+depending on someone remembering the Console command (see the troubleshooting
+entries below for what it looked like when that step was still manual).
+The other seeders (`StaffSeeder`, `PageSeeder`, `NavItemSeeder`,
+`CatalogSeeder`) stay manual-only — `CatalogSeeder` in particular is **not**
+idempotent (see below) and must never be added here. It deliberately does
+**not** run `storage:link` — see the troubleshooting section below for why
+that doesn't work here.
 
 ## 7. Add a queue-worker service
 
@@ -287,16 +298,24 @@ then run `php artisan db:seed --class=CatalogSeeder` once, cleanly.
 
 **Admin panel 500s right after login, log shows
 `Spatie\Permission\Exceptions\PermissionDoesNotExist: There is no
-permission named 'X.tier' for guard 'staff'`** — a new area was added to
-`RoleSeeder::AREAS` (or a new tier/role) after the last time `RoleSeeder`
-was run against this database, so a Policy's `hasPermissionTo(...)` check
-throws instead of returning `false` because the permission row doesn't
-exist at all yet — Spatie only returns `false` for a permission that
-exists but isn't assigned, not for one that's missing outright. This bit
-`audit_logs.full` on 2026-08-24: the area was added to `RoleSeeder` in
-commit `bccc9be` but the Pre-Deploy Command never seeds (see above), so
-production's `permissions` table never got the new rows. Fix: run once
-via the Console tab:
+permission named 'X.tier' for guard 'staff'`**, or the Filament nav item
+for a whole area (e.g. Email Templates) silently doesn't appear for any
+role including admin — a new area was added to `RoleSeeder::AREAS` (or a
+new tier/role) after the last time `RoleSeeder` was run against this
+database, so a Policy's `hasPermissionTo(...)`/`hasAnyPermission(...)`
+check throws or returns `false` because the permission row doesn't exist
+at all yet — Spatie only returns `false` for a permission that exists but
+isn't assigned, not for one that's missing outright (a `viewAny()` built
+on `hasAnyPermission()` swallows this into "hide the nav item" rather than
+a 500). This bit `audit_logs.full` on 2026-08-24 (area added in commit
+`bccc9be`) and `email_templates.*` again later — in both cases the area
+was added to `RoleSeeder::AREAS` but production's `permissions` table
+never got the new rows, because at the time the Pre-Deploy Command didn't
+re-seed. **As of the fix for this, `railway/init-app.sh` runs
+`db:seed --class=RoleSeeder` on every deploy** (see step 6), so this
+should no longer happen — this entry is kept for diagnosing an older
+deploy or a database the Pre-Deploy Command hasn't touched yet. Manual
+fix if needed, via the Console tab:
 ```
 php artisan db:seed --class=RoleSeeder
 ```
@@ -317,9 +336,12 @@ three password-reset keys — they were added on top of an already-running
 template row in `envelope()`/`content()`, so any of them can fail this
 way once its key is missing. Because the mail is queued, this doesn't
 surface as a request-time error — the job just fails silently from the
-app's point of view and lands in `failed_jobs`. Fix: run once via the
-Console tab, any time a new template key is added — not just on first
-deploy:
+app's point of view and lands in `failed_jobs`. **As of the fix for this,
+`railway/init-app.sh` runs `db:seed --class=EmailTemplateSeeder` on every
+deploy** (see step 6), so a new template key added in a PR is seeded
+automatically the next time it deploys — this entry is kept for
+diagnosing an older deploy or a database the Pre-Deploy Command hasn't
+touched yet. Manual fix if needed, via the Console tab:
 ```
 php artisan db:seed --class=EmailTemplateSeeder
 ```
