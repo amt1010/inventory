@@ -153,6 +153,41 @@ Watch the deploy logs for the Pre-Deploy Command output to confirm
 migrations applied cleanly, on **both** the app service and the
 queue-worker service.
 
+## Optional: enable Clerk Google sign-in
+
+Buyer/seller "Continue with Google" (see `CLAUDE.md`'s Clerk section) is
+gated entirely on three env vars — set all three or the feature stays
+invisible (no button, no CSP change; see `app/Http/Middleware/SecurityHeaders.php`).
+Add these on the app service's **Variables** tab, same place as step 5
+(the queue-worker service doesn't need them — Clerk is only touched by
+user-facing HTTP requests):
+
+| Variable | Value | Why |
+|---|---|---|
+| `CLERK_PUBLISHABLE_KEY` | `pk_live_...` from the Clerk dashboard's **API Keys** page | public, safe to expose client-side |
+| `CLERK_SECRET_KEY` | `sk_live_...` from the same page | server-side token verification (`ClerkAuthenticator`) — keep this in Railway's Variables tab, never in git |
+| `CLERK_FRONTEND_API` | the bare host shown on that page, e.g. `your-app-name.clerk.accounts.dev` — **no** `https://` prefix | also feeds the CSP allowlist directly, so a wrong value breaks the button silently rather than erroring |
+
+Use a Clerk **production** instance (`pk_live_`/`sk_live_`), not the
+`pk_test_`/`sk_test_` instance used for local dev — Clerk treats test and
+live as separate instances with separate user pools and separate redirect
+allowlists.
+
+This step is **not** a Railway setting — it's entirely in the Clerk
+dashboard: **your application → Configure → Paths** (labeled "Redirect
+URLs" in some Clerk dashboard versions), add your Railway production
+domain's completion path, e.g.:
+
+```
+https://your-app.up.railway.app/auth/clerk/complete
+```
+
+Clerk rejects the OAuth callback if the redirect URI isn't on this list,
+regardless of what's configured in Railway. If you add a custom domain
+later, add its `/auth/clerk/complete` path here too and keep it in sync
+with `APP_URL` (step 5) the same way the rest of the app depends on
+`APP_URL` matching the real serving domain.
+
 ## Operating the queue
 
 - `php artisan queue:failed` — list jobs (e.g. a queued email) that
