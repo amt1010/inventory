@@ -13,8 +13,10 @@ Three actor types:
 - **Buyers** — public visitors who browse the catalog and submit "Request a Quote"
   (RFQ) enquiries. No checkout, no payments anywhere in this system. An account
   (`web` guard, the stock `users` table) is optional and low-friction — no email
-  verification, no password reset — used only to view past quote requests and
-  favorites.
+  verification — used only to view past quote requests and favorites. Buyers who
+  registered with email/password can self-service reset it at `/forgot-password`;
+  accounts that signed up via Clerk/Google with no local password (`password IS NULL`)
+  are not eligible — same rule applies to sellers.
 - **Sellers** — registered suppliers who list their own products/surplus inventory
   via the `/seller` Filament panel. Never see buyer contact details or interact
   with buyers directly.
