@@ -47,6 +47,10 @@
     color: var(--bs-primary);
 }
 
+.navbar-nav .nav-link {
+    white-space: nowrap;
+}
+
 .card {
     border: 1px solid #eee;
     border-radius: 10px;

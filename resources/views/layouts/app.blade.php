@@ -22,7 +22,7 @@
 </head>
 <body class="md-theme">
     <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
-        <div class="container">
+        <div class="container-fluid px-3 px-lg-4">
             <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url('/') }}">
                 @if ($siteSettings->logo_path)
                     <img src="{{ asset('storage/'.$siteSettings->logo_path) }}" alt="{{ $siteSettings->site_name }}" height="36">
