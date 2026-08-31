@@ -2,7 +2,9 @@
 
 namespace App\Mail;
 
+use App\Models\EmailTemplate;
 use App\Models\Product;
+use App\Services\EmailTemplateRenderer;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -19,18 +21,31 @@ class ProductListingLive extends Mailable implements ShouldQueue
     {
     }
 
+    private function tokens(): array
+    {
+        return [
+            'product_name' => $this->product->name,
+            'product_url' => url('/products/'.$this->product->path()),
+        ];
+    }
+
     public function envelope(): Envelope
     {
+        $template = EmailTemplate::forKey('product_listing_live');
+
         return new Envelope(
-            subject: 'Your listing is now live: '.$this->product->name,
+            subject: app(EmailTemplateRenderer::class)->render($template->subject, $this->tokens()),
+            cc: $template->ccAddresses(),
+            bcc: $template->bccAddresses(),
         );
     }
 
     public function content(): Content
     {
+        $template = EmailTemplate::forKey('product_listing_live');
+
         return new Content(
-            view: 'emails.product-listing-live',
-            with: ['product' => $this->product],
+            htmlString: app(EmailTemplateRenderer::class)->render($template->body, $this->tokens()),
         );
     }
 
