@@ -5,10 +5,13 @@ namespace App\Providers;
 use App\Models\Category;
 use App\Models\NavItem;
 use App\Models\Setting;
+use App\Models\Staff;
 use App\Policies\RolePolicy;
 use App\Support\CategoryHierarchy;
 use Filament\Support\Facades\FilamentView;
 use Filament\View\PanelsRenderHook;
+use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -33,6 +36,16 @@ class AppServiceProvider extends ServiceProvider
         // namespace tree, so it never finds App\Policies\RolePolicy for
         // spatie's Spatie\Permission\Models\Role — register it explicitly.
         Gate::policy(Role::class, RolePolicy::class);
+
+        // A self-service reset means the staff member chose their own new
+        // password directly -- unlike StaffResource's admin-triggered reset,
+        // which sets a temporary password someone else picked, this
+        // shouldn't force yet another change on next login.
+        Event::listen(PasswordReset::class, function (PasswordReset $event): void {
+            if ($event->user instanceof Staff) {
+                $event->user->forceFill(['must_change_password' => false])->save();
+            }
+        });
 
         // Give the Filament admin/seller panels a full-height vertical divider
         // between the sidebar and the content. The sidebar is a sticky,

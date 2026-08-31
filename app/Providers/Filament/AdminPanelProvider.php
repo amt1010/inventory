@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Auth\RequestStaffPasswordReset;
 use App\Filament\Imports\CategoryProductImporter;
 use App\Filament\Imports\SellerImporter;
 use App\Http\Middleware\EnsureStaffPasswordIsCurrent;
@@ -87,6 +88,8 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->authGuard('staff')
+            ->passwordReset(RequestStaffPasswordReset::class)
+            ->authPasswordBroker('staff')
             ->favicon(asset('favicon.svg'))
             ->colors(fn () => [
                 'primary' => Color::hex(filled($branding()?->theme_accent_color) ? $branding()->theme_accent_color : '#ff6a00'),
