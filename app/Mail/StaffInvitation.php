@@ -2,7 +2,9 @@
 
 namespace App\Mail;
 
+use App\Models\EmailTemplate;
 use App\Models\Staff;
+use App\Services\EmailTemplateRenderer;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -19,18 +21,33 @@ class StaffInvitation extends Mailable implements ShouldQueue
     {
     }
 
+    private function tokens(): array
+    {
+        return [
+            'staff_name' => $this->staff->name,
+            'login_url' => $this->loginUrl,
+            'temporary_password' => $this->temporaryPassword,
+        ];
+    }
+
     public function envelope(): Envelope
     {
-        return new Envelope(subject: 'Your admin panel login');
+        $template = EmailTemplate::forKey('staff_invitation');
+
+        return new Envelope(
+            subject: app(EmailTemplateRenderer::class)->render($template->subject, $this->tokens()),
+            cc: $template->ccAddresses(),
+            bcc: $template->bccAddresses(),
+        );
     }
 
     public function content(): Content
     {
-        return new Content(view: 'emails.staff-invitation', with: [
-            'staff' => $this->staff,
-            'temporaryPassword' => $this->temporaryPassword,
-            'loginUrl' => $this->loginUrl,
-        ]);
+        $template = EmailTemplate::forKey('staff_invitation');
+
+        return new Content(
+            htmlString: app(EmailTemplateRenderer::class)->render($template->body, $this->tokens()),
+        );
     }
 
     public function failed(\Throwable $exception): void
