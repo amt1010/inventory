@@ -45,3 +45,83 @@ using subagent-driven-development.
   buyer register, buyer login, seller register, and seller panel login
   still need manual verification against a real Clerk application with an
   actual Google account before this ships.
+
+---
+
+## 2026-08-31 17:14 UTC — Add admin-editable email templates and self-service password reset
+
+- Branch: `email-templates-and-password-reset`
+- Commit: `b84501f`
+- Working tree at log time:
+```
+ M public/css/filament/forms/forms.css
+ M public/js/filament/filament/app.js
+ M public/js/filament/filament/echo.js
+ M public/js/filament/forms/components/color-picker.js
+ M public/js/filament/forms/components/date-time-picker.js
+ M public/js/filament/forms/components/file-upload.js
+ M public/js/filament/forms/components/key-value.js
+ M public/js/filament/forms/components/markdown-editor.js
+ M public/js/filament/forms/components/rich-editor.js
+ M public/js/filament/forms/components/select.js
+ M public/js/filament/forms/components/tags-input.js
+ M public/js/filament/forms/components/textarea.js
+ M public/js/filament/notifications/notifications.js
+ M public/js/filament/support/support.js
+ M public/js/filament/tables/components/table.js
+ M public/js/filament/widgets/components/chart.js
+ M public/js/filament/widgets/components/stats-overview/stat/chart.js
+?? docs/superpowers/reviews/
+```
+
+## Goal
+Let Admin/Content Editor staff edit and publish the content of the app's
+transactional emails from a new admin screen, and close the self-service
+password-reset gap across all three auth guards (staff had none, sellers had
+no guard against Clerk-only accounts, buyers had none at all).
+
+## Changes
+- New `email_templates` table + `EmailTemplate` model (draft/live column
+  pairs, `publish()`/`resetDraft()`/`isModified()`), a small
+  `EmailTemplateRenderer` token-substitution service (no Blade compilation —
+  admin-authored content never executes as code), and a Filament
+  `EmailTemplateResource` at `/admin/email-templates` (draft editing,
+  Publish/Reset Draft, custom template create/delete, a Preview action).
+- 8 of the 9 existing transactional Mailables ported to render from the DB
+  instead of hardcoded Blade views (`product-edit-ready-for-acceptance` and
+  `seller-import-stuck` stay hardcoded — no real "copy" to edit in either).
+- Self-service password reset for staff (new, with a `must_change_password`
+  interaction against the existing admin-triggered reset), sellers (a
+  Clerk-only guard added to the pre-existing flow, plus swapped Filament's
+  default notification for a template-driven one), and buyers (entirely
+  new — controller, routes, views, reusing a previously-unused `users`
+  broker).
+- `docs/superpowers/reviews/2026-08-31-email-templates-and-password-reset-review.md`
+  records every review finding and ruling from both plans' execution.
+
+## Decisions
+- Two plans, executed in dependency order (email templates first) via
+  subagent-driven development in an isolated worktree/branch
+  (`email-templates-and-password-reset`, off `master`).
+- A full, unfiltered `php artisan test` run after all Mailable ports (not
+  just per-task filtered runs) caught a real regression per-task review
+  couldn't see: `Mail::assertQueued(..., fn ($m) => $m->hasTo(...))`
+  triggers envelope-building even under `Mail::fake()`.
+- Discovered mid-execution that a "new" test file for the seller
+  password-reset task already existed from an unrelated July session —
+  corrected the plan's stale assumption and restored 2 tests that had been
+  silently dropped as a result.
+- Two final whole-branch reviews (one per plan) each found real issues
+  (subject-line HTML-escaping, a missing production seed step, a dropped
+  Filament `canAccessPanel()` guard, missing reCAPTCHA, an unrendered
+  confirmation message) — all fixed and re-reviewed clean. Full details in
+  the review-findings doc above rather than duplicated here.
+
+## Open items / next steps
+- PR open at https://github.com/amt1010/inventory/pull/53, not yet merged.
+- Manual click-through in a real environment (admin template editing,
+  publish flow, all three password-reset flows end to end) still worth
+  doing before this ships to production, same as any Filament-heavy change.
+- The final review's deferred trait-refactor suggestion (memoize the
+  double `EmailTemplate::forKey()` lookup per mailable, ~85 lines of
+  boilerplate across 7 files) is a legitimate follow-up, not done here.
