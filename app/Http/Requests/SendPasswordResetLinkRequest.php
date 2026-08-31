@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\Recaptcha;
 use Illuminate\Foundation\Http\FormRequest;
 
 class SendPasswordResetLinkRequest extends FormRequest
@@ -13,6 +14,9 @@ class SendPasswordResetLinkRequest extends FormRequest
 
     public function rules(): array
     {
-        return ['email' => ['required', 'email']];
+        return [
+            'email' => ['required', 'email'],
+            'g-recaptcha-response' => [new Recaptcha()],
+        ];
     }
 }

@@ -101,4 +101,18 @@ class SellerPasswordResetTest extends TestCase
     {
         $this->get('/seller/password-reset/request')->assertOk();
     }
+
+    public function test_a_pending_seller_gets_the_same_response_but_no_email_is_sent(): void
+    {
+        Mail::fake();
+
+        $seller = Seller::factory()->create(['status' => 'pending_admin_approval']);
+
+        Livewire::test(\App\Filament\Seller\Auth\RequestSellerPasswordReset::class)
+            ->fillForm(['email' => $seller->email])
+            ->call('request')
+            ->assertHasNoFormErrors();
+
+        Mail::assertNothingQueued();
+    }
 }

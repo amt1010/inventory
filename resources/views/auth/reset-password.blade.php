@@ -32,6 +32,9 @@
                     <label class="form-label">Confirm New Password</label>
                     <input type="password" name="password_confirmation" class="form-control" required>
                 </div>
+
+                @include('partials.recaptcha-widget')
+
                 <button type="submit" class="btn btn-primary">Reset Password</button>
             </form>
         </div>

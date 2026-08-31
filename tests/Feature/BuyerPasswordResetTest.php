@@ -86,4 +86,16 @@ class BuyerPasswordResetTest extends TestCase
         $this->post('/forgot-password', ['email' => $user->email])
             ->assertStatus(429);
     }
+
+    public function test_the_forgot_password_confirmation_message_is_actually_shown_on_the_login_page(): void
+    {
+        Mail::fake();
+
+        $user = User::factory()->create();
+
+        $response = $this->from(route('password.request'))->post('/forgot-password', ['email' => $user->email]);
+
+        $response->assertRedirect(route('login'));
+        $this->followRedirects($response)->assertSee("If that email is registered, we've sent a password reset link.");
+    }
 }

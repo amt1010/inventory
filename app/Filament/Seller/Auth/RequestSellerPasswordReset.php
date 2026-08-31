@@ -6,6 +6,7 @@ use App\Mail\SellerPasswordReset;
 use App\Models\Seller;
 use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
 use Filament\Facades\Filament;
+use Filament\Models\Contracts\FilamentUser;
 use Filament\Pages\Auth\PasswordReset\RequestPasswordReset;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Support\Facades\Mail;
@@ -34,6 +35,10 @@ class RequestSellerPasswordReset extends RequestPasswordReset
             Password::broker(Filament::getAuthPasswordBroker())->sendResetLink(
                 ['email' => $email],
                 function (CanResetPassword $user, string $token): void {
+                    if (($user instanceof FilamentUser) && (! $user->canAccessPanel(Filament::getCurrentPanel()))) {
+                        return;
+                    }
+
                     Mail::to($user->email)->send(new SellerPasswordReset(
                         $user,
                         Filament::getResetPasswordUrl($token, $user),

@@ -25,7 +25,7 @@ class EmailTemplateSeederTest extends TestCase
         'buyer_password_reset',
     ];
 
-    public function test_seeds_exactly_the_eight_expected_system_templates(): void
+    public function test_seeds_exactly_the_expected_system_templates(): void
     {
         $this->seed(EmailTemplateSeeder::class);
 

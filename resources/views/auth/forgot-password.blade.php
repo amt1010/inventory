@@ -28,6 +28,9 @@
                     <label class="form-label">Email</label>
                     <input type="email" name="email" class="form-control" value="{{ old('email') }}" required>
                 </div>
+
+                @include('partials.recaptcha-widget')
+
                 <button type="submit" class="btn btn-primary">Send Reset Link</button>
                 <a href="{{ route('login') }}" class="btn btn-link">Back to Log In</a>
             </form>

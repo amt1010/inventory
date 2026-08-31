@@ -305,13 +305,21 @@ Safe to re-run any time a new area/tier/role is added to the matrix —
 
 **Every transactional email silently fails — seller activation/approval/
 rejection, RFQ confirmation/notification, product-listing-live, staff
-invitation — and queued jobs pile up in `failed_jobs`** — `email_templates`
-was empty (fresh migration, not yet seeded), so `EmailTemplate::forKey()`
-throws `ModelNotFoundException`. Every one of these mailables looks up its
-template row in `envelope()`/`content()`, so all of them fail the same way.
-Because the mail is queued, this doesn't surface as a request-time error —
-the job just fails silently from the app's point of view and lands in
-`failed_jobs`. Fix: run once via the Console tab:
+invitation, staff/seller/buyer password reset — and queued jobs pile up
+in `failed_jobs`** — the `email_templates` table is missing the row a
+mailable's `EmailTemplate::forKey()` call is looking for, so it throws
+`ModelNotFoundException`. This happens two ways: either the table was
+empty (fresh migration, `EmailTemplateSeeder` never run), or the table
+was seeded once but a later deploy added new keys to `EmailTemplateSeeder`
+that an already-seeded database doesn't have yet (this happened to the
+three password-reset keys — they were added on top of an already-running
+`email_templates` table). Every mailable in this app looks up its
+template row in `envelope()`/`content()`, so any of them can fail this
+way once its key is missing. Because the mail is queued, this doesn't
+surface as a request-time error — the job just fails silently from the
+app's point of view and lands in `failed_jobs`. Fix: run once via the
+Console tab, any time a new template key is added — not just on first
+deploy:
 ```
 php artisan db:seed --class=EmailTemplateSeeder
 ```
