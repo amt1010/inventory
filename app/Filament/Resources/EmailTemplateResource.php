@@ -41,6 +41,31 @@ class EmailTemplateResource extends Resource
         return $tokens[$key] ?? 'No key-specific tokens (custom template) — {{site_name}} is always available.';
     }
 
+    /**
+     * @return array<string, string>
+     */
+    public static function sampleTokensFor(string $key): array
+    {
+        $samples = [
+            'product_listing_live' => ['product_name' => 'Aerial Fiber Cable', 'product_url' => url('/products/sample')],
+            'quote_request_confirmation' => ['first_name' => 'Asha', 'quote_number' => 'QR-1001', 'product_name' => 'Aerial Fiber Cable'],
+            'quote_request_received' => [
+                'reason' => 'General Inquiry', 'full_name' => 'Asha Rao', 'email' => 'asha@example.com',
+                'phone' => '9999999999', 'company' => 'Acme Co', 'admin_url' => url('/admin/quote-requests/1'),
+                'product_name' => 'Aerial Fiber Cable', 'product_url' => url('/products/sample'),
+                'product_thumbnail_html' => '<img src="https://via.placeholder.com/132" width="132" height="132" alt="sample">',
+                'message_text' => 'Please share pricing for 500 meters.',
+            ],
+            'seller_activation_admin_created' => ['company_name' => 'Acme Co', 'activation_url' => url('/seller/activate/1?signature=sample')],
+            'seller_activation_self_registered' => ['company_name' => 'Acme Co', 'activation_url' => url('/seller/activate/1?signature=sample')],
+            'seller_approved' => ['company_name' => 'Acme Co', 'activation_url' => url('/seller/activate/1?signature=sample')],
+            'seller_rejected' => ['company_name' => 'Acme Co', 'rejection_reason' => 'Documents did not match business name.'],
+            'staff_invitation' => ['staff_name' => 'Priya', 'login_url' => url('/admin/login'), 'temporary_password' => 'Temp1234!'],
+        ];
+
+        return $samples[$key] ?? [];
+    }
+
     public static function form(Form $form): Form
     {
         return $form->schema([

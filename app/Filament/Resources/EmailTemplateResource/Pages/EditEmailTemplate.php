@@ -16,6 +16,19 @@ class EditEmailTemplate extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('preview')
+                ->modalHeading('Preview')
+                ->modalSubmitAction(false)
+                ->modalCancelActionLabel('Close')
+                ->modalContent(function (EmailTemplate $record) {
+                    $tokens = \App\Filament\Resources\EmailTemplateResource::sampleTokensFor($record->key);
+                    $renderer = app(\App\Services\EmailTemplateRenderer::class);
+
+                    return view('filament.email-template-preview', [
+                        'subject' => $renderer->render($record->draft_subject, $tokens),
+                        'body' => $renderer->render($record->draft_body, $tokens),
+                    ]);
+                }),
             Action::make('publish')
                 ->visible(fn (EmailTemplate $record) => $record->isModified())
                 ->requiresConfirmation()
