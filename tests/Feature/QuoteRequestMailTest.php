@@ -4,12 +4,20 @@ namespace Tests\Feature;
 
 use App\Mail\QuoteRequestReceived;
 use App\Models\QuoteRequest;
+use Database\Seeders\EmailTemplateSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class QuoteRequestMailTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->seed(EmailTemplateSeeder::class);
+    }
 
     public function test_the_notification_email_renders_the_quote_requests_details(): void
     {

@@ -2,7 +2,9 @@
 
 namespace App\Mail;
 
+use App\Models\EmailTemplate;
 use App\Models\QuoteRequest;
+use App\Services\EmailTemplateRenderer;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -19,18 +21,32 @@ class QuoteRequestConfirmation extends Mailable implements ShouldQueue
     {
     }
 
+    private function tokens(): array
+    {
+        return [
+            'first_name' => $this->quoteRequest->first_name,
+            'quote_number' => $this->quoteRequest->quote_number,
+            'product_name' => $this->quoteRequest->product?->name,
+        ];
+    }
+
     public function envelope(): Envelope
     {
+        $template = EmailTemplate::forKey('quote_request_confirmation');
+
         return new Envelope(
-            subject: 'Your Quote Request '.$this->quoteRequest->quote_number.' Has Been Received',
+            subject: app(EmailTemplateRenderer::class)->render($template->subject, $this->tokens()),
+            cc: $template->ccAddresses(),
+            bcc: $template->bccAddresses(),
         );
     }
 
     public function content(): Content
     {
+        $template = EmailTemplate::forKey('quote_request_confirmation');
+
         return new Content(
-            view: 'emails.quote-request-confirmation',
-            with: ['quoteRequest' => $this->quoteRequest],
+            htmlString: app(EmailTemplateRenderer::class)->render($template->body, $this->tokens()),
         );
     }
 
