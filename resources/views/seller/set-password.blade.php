@@ -16,7 +16,7 @@
         </div>
     @endif
 
-    <form action="{{ url()->full() }}" method="POST">
+    <form action="{{ url()->full() }}" method="POST" novalidate>
         @csrf
         <div class="mb-3">
             <label class="form-label">Password</label>

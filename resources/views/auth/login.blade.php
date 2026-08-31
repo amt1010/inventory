@@ -10,7 +10,7 @@
 
             @include('partials.clerk-google-button', ['intent' => 'buyer'])
 
-            <form method="POST" action="{{ route('login.store') }}">
+            <form method="POST" action="{{ route('login.store') }}" novalidate>
                 @csrf
 
                 @if ($errors->any())

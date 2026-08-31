@@ -171,6 +171,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('js/mobile-category-nav.js') }}"></script>
     <script src="{{ asset('js/search-suggest.js') }}"></script>
+    <script src="{{ asset('js/form-validation.js') }}"></script>
     @if (config('services.recaptcha.site_key'))
         <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     @endif

@@ -4,7 +4,7 @@
     $idSuffix = $idSuffix ?? (isset($product) ? '-'.$product->id : '');
 @endphp
 
-<form action="{{ route('quote-requests.store') }}" method="POST">
+<form action="{{ route('quote-requests.store') }}" method="POST" novalidate>
     @csrf
     @if ($errors->any())
         <div class="alert alert-danger">

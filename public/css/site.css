@@ -9,6 +9,32 @@
     --bs-link-hover-color-rgb: 230, 95, 0;
     --brand-hover: #e65f00;
     --bs-body-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --neon-red: #ff1744;
+    --neon-red-rgb: 255, 23, 68;
+}
+
+/* Required-field marker + invalid-on-submit highlight for public Bootstrap
+   forms (public/js/form-validation.js adds .was-validated to a
+   form[novalidate] once Submit is pressed). Driven by the `required`
+   attribute already on each field, not hand-added per field, so it covers
+   every form that follows the label-then-field markup convention. */
+.form-label:has(+ input[required])::after,
+.form-label:has(+ select[required])::after,
+.form-label:has(+ textarea[required])::after {
+    content: " *";
+    color: var(--neon-red);
+}
+
+.form-check-input[required] + .form-check-label::after {
+    content: " *";
+    color: var(--neon-red);
+}
+
+.was-validated .form-control:invalid,
+.was-validated .form-select:invalid,
+.was-validated .form-check-input:invalid {
+    border-color: var(--neon-red);
+    box-shadow: 0 0 0 0.2rem rgba(var(--neon-red-rgb), 0.35);
 }
 
 .btn-primary {

@@ -90,6 +90,7 @@ class AdminPanelProvider extends PanelProvider
             ->favicon(asset('favicon.svg'))
             ->colors(fn () => [
                 'primary' => Color::hex(filled($branding()?->theme_accent_color) ? $branding()->theme_accent_color : '#ff6a00'),
+                'danger' => Color::hex('#ff1744'),
             ])
             ->brandName($brandName)
             ->brandLogo(fn () => $branding()?->logo_path
