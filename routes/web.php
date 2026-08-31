@@ -5,6 +5,7 @@ use App\Http\Controllers\ClerkBuyerAuthController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\PreviewController;
 use App\Http\Controllers\QuoteRequestController;
 use App\Http\Controllers\QuoteRequestHistoryController;
@@ -35,6 +36,11 @@ Route::post('/register', [RegistrationController::class, 'store'])->middleware('
 Route::get('/login', [SessionController::class, 'create'])->name('login');
 Route::post('/login', [SessionController::class, 'store'])->middleware('throttle:6,1')->name('login.store');
 Route::post('/logout', [SessionController::class, 'destroy'])->name('logout');
+
+Route::get('/forgot-password', [PasswordResetController::class, 'showRequestForm'])->name('password.request');
+Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink'])->middleware('throttle:6,1')->name('password.email');
+Route::get('/reset-password/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
+Route::post('/reset-password', [PasswordResetController::class, 'reset'])->middleware('throttle:6,1')->name('password.update');
 
 Route::view('/auth/clerk/complete', 'auth.clerk-complete')->name('auth.clerk.complete');
 

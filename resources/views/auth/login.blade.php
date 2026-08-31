@@ -31,6 +31,9 @@
                     <label class="form-label">Password</label>
                     <input type="password" name="password" class="form-control" required>
                 </div>
+                <div class="mb-3">
+                    <a href="{{ route('password.request') }}" class="small">Forgot your password?</a>
+                </div>
 
                 @include('partials.recaptcha-widget')
 
