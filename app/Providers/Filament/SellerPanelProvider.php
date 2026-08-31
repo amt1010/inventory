@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Seller\Auth\RequestSellerPasswordReset;
 use App\Models\Setting;
 use Filament\Facades\Filament;
 use Filament\Http\Middleware\Authenticate;
@@ -86,7 +87,7 @@ class SellerPanelProvider extends PanelProvider
             ->id('seller')
             ->path('seller')
             ->login()
-            ->passwordReset()
+            ->passwordReset(RequestSellerPasswordReset::class)
             ->authGuard('seller')
             ->authPasswordBroker('sellers')
             ->favicon(asset('favicon.svg'))
