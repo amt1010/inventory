@@ -2,7 +2,9 @@
 
 namespace App\Mail;
 
+use App\Models\EmailTemplate;
 use App\Models\Seller;
+use App\Services\EmailTemplateRenderer;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -19,17 +21,32 @@ class SellerApproved extends Mailable implements ShouldQueue
     {
     }
 
+    private function tokens(): array
+    {
+        return [
+            'company_name' => $this->seller->company_name,
+            'activation_url' => $this->activationUrl,
+        ];
+    }
+
     public function envelope(): Envelope
     {
-        return new Envelope(subject: 'Your seller account has been approved');
+        $template = EmailTemplate::forKey('seller_approved');
+
+        return new Envelope(
+            subject: app(EmailTemplateRenderer::class)->render($template->subject, $this->tokens()),
+            cc: $template->ccAddresses(),
+            bcc: $template->bccAddresses(),
+        );
     }
 
     public function content(): Content
     {
-        return new Content(view: 'emails.seller-approved', with: [
-            'seller' => $this->seller,
-            'activationUrl' => $this->activationUrl,
-        ]);
+        $template = EmailTemplate::forKey('seller_approved');
+
+        return new Content(
+            htmlString: app(EmailTemplateRenderer::class)->render($template->body, $this->tokens()),
+        );
     }
 
     public function failed(\Throwable $exception): void
