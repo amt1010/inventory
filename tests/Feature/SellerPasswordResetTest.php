@@ -90,4 +90,15 @@ class SellerPasswordResetTest extends TestCase
 
         Mail::assertNothingQueued();
     }
+
+    public function test_the_seller_password_reset_broker_is_scoped_to_sellers_not_users(): void
+    {
+        $this->assertSame('sellers', config('auth.passwords.sellers.provider'));
+        $this->assertSame('seller_password_reset_tokens', config('auth.passwords.sellers.table'));
+    }
+
+    public function test_the_forgot_password_page_is_reachable(): void
+    {
+        $this->get('/seller/password-reset/request')->assertOk();
+    }
 }
