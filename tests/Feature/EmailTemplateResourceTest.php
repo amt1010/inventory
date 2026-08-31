@@ -104,4 +104,16 @@ class EmailTemplateResourceTest extends TestCase
 
         $this->assertSame($originalSubject, $template->fresh()->draft_subject);
     }
+
+    public function test_an_invalid_cc_address_is_rejected_with_a_validation_error(): void
+    {
+        $this->actingAsAdmin();
+
+        $template = EmailTemplate::forKey('staff_invitation');
+
+        Livewire::test(EditEmailTemplate::class, ['record' => $template->getRouteKey()])
+            ->fillForm(['draft_default_cc' => 'ops@example.com, not-an-email'])
+            ->call('save')
+            ->assertHasFormErrors(['draft_default_cc']);
+    }
 }

@@ -23,22 +23,63 @@ class EmailTemplateResource extends Resource
     protected static ?int $navigationSort = 9;
 
     /**
+     * Token names each system template key accepts — the single source
+     * of truth for both the admin-facing token help text and the
+     * preview's sample data, so the two can never drift again.
+     *
+     * @var array<string, array<int, string>>
+     */
+    private const TOKEN_MAP = [
+        'product_listing_live' => ['product_name', 'product_url'],
+        'quote_request_confirmation' => ['first_name', 'quote_number', 'product_name'],
+        'quote_request_received' => ['reason', 'full_name', 'email', 'phone', 'company', 'admin_url', 'product_name', 'product_url', 'product_thumbnail_html', 'message_text'],
+        'seller_activation_admin_created' => ['company_name', 'activation_url'],
+        'seller_activation_self_registered' => ['company_name', 'activation_url'],
+        'seller_approved' => ['company_name', 'activation_url'],
+        'seller_rejected' => ['company_name', 'rejection_reason'],
+        'staff_invitation' => ['staff_name', 'login_url', 'temporary_password'],
+    ];
+
+    /**
+     * Sample values for each token name, keyed by name so the same
+     * token (e.g. company_name) gets a consistent sample everywhere it
+     * appears.
+     *
      * @return array<string, string>
      */
+    private static function tokenSampleValues(): array
+    {
+        return [
+            'product_name' => 'Aerial Fiber Cable',
+            'product_url' => url('/products/sample'),
+            'first_name' => 'Asha',
+            'quote_number' => 'QR-1001',
+            'reason' => 'General Inquiry',
+            'full_name' => 'Asha Rao',
+            'email' => 'asha@example.com',
+            'phone' => '9999999999',
+            'company' => 'Acme Co',
+            'admin_url' => url('/admin/quote-requests/1'),
+            'product_thumbnail_html' => '<div style="width:132px;height:132px;background:#eee;display:flex;align-items:center;justify-content:center;color:#999;font-size:12px;">Sample Image</div>',
+            'message_text' => 'Please share pricing for 500 meters.',
+            'company_name' => 'Acme Co',
+            'activation_url' => url('/seller/activate/1?signature=sample'),
+            'rejection_reason' => 'Documents did not match business name.',
+            'staff_name' => 'Priya',
+            'login_url' => url('/admin/login'),
+            'temporary_password' => 'Temp1234!',
+        ];
+    }
+
     public static function tokenHelpFor(string $key): string
     {
-        $tokens = [
-            'product_listing_live' => '{{product_name}}, {{product_url}}',
-            'quote_request_confirmation' => '{{first_name}}, {{quote_number}}, optional section {{#product_name}}...{{/product_name}}',
-            'quote_request_received' => '{{reason}}, {{full_name}}, {{email}}, {{phone}}, {{company}}, {{admin_url}}, optional sections {{#product_name}}...{{/product_name}} and {{#message_text}}...{{/message_text}}',
-            'seller_activation_admin_created' => '{{company_name}}, {{activation_url}}',
-            'seller_activation_self_registered' => '{{company_name}}, {{activation_url}}',
-            'seller_approved' => '{{company_name}}, optional section {{#activation_url}}...{{/activation_url}}',
-            'seller_rejected' => '{{company_name}}, optional section {{#rejection_reason}}...{{/rejection_reason}}',
-            'staff_invitation' => '{{staff_name}}, {{login_url}}, {{temporary_password}}',
-        ];
+        $names = self::TOKEN_MAP[$key] ?? null;
 
-        return $tokens[$key] ?? 'No key-specific tokens (custom template) — {{site_name}} is always available.';
+        if ($names === null) {
+            return 'No key-specific tokens (custom template) — {{site_name}} is always available.';
+        }
+
+        return collect($names)->map(fn (string $name) => "{{{$name}}}")->implode(', ');
     }
 
     /**
@@ -46,24 +87,10 @@ class EmailTemplateResource extends Resource
      */
     public static function sampleTokensFor(string $key): array
     {
-        $samples = [
-            'product_listing_live' => ['product_name' => 'Aerial Fiber Cable', 'product_url' => url('/products/sample')],
-            'quote_request_confirmation' => ['first_name' => 'Asha', 'quote_number' => 'QR-1001', 'product_name' => 'Aerial Fiber Cable'],
-            'quote_request_received' => [
-                'reason' => 'General Inquiry', 'full_name' => 'Asha Rao', 'email' => 'asha@example.com',
-                'phone' => '9999999999', 'company' => 'Acme Co', 'admin_url' => url('/admin/quote-requests/1'),
-                'product_name' => 'Aerial Fiber Cable', 'product_url' => url('/products/sample'),
-                'product_thumbnail_html' => '<img src="https://via.placeholder.com/132" width="132" height="132" alt="sample">',
-                'message_text' => 'Please share pricing for 500 meters.',
-            ],
-            'seller_activation_admin_created' => ['company_name' => 'Acme Co', 'activation_url' => url('/seller/activate/1?signature=sample')],
-            'seller_activation_self_registered' => ['company_name' => 'Acme Co', 'activation_url' => url('/seller/activate/1?signature=sample')],
-            'seller_approved' => ['company_name' => 'Acme Co', 'activation_url' => url('/seller/activate/1?signature=sample')],
-            'seller_rejected' => ['company_name' => 'Acme Co', 'rejection_reason' => 'Documents did not match business name.'],
-            'staff_invitation' => ['staff_name' => 'Priya', 'login_url' => url('/admin/login'), 'temporary_password' => 'Temp1234!'],
-        ];
+        $names = self::TOKEN_MAP[$key] ?? [];
+        $samples = self::tokenSampleValues();
 
-        return $samples[$key] ?? [];
+        return collect($names)->mapWithKeys(fn (string $name) => [$name => $samples[$name] ?? ''])->all();
     }
 
     public static function form(Form $form): Form
@@ -83,8 +110,50 @@ class EmailTemplateResource extends Resource
                 ->content(fn (?EmailTemplate $record) => $record ? static::tokenHelpFor($record->key) : 'Save first to see available tokens.'),
             TextInput::make('draft_subject')->label('Subject (draft)')->required(),
             RichEditor::make('draft_body')->label('Body (draft)')->required(),
-            TextInput::make('draft_default_cc')->label('Default CC')->helperText('Comma-separated email addresses.'),
-            TextInput::make('draft_default_bcc')->label('Default BCC')->helperText('Comma-separated email addresses.'),
+            TextInput::make('draft_default_cc')
+                ->label('Default CC')
+                ->helperText('Comma-separated email addresses.')
+                ->rule(function () {
+                    return function (string $attribute, $value, \Closure $fail) {
+                        if (blank($value)) {
+                            return;
+                        }
+
+                        foreach (explode(',', $value) as $email) {
+                            $email = trim($email);
+
+                            if ($email === '') {
+                                continue;
+                            }
+
+                            if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                                $fail("Each address must be a valid email — \"{$email}\" is not.");
+                            }
+                        }
+                    };
+                }),
+            TextInput::make('draft_default_bcc')
+                ->label('Default BCC')
+                ->helperText('Comma-separated email addresses.')
+                ->rule(function () {
+                    return function (string $attribute, $value, \Closure $fail) {
+                        if (blank($value)) {
+                            return;
+                        }
+
+                        foreach (explode(',', $value) as $email) {
+                            $email = trim($email);
+
+                            if ($email === '') {
+                                continue;
+                            }
+
+                            if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                                $fail("Each address must be a valid email — \"{$email}\" is not.");
+                            }
+                        }
+                    };
+                }),
         ]);
     }
 

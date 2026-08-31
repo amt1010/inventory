@@ -55,4 +55,13 @@ class EmailTemplatePreviewTest extends TestCase
             ->assertActionMounted('preview')
             ->assertSee('{{not_a_real_token}}');
     }
+
+    public function test_token_help_for_quote_request_received_lists_every_token_the_seeded_template_actually_uses(): void
+    {
+        $help = \App\Filament\Resources\EmailTemplateResource::tokenHelpFor('quote_request_received');
+
+        foreach (['reason', 'full_name', 'email', 'phone', 'company', 'admin_url', 'product_name', 'product_url', 'product_thumbnail_html', 'message_text'] as $token) {
+            $this->assertStringContainsString("{{{$token}}}", $help);
+        }
+    }
 }
