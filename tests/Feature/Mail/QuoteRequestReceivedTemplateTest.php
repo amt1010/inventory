@@ -69,4 +69,19 @@ class QuoteRequestReceivedTemplateTest extends TestCase
 
         $mailable->assertSeeInHtml('<p>Before</p><p>After</p>', escape: false);
     }
+
+    public function test_the_subject_does_not_html_escape_apostrophes_or_ampersands(): void
+    {
+        EmailTemplate::forKey('quote_request_received')->update([
+            'subject' => 'New Quote Request from {{full_name}}',
+        ]);
+
+        $quoteRequest = QuoteRequest::factory()->create([
+            'first_name' => "O'Brien", 'last_name' => '& Sons',
+        ]);
+
+        $mailable = new QuoteRequestReceived($quoteRequest);
+
+        $mailable->assertHasSubject("New Quote Request from O'Brien & Sons");
+    }
 }

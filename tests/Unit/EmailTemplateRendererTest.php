@@ -85,4 +85,25 @@ class EmailTemplateRendererTest extends TestCase
 
         $this->assertSame('<p>Override</p>', $html);
     }
+
+    public function test_does_not_escape_when_escape_html_is_false(): void
+    {
+        $html = $this->renderer()->render('{{name}}', ['name' => "O'Brien & Sons"], escapeHtml: false);
+
+        $this->assertSame("O'Brien & Sons", $html);
+    }
+
+    public function test_still_escapes_by_default_when_escape_html_omitted(): void
+    {
+        $html = $this->renderer()->render('{{name}}', ['name' => "O'Brien & Sons"]);
+
+        $this->assertSame('O&#039;Brien &amp; Sons', $html);
+    }
+
+    public function test_a_non_scalar_token_value_is_left_literal_instead_of_crashing(): void
+    {
+        $html = $this->renderer()->render('{{data}}', ['data' => ['nested' => 'array']]);
+
+        $this->assertSame('{{data}}', $html);
+    }
 }

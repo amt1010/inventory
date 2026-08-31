@@ -34,7 +34,7 @@ class SellerRejected extends Mailable implements ShouldQueue
         $template = EmailTemplate::forKey('seller_rejected');
 
         return new Envelope(
-            subject: app(EmailTemplateRenderer::class)->render($template->subject, $this->tokens()),
+            subject: app(EmailTemplateRenderer::class)->render($template->subject, $this->tokens(), escapeHtml: false),
             cc: $template->ccAddresses(),
             bcc: $template->bccAddresses(),
         );
