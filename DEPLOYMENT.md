@@ -256,9 +256,12 @@ php artisan db:seed --class=StaffSeeder
 php artisan db:seed --class=CatalogSeeder   # optional — sample/demo catalog data, skip for a real launch
 php artisan db:seed --class=PageSeeder
 php artisan db:seed --class=NavItemSeeder
+php artisan db:seed --class=EmailTemplateSeeder
 ```
 `RoleSeeder`/`StaffSeeder`/`PageSeeder`/`NavItemSeeder` use `firstOrCreate`
-and are safe to re-run. `CatalogSeeder` is **not** — it calls
+and are safe to re-run. `EmailTemplateSeeder` is also safe to re-run — it
+looks up each row with `first()` and skips it if already present, rather
+than calling `create()` blindly. `CatalogSeeder` is **not** — it calls
 `Product::factory()->create()` / `Category::factory()->create()` directly.
 Re-running it does **not** throw a unique-constraint error the way you'd
 expect from the `(category_id, slug)` / `(parent_id, slug)` unique indexes
@@ -299,6 +302,20 @@ php artisan db:seed --class=RoleSeeder
 ```
 Safe to re-run any time a new area/tier/role is added to the matrix —
 `firstOrCreate`/`syncPermissions` make it idempotent.
+
+**Every transactional email silently fails — seller activation/approval/
+rejection, RFQ confirmation/notification, product-listing-live, staff
+invitation — and queued jobs pile up in `failed_jobs`** — `email_templates`
+was empty (fresh migration, not yet seeded), so `EmailTemplate::forKey()`
+throws `ModelNotFoundException`. Every one of these mailables looks up its
+template row in `envelope()`/`content()`, so all of them fail the same way.
+Because the mail is queued, this doesn't surface as a request-time error —
+the job just fails silently from the app's point of view and lands in
+`failed_jobs`. Fix: run once via the Console tab:
+```
+php artisan db:seed --class=EmailTemplateSeeder
+```
+Idempotent, safe to re-run any time.
 
 **Hyperlinks render Bootstrap's default blue instead of the brand orange**
 — `public/css/site.css` set `--bs-link-color`, but Bootstrap 5.3's actual
