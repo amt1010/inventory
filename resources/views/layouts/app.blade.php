@@ -28,7 +28,7 @@
                     <img src="{{ asset('storage/'.$siteSettings->logo_path) }}" alt="{{ $siteSettings->site_name }}" height="36">
                 @endif
                 @if (filled($siteSettings->site_name))
-                    <span>{{ $siteSettings->site_name }}</span>
+                    <span class="brand-mark">Excess<span class="brand-mark-accent">Kart</span></span>
                 @endif
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">

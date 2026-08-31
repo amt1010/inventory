@@ -69,6 +69,14 @@
     color: var(--bs-primary);
 }
 
+.brand-mark {
+    color: #000;
+}
+
+.brand-mark-accent {
+    color: var(--color-accent);
+}
+
 .nav-link:hover {
     color: var(--bs-primary);
 }

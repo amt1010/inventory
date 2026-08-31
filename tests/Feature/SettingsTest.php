@@ -32,17 +32,17 @@ class SettingsTest extends TestCase
         $this->assertSame($setting->id, Setting::current()->id);
     }
 
-    public function test_the_public_layout_shows_the_configured_site_name_when_there_is_no_logo(): void
+    public function test_the_public_layout_shows_the_brand_mark_when_there_is_no_logo(): void
     {
-        Setting::current()->update(['site_name' => 'Acme Cable Co.']);
+        Setting::current()->update(['site_name' => 'Acme Cable Co.', 'logo_path' => null]);
 
         $response = $this->get('/');
 
         $response->assertOk();
-        $response->assertSee('Acme Cable Co.');
+        $response->assertSee('<span class="brand-mark">Excess<span class="brand-mark-accent">Kart</span></span>', false);
     }
 
-    public function test_the_public_layout_shows_both_the_logo_and_site_name_when_both_are_configured(): void
+    public function test_the_public_layout_shows_both_the_logo_and_the_fixed_brand_mark_when_a_logo_is_configured(): void
     {
         Setting::current()->update([
             'site_name' => 'Acme Cable Co.',
@@ -52,10 +52,8 @@ class SettingsTest extends TestCase
         $response = $this->get('/');
 
         $response->assertOk();
-        // assertSeeText strips tags/attributes first, so this only matches the
-        // site name rendered as visible text, not the img's alt attribute.
-        $response->assertSeeText('Acme Cable Co.');
         $response->assertSee('storage/logos/acme.png', false);
+        $response->assertSee('<span class="brand-mark">Excess<span class="brand-mark-accent">Kart</span></span>', false);
     }
 
     public function test_copyright_text_resolves_the_year_placeholder(): void
