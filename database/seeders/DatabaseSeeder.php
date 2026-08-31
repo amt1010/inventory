@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
             CatalogSeeder::class,
             PageSeeder::class,
             NavItemSeeder::class,
+            EmailTemplateSeeder::class,
         ]);
     }
 }
