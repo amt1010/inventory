@@ -5,12 +5,19 @@ namespace Tests\Feature;
 use App\Mail\ProductListingLive;
 use App\Models\Category;
 use App\Models\Product;
+use Database\Seeders\EmailTemplateSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class ProductListingLiveMailTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->seed(EmailTemplateSeeder::class);
+    }
 
     public function test_the_email_links_to_the_live_product_page(): void
     {
