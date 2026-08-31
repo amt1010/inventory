@@ -20,6 +20,9 @@ class EmailTemplateSeederTest extends TestCase
         'seller_approved',
         'seller_rejected',
         'staff_invitation',
+        'staff_password_reset',
+        'seller_password_reset',
+        'buyer_password_reset',
     ];
 
     public function test_seeds_exactly_the_eight_expected_system_templates(): void
@@ -47,7 +50,7 @@ class EmailTemplateSeederTest extends TestCase
         $this->seed(EmailTemplateSeeder::class);
         $this->seed(EmailTemplateSeeder::class);
 
-        $this->assertSame(8, EmailTemplate::count());
+        $this->assertSame(11, EmailTemplate::count());
     }
 
     public function test_seller_activation_templates_carry_the_two_distinct_variants(): void
@@ -59,5 +62,14 @@ class EmailTemplateSeederTest extends TestCase
 
         $this->assertStringContainsString('An administrator has created', $admin->body);
         $this->assertStringContainsString('Thanks for registering', $self->body);
+    }
+
+    public function test_the_three_password_reset_templates_contain_the_reset_url_token(): void
+    {
+        $this->seed(EmailTemplateSeeder::class);
+
+        foreach (['staff_password_reset', 'seller_password_reset', 'buyer_password_reset'] as $key) {
+            $this->assertStringContainsString('{{reset_url}}', EmailTemplate::forKey($key)->body);
+        }
     }
 }

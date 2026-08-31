@@ -38,6 +38,9 @@ class EmailTemplateResource extends Resource
         'seller_approved' => ['company_name', 'activation_url'],
         'seller_rejected' => ['company_name', 'rejection_reason'],
         'staff_invitation' => ['staff_name', 'login_url', 'temporary_password'],
+        'staff_password_reset' => ['staff_name', 'reset_url'],
+        'seller_password_reset' => ['company_name', 'reset_url'],
+        'buyer_password_reset' => ['name', 'reset_url'],
     ];
 
     /**
@@ -68,6 +71,8 @@ class EmailTemplateResource extends Resource
             'staff_name' => 'Priya',
             'login_url' => url('/admin/login'),
             'temporary_password' => 'Temp1234!',
+            'reset_url' => url('/reset-password/sample'),
+            'name' => 'Asha',
         ];
     }
 

@@ -118,6 +118,36 @@ HTML,
 <p>You'll be asked to set a new password the first time you log in.</p>
 HTML,
             ],
+            'staff_password_reset' => [
+                'label' => 'Staff Password Reset',
+                'subject' => 'Reset your admin panel password',
+                'body' => <<<'HTML'
+<h1>Reset your password</h1>
+<p>Hi {{staff_name}}, click below to set a new password for your admin panel account.</p>
+<p><a href="{{reset_url}}">Reset Password</a></p>
+<p>If you didn't request this, you can safely ignore this email.</p>
+HTML,
+            ],
+            'seller_password_reset' => [
+                'label' => 'Seller Password Reset',
+                'subject' => 'Reset your seller account password',
+                'body' => <<<'HTML'
+<h1>Reset your password</h1>
+<p>Hi, click below to set a new password for {{company_name}}'s seller account.</p>
+<p><a href="{{reset_url}}">Reset Password</a></p>
+<p>If you didn't request this, you can safely ignore this email.</p>
+HTML,
+            ],
+            'buyer_password_reset' => [
+                'label' => 'Buyer Password Reset',
+                'subject' => 'Reset your password',
+                'body' => <<<'HTML'
+<h1>Reset your password</h1>
+<p>Hi {{name}}, click below to set a new password.</p>
+<p><a href="{{reset_url}}">Reset Password</a></p>
+<p>If you didn't request this, you can safely ignore this email.</p>
+HTML,
+            ],
         ];
     }
 }
