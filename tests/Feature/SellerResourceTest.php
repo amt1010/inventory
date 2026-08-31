@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Filament\Resources\SellerResource\Pages\CreateSeller;
 use App\Filament\Resources\SellerResource\Pages\EditSeller;
 use App\Filament\Resources\SellerResource\Pages\ListSellers;
+use App\Mail\SellerActivationMail;
 use App\Mail\SellerApproved;
 use App\Mail\SellerRejected;
 use App\Models\Seller;
@@ -139,6 +140,34 @@ class SellerResourceTest extends TestCase
             ->assertHasFormErrors(['status']);
 
         $this->assertSame('pending_email_verification', $seller->fresh()->status);
+    }
+
+    public function test_resend_activation_email_queues_a_fresh_activation_mail_for_a_seller_pending_email_verification(): void
+    {
+        Mail::fake();
+
+        $admin = Staff::factory()->create();
+        $admin->assignRole('admin');
+        $this->actingAs($admin, 'staff');
+
+        $seller = Seller::factory()->create(['status' => 'pending_email_verification']);
+
+        Livewire::test(ListSellers::class)
+            ->callTableAction('resend_activation', $seller);
+
+        Mail::assertQueued(SellerActivationMail::class, fn ($mail) => $mail->seller->is($seller));
+    }
+
+    public function test_resend_activation_email_is_not_available_for_a_seller_not_pending_email_verification(): void
+    {
+        $admin = Staff::factory()->create();
+        $admin->assignRole('admin');
+        $this->actingAs($admin, 'staff');
+
+        $seller = Seller::factory()->create(['status' => 'approved']);
+
+        Livewire::test(ListSellers::class)
+            ->assertTableActionHidden('resend_activation', $seller);
     }
 
     public function test_admin_created_seller_with_a_duplicate_email_is_rejected_with_a_validation_error(): void

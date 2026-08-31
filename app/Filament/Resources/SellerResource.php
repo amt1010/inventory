@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Actions\ApproveSeller;
 use App\Filament\Resources\SellerResource\Pages;
 use App\Filament\Resources\SellerResource\RelationManagers\DocumentsRelationManager;
+use App\Mail\SellerActivationMail;
 use App\Mail\SellerRejected;
 use App\Models\Seller;
 use Filament\Forms\Components\Select;
@@ -104,6 +105,31 @@ class SellerResource extends Resource
                             Notification::make()
                                 ->title('Cannot approve this seller')
                                 ->body(implode(' ', $reasons))
+                                ->danger()
+                                ->send();
+                        }
+                    }),
+                Action::make('resend_activation')
+                    ->label('Resend Activation Email')
+                    ->icon('heroicon-o-envelope')
+                    ->visible(fn (Seller $record) => $record->status === 'pending_email_verification')
+                    ->requiresConfirmation()
+                    ->action(function (Seller $record) {
+                        try {
+                            Mail::to($record->email)->send(new SellerActivationMail($record));
+
+                            Notification::make()
+                                ->title('Activation email resent')
+                                ->success()
+                                ->send();
+                        } catch (\Throwable $exception) {
+                            Log::error('Failed to resend seller activation email.', [
+                                'seller_id' => $record->id,
+                                'exception' => $exception->getMessage(),
+                            ]);
+
+                            Notification::make()
+                                ->title('Could not resend activation email')
                                 ->danger()
                                 ->send();
                         }
