@@ -32,13 +32,11 @@
                     @foreach (\App\Filament\Resources\RoleResource::TIERS as $tier => $tierLabel)
                         <td class="border border-gray-300 px-3 py-2 text-center dark:border-gray-700">
                             <input
-                                type="radio"
-                                name="permission_{{ $area }}"
-                                value="{{ $tier }}"
-                                x-model="values['{{ $area }}']"
-                                x-on:change="sync()"
+                                type="checkbox"
+                                :checked="values['{{ $area }}'] === '{{ $tier }}'"
+                                x-on:change="values['{{ $area }}'] = ($event.target.checked ? '{{ $tier }}' : ''); sync()"
                                 aria-label="{{ $label }} {{ $tierLabel }}"
-                                class="h-4 w-4 border-gray-400 text-primary-600 focus:ring-primary-600"
+                                class="h-4 w-4 rounded border-gray-400 text-primary-600 focus:ring-primary-600"
                             >
                         </td>
                     @endforeach
