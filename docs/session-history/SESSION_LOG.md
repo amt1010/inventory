@@ -177,3 +177,24 @@ Fix two issues logged at https://github.com/amt1010/inventory/issues:
   php artisan db:seed --class=EmailTemplateSeeder --force
 - Full test suite: 629 passed, 1766 assertions, 0 failures (unchanged —
   this fix only touches deploy script + docs, no app code).
+
+---
+
+## 2026-09-01 03:42 UTC — Pull latest from origin/master, apply new migrations, verify full test suite
+
+- Branch: `master`
+- Commit: `05d2059`
+
+## Goal
+Sync local master with origin/master and confirm the pulled changes are safe.
+
+## Changes
+- Fast-forwarded local master from 6fc3034 to 05d2059 (clean merge, no conflicts)
+- Pulled in: routes/api.php (new), RoleSeeder.php updates, bootstrap/app.php, railway/init-app.sh
+- Ran `php artisan migrate` — applied 4 new migrations (Clerk fields on users/sellers, email_templates table, staff_password_reset_tokens table)
+
+## Decisions
+- Used `php artisan migrate` (not migrate:fresh) per project convention — dev DB holds real data
+
+## Open items / next steps
+- None; full test suite green (641 passed, 1808 assertions)
