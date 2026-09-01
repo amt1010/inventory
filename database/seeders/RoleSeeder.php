@@ -8,7 +8,7 @@ use Spatie\Permission\Models\Role;
 
 class RoleSeeder extends Seeder
 {
-    private const AREAS = ['dashboard', 'staff', 'roles', 'categories', 'products', 'sellers', 'quote_requests', 'pages', 'nav_items', 'settings', 'audit_logs', 'email_templates'];
+    private const AREAS = ['dashboard', 'staff', 'roles', 'categories', 'products', 'sellers', 'quote_requests', 'subscribers', 'pages', 'nav_items', 'settings', 'audit_logs', 'email_templates'];
 
     private const TIERS = ['read', 'write', 'full'];
 
@@ -17,19 +17,19 @@ class RoleSeeder extends Seeder
             'dashboard' => 'full', 'staff' => 'full',
             'roles' => 'full',
             'categories' => 'full', 'products' => 'full', 'sellers' => 'full',
-            'quote_requests' => 'full', 'pages' => 'full', 'nav_items' => 'full', 'settings' => 'full',
+            'quote_requests' => 'full', 'subscribers' => 'full', 'pages' => 'full', 'nav_items' => 'full', 'settings' => 'full',
             'audit_logs' => 'full', 'email_templates' => 'full',
         ],
         'content_editor' => [
             'dashboard' => 'read', 'staff' => null,
             'categories' => 'full', 'products' => 'write', 'sellers' => null,
-            'quote_requests' => null, 'pages' => 'full', 'nav_items' => 'full', 'settings' => null,
+            'quote_requests' => null, 'subscribers' => null, 'pages' => 'full', 'nav_items' => 'full', 'settings' => null,
             'audit_logs' => null, 'email_templates' => 'full',
         ],
         'sales' => [
             'dashboard' => 'read', 'staff' => null,
             'categories' => 'read', 'products' => 'read', 'sellers' => null,
-            'quote_requests' => 'write', 'pages' => 'read', 'nav_items' => 'read', 'settings' => null,
+            'quote_requests' => 'write', 'subscribers' => 'write', 'pages' => 'read', 'nav_items' => 'read', 'settings' => null,
             'audit_logs' => null, 'email_templates' => null,
         ],
     ];

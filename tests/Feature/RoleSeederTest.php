@@ -16,7 +16,7 @@ class RoleSeederTest extends TestCase
     {
         $this->seed(RoleSeeder::class);
 
-        $this->assertSame(36, Permission::where('guard_name', 'staff')->count());
+        $this->assertSame(39, Permission::where('guard_name', 'staff')->count());
     }
 
     public function test_admin_role_gets_full_permission_in_every_area(): void
@@ -28,7 +28,7 @@ class RoleSeederTest extends TestCase
         $this->assertSame([
             'audit_logs.full', 'categories.full', 'dashboard.full', 'email_templates.full', 'nav_items.full',
             'pages.full', 'products.full', 'quote_requests.full', 'roles.full', 'sellers.full', 'settings.full',
-            'staff.full',
+            'staff.full', 'subscribers.full',
         ], $permissions);
     }
 
@@ -51,6 +51,7 @@ class RoleSeederTest extends TestCase
 
         $this->assertSame([
             'categories.read', 'dashboard.read', 'nav_items.read', 'pages.read', 'products.read', 'quote_requests.write',
+            'subscribers.write',
         ], $permissions);
     }
 }

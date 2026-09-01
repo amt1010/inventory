@@ -7,11 +7,13 @@ use App\Filament\Widgets\ProductsByStatusChart;
 use App\Filament\Widgets\QuoteRequestsByDateChart;
 use App\Filament\Widgets\SellersByStatusChart;
 use App\Filament\Widgets\StaffByRoleChart;
+use App\Filament\Widgets\SubscribersOverTimeChart;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\QuoteRequest;
 use App\Models\Seller;
 use App\Models\Staff;
+use App\Models\Subscriber;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use ReflectionMethod;
@@ -83,6 +85,22 @@ class DashboardChartsTest extends TestCase
             'Content Editor' => 2,
             'Sales' => 0,
         ], $counts);
+    }
+
+    public function test_subscribers_over_time_chart_counts_signups_per_day(): void
+    {
+        Subscriber::factory()->count(2)->create(['created_at' => now()]);
+        Subscriber::factory()->count(1)->create(['created_at' => now()->subDay()]);
+        // Older than the 30-day window, must not appear anywhere.
+        Subscriber::factory()->count(5)->create(['created_at' => now()->subDays(45)]);
+
+        $counts = (new SubscribersOverTimeChart())->dailyCounts();
+
+        $this->assertCount(30, $counts);
+        $this->assertSame(2, $counts[now()->toDateString()]);
+        $this->assertSame(1, $counts[now()->subDay()->toDateString()]);
+        $this->assertSame(0, $counts[now()->subDays(3)->toDateString()]);
+        $this->assertSame(3, array_sum($counts));
     }
 
     public function test_quote_requests_by_date_chart_counts_requests_per_day(): void
@@ -225,7 +243,7 @@ class DashboardChartsTest extends TestCase
         $this->assertStringEndsWith('})', trim($chartAttribute));
     }
 
-    public function test_an_admin_sees_all_five_dashboard_charts(): void
+    public function test_an_admin_sees_all_six_dashboard_charts(): void
     {
         $staff = Staff::factory()->create();
         $staff->assignRole('admin');
@@ -239,9 +257,10 @@ class DashboardChartsTest extends TestCase
         $response->assertSee('Sellers by Status');
         $response->assertSee('Quote Requests by Date');
         $response->assertSee('Staff by Role');
+        $response->assertSee('Subscribers Over Time');
     }
 
-    public function test_a_content_editor_does_not_see_the_sellers_quote_requests_or_staff_charts(): void
+    public function test_a_content_editor_does_not_see_the_sellers_quote_requests_staff_or_subscribers_charts(): void
     {
         $staff = Staff::factory()->create();
         $staff->assignRole('content_editor');
@@ -255,9 +274,10 @@ class DashboardChartsTest extends TestCase
         $response->assertDontSee('Sellers by Status');
         $response->assertDontSee('Quote Requests by Date');
         $response->assertDontSee('Staff by Role');
+        $response->assertDontSee('Subscribers Over Time');
     }
 
-    public function test_sales_sees_the_quote_requests_chart_but_not_the_sellers_or_staff_charts(): void
+    public function test_sales_sees_the_quote_requests_and_subscribers_charts_but_not_the_sellers_or_staff_charts(): void
     {
         $staff = Staff::factory()->create();
         $staff->assignRole('sales');
@@ -267,6 +287,7 @@ class DashboardChartsTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Quote Requests by Date');
+        $response->assertSee('Subscribers Over Time');
         $response->assertDontSee('Sellers by Status');
         $response->assertDontSee('Staff by Role');
     }

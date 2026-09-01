@@ -30,7 +30,7 @@ class AdminNavigationOrderTest extends TestCase
         preg_match_all('/fi-sidebar-item-label[^>]*>\s*(.+?)\s*</s', $response->getContent(), $matches);
 
         $this->assertSame(
-            ['Dashboard', 'Site Settings', 'Nav Items', 'Pages', 'Categories', 'Products', 'Quote Requests', 'Sellers', 'Roles', 'Email Templates', 'Staff', 'Audit Logs'],
+            ['Dashboard', 'Site Settings', 'Nav Items', 'Pages', 'Categories', 'Products', 'Quote Requests', 'Sellers', 'Roles', 'Email Templates', 'Staff', 'Audit Logs', 'Subscribers'],
             $matches[1],
         );
     }
