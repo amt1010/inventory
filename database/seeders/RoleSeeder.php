@@ -36,11 +36,30 @@ class RoleSeeder extends Seeder
 
     public function run(): void
     {
+        $now = now();
+
+        $permissionRows = [];
         foreach (self::AREAS as $area) {
             foreach (self::TIERS as $tier) {
-                Permission::firstOrCreate(['name' => "{$area}.{$tier}", 'guard_name' => 'staff']);
+                $permissionRows[] = [
+                    'name' => "{$area}.{$tier}",
+                    'guard_name' => 'staff',
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ];
             }
         }
+
+        // Batch upsert all permissions in a single query/transaction instead of
+        // one firstOrCreate() per row -- drastically reduces the number of
+        // locks acquired against the permissions table during seeding.
+        Permission::upsert(
+            $permissionRows,
+            ['name', 'guard_name'],
+            ['updated_at']
+        );
+
+        app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
 
         foreach (self::ROLE_MATRIX as $roleName => $areaTiers) {
             $role = Role::firstOrCreate(['name' => $roleName, 'guard_name' => 'staff']);

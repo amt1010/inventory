@@ -6,8 +6,17 @@ set -e
 
 php artisan optimize:clear
 php artisan migrate --force
-php artisan db:seed --class=RoleSeeder --force
-php artisan db:seed --class=EmailTemplateSeeder --force
+
+# Only seed if roles table is empty
+if [ "$(php artisan tinker --execute="echo DB::table('roles')->count();")" = "0" ]; then
+ echo "Seeding RoleSeeder..."
+ php artisan db:seed --class=RoleSeeder --force
+ echo "Seeding EmailTemplateSeeder..."
+ php artisan db:seed --class=EmailTemplateSeeder --force
+else
+ echo "Roles already exist, skipping seeders to avoid lock contention."
+fi
+
 php artisan config:cache
 php artisan event:cache
 php artisan route:cache
