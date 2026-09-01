@@ -54,6 +54,20 @@ class ForcedPasswordChangeTest extends TestCase
         $this->actingAs($staff->fresh(), 'staff')->get('/admin')->assertOk();
     }
 
+    public function test_the_change_password_page_uses_the_site_header_and_footer(): void
+    {
+        $staff = Staff::factory()->create(['must_change_password' => true]);
+        $staff->assignRole('admin');
+
+        $response = $this->actingAs($staff, 'staff')->get(route('admin.change-password'));
+
+        $response->assertOk();
+        $response->assertSee('<span class="brand-mark">Excess<span class="brand-mark-accent">Kart</span></span>', false);
+        $response->assertSee('<footer', false);
+        $response->assertSee('name="password"', false);
+        $response->assertSee('name="password_confirmation"', false);
+    }
+
     public function test_a_staff_member_with_the_flag_already_false_is_never_redirected(): void
     {
         $staff = Staff::factory()->create(['must_change_password' => false]);
