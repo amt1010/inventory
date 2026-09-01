@@ -8,8 +8,7 @@ class StaffPolicy
 {
     public function viewAny(Staff $staff): bool
     {
-        return $staff->hasRole('admin');
-            return $staff->hasAnyPermission(['staff.read', 'staff.write', 'staff.full']);
+        return $staff->hasAnyPermission(['staff.read', 'staff.write', 'staff.full']);
     }
 
     public function view(Staff $staff, Staff $model): bool

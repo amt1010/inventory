@@ -23,6 +23,26 @@ class StaffResourceTest extends TestCase
         $this->seed(RoleSeeder::class);
     }
 
+    public function test_an_admin_can_view_the_staff_list(): void
+    {
+        $admin = Staff::factory()->create();
+        $admin->assignRole('admin');
+
+        $response = $this->actingAs($admin, 'staff')->get('/admin/staff');
+
+        $response->assertOk();
+    }
+
+    public function test_a_content_editor_gets_a_403_visiting_the_staff_list(): void
+    {
+        $editor = Staff::factory()->create();
+        $editor->assignRole('content_editor');
+
+        $response = $this->actingAs($editor, 'staff')->get('/admin/staff');
+
+        $response->assertForbidden();
+    }
+
     public function test_creating_a_staff_login_hashes_a_temp_password_flags_forced_change_assigns_roles_and_queues_the_invitation(): void
     {
         Mail::fake();
