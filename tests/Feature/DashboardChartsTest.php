@@ -6,6 +6,7 @@ use App\Filament\Widgets\CategoriesByStatusChart;
 use App\Filament\Widgets\ProductsByStatusChart;
 use App\Filament\Widgets\QuoteRequestsByDateChart;
 use App\Filament\Widgets\SellersByStatusChart;
+use App\Filament\Widgets\StaffByRoleChart;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\QuoteRequest;
@@ -67,6 +68,20 @@ class DashboardChartsTest extends TestCase
             'Approved' => 1,
             'Rejected' => 0,
             'Suspended' => 0,
+        ], $counts);
+    }
+
+    public function test_staff_by_role_chart_counts_staff_per_role(): void
+    {
+        Staff::factory()->create()->assignRole('admin');
+        Staff::factory()->count(2)->create()->each(fn (Staff $staff) => $staff->assignRole('content_editor'));
+
+        $counts = (new StaffByRoleChart())->roleCounts();
+
+        $this->assertSame([
+            'Admin' => 1,
+            'Content Editor' => 2,
+            'Sales' => 0,
         ], $counts);
     }
 
@@ -210,7 +225,7 @@ class DashboardChartsTest extends TestCase
         $this->assertStringEndsWith('})', trim($chartAttribute));
     }
 
-    public function test_an_admin_sees_all_four_dashboard_charts(): void
+    public function test_an_admin_sees_all_five_dashboard_charts(): void
     {
         $staff = Staff::factory()->create();
         $staff->assignRole('admin');
@@ -223,9 +238,10 @@ class DashboardChartsTest extends TestCase
         $response->assertSee('Products by Status');
         $response->assertSee('Sellers by Status');
         $response->assertSee('Quote Requests by Date');
+        $response->assertSee('Staff by Role');
     }
 
-    public function test_a_content_editor_does_not_see_the_sellers_or_quote_requests_charts(): void
+    public function test_a_content_editor_does_not_see_the_sellers_quote_requests_or_staff_charts(): void
     {
         $staff = Staff::factory()->create();
         $staff->assignRole('content_editor');
@@ -238,9 +254,10 @@ class DashboardChartsTest extends TestCase
         $response->assertSee('Products by Status');
         $response->assertDontSee('Sellers by Status');
         $response->assertDontSee('Quote Requests by Date');
+        $response->assertDontSee('Staff by Role');
     }
 
-    public function test_sales_sees_the_quote_requests_chart_but_not_the_sellers_chart(): void
+    public function test_sales_sees_the_quote_requests_chart_but_not_the_sellers_or_staff_charts(): void
     {
         $staff = Staff::factory()->create();
         $staff->assignRole('sales');
@@ -251,5 +268,6 @@ class DashboardChartsTest extends TestCase
         $response->assertOk();
         $response->assertSee('Quote Requests by Date');
         $response->assertDontSee('Sellers by Status');
+        $response->assertDontSee('Staff by Role');
     }
 }
