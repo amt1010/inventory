@@ -75,6 +75,7 @@ class AppServiceProvider extends ServiceProvider
             $view->with('footerNavItems', NavItem::query()
                 ->whereNull('parent_id')
                 ->where('location', 'footer')
+                ->with('children')
                 ->orderBy('sort_order')
                 ->get());
 

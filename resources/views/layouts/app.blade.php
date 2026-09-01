@@ -111,15 +111,28 @@
 
     <footer class="border-top py-4 mt-5">
         <div class="container">
+            @if ($footerNavItems->isNotEmpty())
+                <div class="row gy-4 mb-4">
+                    @foreach ($footerNavItems as $column)
+                        <div class="col-6 col-md">
+                            <div class="mb-2 small text-uppercase fw-semibold">{{ $column->label }}</div>
+                            <ul class="list-unstyled mb-0">
+                                @if (strcasecmp($column->label, 'Products') === 0)
+                                    @foreach ($topLevelCategories as $category)
+                                        <li class="mb-1"><a href="{{ url('/products/'.$category->path()) }}" class="text-decoration-none">{{ $category->name }}</a></li>
+                                    @endforeach
+                                @else
+                                    @foreach ($column->children as $child)
+                                        <li class="mb-1"><a href="{{ $child->url }}" class="text-decoration-none">{{ $child->label }}</a></li>
+                                    @endforeach
+                                @endif
+                            </ul>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
             <div class="row gy-4">
                 <div class="col-md-5">
-                    @if ($footerNavItems->isNotEmpty())
-                        <ul class="list-inline mb-2">
-                            @foreach ($footerNavItems as $item)
-                                <li class="list-inline-item me-3"><a href="{{ $item->url }}">{{ $item->label }}</a></li>
-                            @endforeach
-                        </ul>
-                    @endif
                     @if ($siteSettings->footer_address)
                         <address class="mb-2 small">{!! nl2br(e($siteSettings->footer_address)) !!}</address>
                     @endif
